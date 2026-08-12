@@ -70,6 +70,20 @@
     .layout { flex-direction:column; }
     .sidebar { width:100%; position:static; }
   }
+  .nav-section-upload { margin-top:10px; padding-top:10px; border-top:1px solid var(--border); }
+  .nav-parent-upload { color: var(--text-secondary); }
+
+  .drop-zone { border:2px dashed var(--border); border-radius:10px; padding:32px 16px; text-align:center; cursor:pointer; margin-top:6px; transition:border-color .15s, background .15s; }
+  .drop-zone:hover, .drop-zone.drag-over { border-color: var(--text-primary); background: var(--grid); }
+  .drop-zone-icon { font-size:22px; color: var(--muted); }
+  .drop-zone-text { font-size:13.5px; font-weight:600; margin-top:6px; }
+  .drop-zone-sub { font-size:12px; color: var(--muted); margin-top:2px; }
+  .upload-file-card { margin-top:14px; padding:12px 14px; background: var(--grid); border-radius:8px; font-size:13px; }
+  .upload-size { color: var(--muted); font-size:12px; }
+  .upload-warning { color: var(--critical); font-size:12.5px; margin-top:6px; }
+  .upload-steps { margin-top:8px; font-size:12.5px; color: var(--text-secondary); line-height:1.7; }
+  .upload-mailto-btn { display:inline-block; text-decoration:none; margin-top:10px; }
+  .upload-note { margin-top:16px; font-size:11.5px; color: var(--muted); line-height:1.6; }
 
   .chart-card { background: var(--surface-1); border:1px solid var(--border); border-radius:12px; padding:16px 18px; margin-bottom:14px; }
   .chart-title { font-size:14px; font-weight:600; margin:0 0 2px; }
@@ -113,7 +127,7 @@
   <header class="top">
     <div>
       <h1>Comparateur KPI — Groupeautomax</h1>
-      <div class="subtitle" id="subtitle">Mis à jour le 11 août 2026</div>
+      <div class="subtitle" id="subtitle">Mis à jour le 12 août 2026</div>
     </div>
     <button class="theme-toggle" id="themeToggle" type="button">Mode sombre</button>
   </header>
@@ -176,6 +190,11 @@ const PERIOD_LIST = [{"key": "2026-06", "label": "Juin 2026"}, {"key": "2026-07"
 // dealer -- "concessions combinées" -- shown as an extra leading
 // column/bar, never part of the roster/checkbox filter itself.
 const COMBINED_KEY = '__combined__';
+// This site is hosted statically (GitHub Pages) -- there is no server here
+// to process an uploaded Excel file automatically. The "Déposer un fichier"
+// page instead helps someone package a file to send onward by email, to be
+// processed the same way every dealer file has been so far.
+const UPLOAD_EMAIL = 'mallard@groupeautomax.com';
 function dealerLabel(key) {
   if (key === COMBINED_KEY) return 'Total (combiné)';
   const d = DEALER_ROSTER.find(x => x.key === key);
@@ -639,6 +658,16 @@ function renderSidebar() {
     deptSection.appendChild(sub);
   }
   nav.appendChild(deptSection);
+
+  const uploadSection = document.createElement('div');
+  uploadSection.className = 'nav-section nav-section-upload';
+  const uploadBtn = document.createElement('button');
+  uploadBtn.type = 'button';
+  uploadBtn.className = 'nav-parent nav-parent-upload' + (state.scope === 'upload' ? ' active' : '');
+  uploadBtn.textContent = '+ Déposer un fichier';
+  uploadBtn.addEventListener('click', () => { state.scope = 'upload'; renderTopControls(); renderContent(); });
+  uploadSection.appendChild(uploadBtn);
+  nav.appendChild(uploadSection);
 }
 
 function hasOtherKpis() {
@@ -1117,9 +1146,86 @@ function renderDepartmentTableView(container) {
   });
 }
 
+// "Déposer un fichier" -- a drop zone that accepts a dealer's monthly Excel
+// file client-side (name/size only, this is a static site with no backend
+// to parse it) and packages a pre-filled email to send it onward for
+// processing, exactly like every file has been handled up to now.
+function renderUploadView(container) {
+  const wrap = document.createElement('div');
+  wrap.className = 'chart-card upload-card';
+  wrap.innerHTML = `
+    <p class="chart-title">Déposer un nouveau fichier</p>
+    <div class="chart-meta">Glissez le fichier « Réalisé » (.xlsx / .xlsm) d'un concessionnaire ci-dessous, ou cliquez pour le choisir.</div>
+    <div class="drop-zone" id="dropZone" tabindex="0" role="button">
+      <div class="drop-zone-icon">⬆</div>
+      <div class="drop-zone-text">Glissez-déposez le fichier ici</div>
+      <div class="drop-zone-sub">ou cliquez pour parcourir vos fichiers</div>
+      <input type="file" id="fileInput" accept=".xlsx,.xlsm" style="display:none;">
+    </div>
+    <div id="uploadResult"></div>
+    <div class="upload-note">
+      Ce site est hébergé de façon statique (GitHub Pages) : il ne peut pas lire ou intégrer le fichier
+      lui-même. Une fois déposé ci-dessus, utilisez le bouton pour préparer un courriel — les données
+      seront ensuite compilées dans ce tableau de bord, comme pour chaque fichier reçu jusqu'à présent.
+    </div>
+  `;
+  container.appendChild(wrap);
+
+  const dropZone = wrap.querySelector('#dropZone');
+  const fileInput = wrap.querySelector('#fileInput');
+  const resultEl = wrap.querySelector('#uploadResult');
+
+  function handleFile(file) {
+    if (!file) return;
+    resultEl.innerHTML = '';
+    const card = document.createElement('div');
+    card.className = 'upload-file-card';
+    const okExt = /\.(xlsx|xlsm)$/i.test(file.name);
+    if (!okExt) {
+      card.innerHTML = `<strong>${file.name}</strong><div class="upload-warning">Ce fichier ne semble pas être un fichier Excel (.xlsx/.xlsm) — vérifiez qu'il s'agit du bon fichier avant de l'envoyer.</div>`;
+    } else {
+      const sizeMo = (file.size / 1024 / 1024).toFixed(2);
+      const subject = encodeURIComponent('Nouveau fichier KPI — ' + file.name);
+      const body = encodeURIComponent(`Bonjour,
+
+Veuillez trouver ci-joint le fichier ${file.name} pour la mise à jour du tableau de bord KPI Groupeautomax.
+
+(Important : joignez le fichier à ce courriel avant de l'envoyer -- ce lien ne l'attache pas automatiquement.)
+`);
+      const mailto = `mailto:${UPLOAD_EMAIL}?subject=${subject}&body=${body}`;
+      card.innerHTML = `
+        <strong>${file.name}</strong> <span class="upload-size">(${sizeMo} Mo)</span>
+        <div class="upload-steps">
+          <div>1. Cliquez sur le bouton ci-dessous pour ouvrir un courriel pré-rempli.</div>
+          <div>2. Joignez ce fichier (${file.name}) au courriel avant de l'envoyer.</div>
+          <div>3. Envoyez — les données seront intégrées au tableau de bord.</div>
+        </div>
+        <a class="pill active upload-mailto-btn" href="${mailto}">Ouvrir un courriel pré-rempli</a>
+      `;
+    }
+    resultEl.appendChild(card);
+  }
+
+  dropZone.addEventListener('click', () => fileInput.click());
+  dropZone.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') fileInput.click(); });
+  dropZone.addEventListener('dragover', (e) => { e.preventDefault(); dropZone.classList.add('drag-over'); });
+  dropZone.addEventListener('dragleave', () => dropZone.classList.remove('drag-over'));
+  dropZone.addEventListener('drop', (e) => {
+    e.preventDefault();
+    dropZone.classList.remove('drag-over');
+    const file = e.dataTransfer.files && e.dataTransfer.files[0];
+    handleFile(file);
+  });
+  fileInput.addEventListener('change', () => handleFile(fileInput.files[0]));
+}
+
 function renderContent() {
   const container = document.getElementById('content');
   container.innerHTML = '';
+  if (state.scope === 'upload') {
+    renderUploadView(container);
+    return;
+  }
   if (state.scope === 'departments') {
     if (state.view === 'chart') renderDepartmentChartsView(container);
     else renderDepartmentTableView(container);

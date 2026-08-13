@@ -119,10 +119,27 @@
   table.detail-table th, table.detail-table td { padding:4px 6px; }
 
   footer.notes { margin-top: 28px; font-size:12px; color: var(--muted); line-height:1.6; border-top:1px solid var(--border); padding-top:14px; }
+
+  .lock-screen { position:fixed; inset:0; background: var(--page); display:flex; align-items:center; justify-content:center; z-index:1000; padding:20px; }
+  .lock-card { width:100%; max-width:340px; background: var(--surface-1); border:1px solid var(--border); border-radius:14px; padding:28px 26px; text-align:center; }
+  .lock-card h1 { font-size:17px; margin:0 0 4px; }
+  .lock-card p { font-size:12.5px; color: var(--text-secondary); margin:0 0 18px; }
+  .lock-input { width:100%; box-sizing:border-box; padding:10px 12px; border-radius:8px; border:1px solid var(--border); background: var(--page); color: var(--text-primary); font-size:14px; margin-bottom:10px; }
+  .lock-btn { width:100%; padding:10px 12px; border-radius:8px; border:none; background: var(--text-primary); color: var(--page); font-size:13.5px; font-weight:600; cursor:pointer; }
+  .lock-error { color: var(--critical); font-size:12px; margin-top:10px; min-height:16px; }
 </style>
 </head>
 <body>
-<div class="viz-root">
+<div class="lock-screen" id="lockScreen">
+  <div class="lock-card">
+    <h1>Comparateur KPI — Groupeautomax</h1>
+    <p>Ce tableau de bord contient des données financières confidentielles. Entrez le mot de passe pour continuer.</p>
+    <input type="password" id="lockInput" class="lock-input" placeholder="Mot de passe" autocomplete="off">
+    <button type="button" id="lockBtn" class="lock-btn">Déverrouiller</button>
+    <div class="lock-error" id="lockError"></div>
+  </div>
+</div>
+<div class="viz-root" id="vizRoot" style="display:none;">
 <div class="app">
   <header class="top">
     <div>
@@ -1262,11 +1279,59 @@ function initTheme() {
   apply();
 }
 
-renderLegend();
-renderDealerFilter();
-initCombinedToggle();
-renderAll();
-initTheme();
+function initDashboard() {
+  renderLegend();
+  renderDealerFilter();
+  initCombinedToggle();
+  renderAll();
+  initTheme();
+}
+
+// --- Access gate --------------------------------------------------------
+// This dashboard holds confidential dealer financials and is published on a
+// public static site (GitHub Pages has no built-in access control on a free
+// plan). This is a basic deterrent, not real security: the page and its data
+// are still fully present in the file served to the browser, so anyone
+// determined enough to read the page source could bypass it. Only the SHA-256
+// hash of the password is stored here, never the password itself, and the
+// unlocked state is kept in memory only (no cookies/storage), so it resets
+// every time the page is loaded fresh.
+const PASSWORD_HASH = 'dd7cf2ab4ce93e418e0a85271a6ae7233d9b97ae02d002dbc5d318a31b7cf410';
+
+async function sha256Hex(text) {
+  const data = new TextEncoder().encode(text);
+  const digest = await crypto.subtle.digest('SHA-256', data);
+  return Array.from(new Uint8Array(digest)).map(b => b.toString(16).padStart(2, '0')).join('');
+}
+
+function initLockScreen() {
+  const lockScreen = document.getElementById('lockScreen');
+  const vizRoot = document.getElementById('vizRoot');
+  const input = document.getElementById('lockInput');
+  const btn = document.getElementById('lockBtn');
+  const errorEl = document.getElementById('lockError');
+
+  async function tryUnlock() {
+    const value = input.value;
+    if (!value) return;
+    const hash = await sha256Hex(value);
+    if (hash === PASSWORD_HASH) {
+      lockScreen.style.display = 'none';
+      vizRoot.style.display = '';
+      initDashboard();
+    } else {
+      errorEl.textContent = 'Mot de passe incorrect.';
+      input.value = '';
+      input.focus();
+    }
+  }
+
+  btn.addEventListener('click', tryUnlock);
+  input.addEventListener('keydown', (e) => { if (e.key === 'Enter') tryUnlock(); });
+  input.focus();
+}
+
+initLockScreen();
 </script>
 </body>
 </html>

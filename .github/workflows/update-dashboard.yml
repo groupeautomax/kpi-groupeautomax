@@ -11,6 +11,11 @@ on:
       - "sources/**"
   workflow_dispatch: {}
 
+# HAWKS sends GM's standardized .xlsm "Composite Financial Statement" export
+# instead of the .xlsx template every other dealer uses -- extract.py already
+# dispatches on extension (see extract_any_file), so the only change needed
+# here is to also glob .xlsm files into the extraction step below.
+
 permissions:
   contents: write
 
@@ -34,7 +39,10 @@ jobs:
         run: pip install openpyxl
 
       - name: Extract data from all source files
-        run: python src/extract.py sources/*.xlsx
+        run: |
+          shopt -s nullglob
+          files=(sources/*.xlsx sources/*.xlsm)
+          python src/extract.py "${files[@]}"
 
       - name: Rebuild dashboard
         run: python src/build_dashboard.py index.html

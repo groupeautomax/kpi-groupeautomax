@@ -522,6 +522,185 @@ def extract_file(path):
         "sections": sections,
     }
 
+# ---------------------------------------------------------------------------
+# HAWKS-specific parser.
+#
+# HAWKS' monthly file is GM Canada's standardized "Composite Financial
+# Statement" (GMCL) export -- a completely different workbook from the
+# Quotus-based template every other Groupeautomax dealer sends (different
+# sheet names: Page1..Page8, Page5_<brand>_<MCI|VE>, etc; different row/
+# column layout; and, critically, NO budget or prior-year columns at all --
+# only "Mois" (this period's actual) and "Cumul annuel" (year-to-date
+# actual)). So HAWKS needs its own reader here, but it still funnels into
+# the exact same department_kpis_for_company_view() / summary_kpis_for_
+# company_view() aggregation the other 5 dealers use, by building
+# `departments` / `summary` dicts shaped exactly like theirs (with budget
+# and prior_year simply always None for HAWKS -- shown as "n/d" on the
+# dashboard, same as any other missing comparison).
+# ---------------------------------------------------------------------------
+
+HAWKS_MONTHS = ["", "Janvier", "Février", "Mars", "Avril", "Mai", "Juin",
+                "Juillet", "Août", "Septembre", "Octobre", "Novembre", "Décembre"]
+
+# The 8 per-brand "new vehicle" detail sheets whose "TOTAL VÉHICULES NEUFS"
+# row must be summed for the dealership-wide new-unit count (each brand's
+# total already folds in that brand's fleet/parcs units -- see
+# hawks_fleet_units below, which reads the *same* units as a separate memo
+# breakout, not an additional amount to add on top).
+HAWKS_NEW_VEHICLE_BRAND_SHEETS = [
+    "Page5_CHV_MCI", "Page5_CHV_VE", "Page5_BUI_MCI", "Page5_BUI_VE",
+    "Page5_GMC_MCI", "Page5_GMC_VE", "Page5_CAD_MCI", "Page5_CAD_VE",
+]
+
+# Fixed row numbers within Page3 ("Véhicules neufs" / "Véhicules d'occasion")
+# and Page4 ("Mécanique" / "Carrosserie" / "Pièces et accessoires") -- these
+# are printed-form line numbers on GM's standardized statement, stable across
+# reporting periods for a given dealer (verified against both the December
+# 2025 and June 2026 HAWKS files).
+HAWKS_DEPT_ROWS = {
+    "profit_brut": 5,
+    "total_variables": 10,
+    "total_personnel": 20,
+    "total_semifixes": 59,  # GM's "semi-fixes" + "fixe" combined subtotal --
+                             # the closest single-bucket match to the Quotus
+                             # template's one "total semi-fixes" line.
+    "total_depenses": 60,
+    "profit_departemental": 64,
+}
+
+def real_only_kv(value):
+    """A real-only kv (no budget/prior-year exists in HAWKS' source file)."""
+    v = norm_num(value)
+    return {"real": v, "budget": None, "delta_budget": None, "prior_year": None, "delta_prior_year": None}
+
+def hawks_find_row(ws, label_prefix, col=3, max_row=200):
+    target = sa(label_prefix)
+    for r in range(1, max_row + 1):
+        v = ws.cell(row=r, column=col).value
+        if isinstance(v, str) and sa(v).startswith(target):
+            return r
+    return None
+
+def hawks_new_vehicle_units(wb):
+    """Sum "TOTAL VÉHICULES NEUFS" across the 8 per-brand sheets -> (month_kv, ytd_kv)."""
+    month_total, ytd_total, any_found = 0, 0, False
+    for name in HAWKS_NEW_VEHICLE_BRAND_SHEETS:
+        if name not in wb.sheetnames:
+            continue
+        ws = wb[name]
+        row = hawks_find_row(ws, "total vehicules neufs")
+        if row is None:
+            continue
+        any_found = True
+        month_total += ws.cell(row=row, column=6).value or 0
+        ytd_total += ws.cell(row=row, column=11).value or 0
+    if not any_found:
+        return None, None
+    return real_only_kv(month_total), real_only_kv(ytd_total)
+
+def hawks_fleet_units(wb):
+    """"Unités flottes" memo -- TOTAL VÉHICULES DE PARCS ET GOUV, already
+    included inside hawks_new_vehicle_units' brand totals above, exposed here
+    a second time as its own KPI (mirrors how the Quotus template surfaces
+    "Flottes" alongside, not subtracted from, the neuf total)."""
+    if "Page5_PARCS_GOUV" not in wb.sheetnames:
+        return None, None
+    ws = wb["Page5_PARCS_GOUV"]
+    row = hawks_find_row(ws, "total vehicules de parcs et gouv")
+    if row is None:
+        return None, None
+    return real_only_kv(ws.cell(row=row, column=6).value), real_only_kv(ws.cell(row=row, column=11).value)
+
+def hawks_used_vehicle_units(wb):
+    """TOTAL VÉH. D'OCCASION DÉTAIL (retail only, excludes wholesale "en
+    gros" -- same convention as the Quotus template's unites_usage)."""
+    ws = wb["Page6"]
+    row = hawks_find_row(ws, "total veh. d'occasion detail") or hawks_find_row(ws, "total veh")
+    if row is None:
+        return None, None
+    return real_only_kv(ws.cell(row=row, column=6).value), real_only_kv(ws.cell(row=row, column=11).value)
+
+def hawks_department_section(wb, sheet_name, money_col, units_kv=None, units_flottes_kv=None):
+    """One department's data for one section (month or ytd), keyed exactly
+    like analyze_department()'s output so it plugs into
+    department_kpis_for_company_view() unchanged."""
+    ws = wb[sheet_name]
+    data = {key: real_only_kv(ws.cell(row=row, column=money_col).value) for key, row in HAWKS_DEPT_ROWS.items()}
+    if units_kv is not None:
+        data["units"] = units_kv
+    if units_flottes_kv is not None:
+        data["units_flottes"] = units_flottes_kv
+    data["line_items"] = []  # per-department detail drill-down not built for HAWKS yet
+    return data
+
+def hawks_summary_section(ws2, col):
+    return {
+        "ventes_nettes": real_only_kv(ws2.cell(row=4, column=col).value),
+        "profit_brut": real_only_kv(ws2.cell(row=5, column=col).value),
+        "total_depenses": real_only_kv(ws2.cell(row=60, column=col).value),
+        "total_autres_revenus": real_only_kv(ws2.cell(row=62, column=col).value),
+        "profit_net": real_only_kv(ws2.cell(row=66, column=col).value),
+        "impot": real_only_kv(ws2.cell(row=67, column=col).value),
+        "profit_net_apres_impot": real_only_kv(ws2.cell(row=68, column=col).value),
+    }
+
+def extract_hawks_file(path):
+    wb = openpyxl.load_workbook(path, data_only=True)
+    tag = wb["Page2"]["U1"].value if "Page2" in wb.sheetnames else None
+    m = re.search(r'(\d{4})(\d{2})\s*-\s*PAGE', str(tag) or '')
+    if not m:
+        raise ValueError(f"Could not find the '<code> - YYYYMM - PAGE N' period tag in {path}")
+    year, month_num = int(m.group(1)), int(m.group(2))
+    month_name = HAWKS_MONTHS[month_num]
+    company = wb["Page1"]["J6"].value
+
+    new_units_month, new_units_ytd = hawks_new_vehicle_units(wb)
+    fleet_month, fleet_ytd = hawks_fleet_units(wb)
+    used_month, used_ytd = hawks_used_vehicle_units(wb)
+
+    # (sheet, month_col, ytd_col, (units_month, units_ytd), (flottes_month, flottes_ytd))
+    dept_specs = {
+        "Véhicules neufs": ("Page3", 4, 6, (new_units_month, new_units_ytd), (fleet_month, fleet_ytd)),
+        "Véhicules usagés": ("Page3", 8, 10, (used_month, used_ytd), (None, None)),
+        "Service": ("Page4", 4, 6, (None, None), (None, None)),
+        "Carrosserie": ("Page4", 8, 10, (None, None), (None, None)),
+        "Pièces": ("Page4", 12, 14, (None, None), (None, None)),
+    }
+    departments_month, departments_ytd = {}, {}
+    for name, (sheet, mcol, ycol, (u_m, u_y), (f_m, f_y)) in dept_specs.items():
+        departments_month[name] = hawks_department_section(wb, sheet, mcol, units_kv=u_m, units_flottes_kv=f_m)
+        departments_ytd[name] = hawks_department_section(wb, sheet, ycol, units_kv=u_y, units_flottes_kv=f_y)
+
+    ws2 = wb["Page2"]
+    summary_month = hawks_summary_section(ws2, 7)   # G = MOIS
+    summary_ytd = hawks_summary_section(ws2, 10)    # J = CUMUL ANNUEL
+
+    kpis_month = {}
+    kpis_month.update(department_kpis_for_company_view(departments_month))
+    kpis_month.update(summary_kpis_for_company_view(summary_month))
+    kpis_ytd = {}
+    kpis_ytd.update(department_kpis_for_company_view(departments_ytd))
+    kpis_ytd.update(summary_kpis_for_company_view(summary_ytd))
+
+    return {
+        "company": company.strip() if isinstance(company, str) else company,
+        "month_name": month_name,
+        "month_num": month_num,
+        "year": year,
+        "period_key": f"{year}-{month_num:02d}",
+        "sections": {
+            "month": {"source_title": month_name, "kpis": kpis_month, "departments": departments_month},
+            "ytd": {"source_title": f"AAD {month_name}", "kpis": kpis_ytd, "departments": departments_ytd},
+        },
+    }
+
+def extract_any_file(path):
+    """HAWKS sends GM's standardized .xlsm composite statement; every other
+    dealer sends the Quotus-based .xlsx template. Dispatch on extension."""
+    if path.lower().endswith(".xlsm"):
+        return extract_hawks_file(path)
+    return extract_file(path)
+
 def load_store(store_path):
     if os.path.exists(store_path):
         with open(store_path, 'r', encoding='utf-8') as f:
@@ -558,7 +737,7 @@ if __name__ == "__main__":
     store_path = str(repo_root / "data" / "data.json")
     store = load_store(store_path)
     for path in sys.argv[1:]:
-        extracted = extract_file(path)
+        extracted = extract_any_file(path)
         print(f"Extracted: {extracted['company']} - {extracted['period_key']} -- sections: {list(extracted['sections'].keys())}")
         merge_into_store(store, extracted)
     save_store(store, store_path)

@@ -529,6 +529,10 @@ def load_store(store_path):
     return {"dealers": {}}
 
 def save_store(store, store_path):
+    # A fresh checkout (e.g. a GitHub Actions runner) won't have data/ at all
+    # -- git doesn't track empty directories -- so create it on demand rather
+    # than assuming it already exists like a long-lived local workspace does.
+    os.makedirs(os.path.dirname(store_path) or ".", exist_ok=True)
     with open(store_path, 'w', encoding='utf-8') as f:
         json.dump(store, f, ensure_ascii=False, indent=2)
 

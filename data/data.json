@@ -80693,6 +80693,1766 @@
           }
         }
       }
+    },
+    "hawks": {
+      "display_name": "HAWKS",
+      "legal_name": "HAWKESBURY CHEV CADILLAC BUICK GMC",
+      "periods": {
+        "2025-12": {
+          "month_name": "Décembre",
+          "month_num": 12,
+          "year": 2025,
+          "sections": {
+            "month": {
+              "source_title": "Décembre",
+              "kpis": {
+                "pb_neuf": {
+                  "real": 122446,
+                  "budget": null,
+                  "delta_budget": null,
+                  "prior_year": null,
+                  "delta_prior_year": null,
+                  "label": "Profit brut neuf",
+                  "raw_label": "Véhicules neufs",
+                  "group": "profit"
+                },
+                "pb_usage": {
+                  "real": 51604,
+                  "budget": null,
+                  "delta_budget": null,
+                  "prior_year": null,
+                  "delta_prior_year": null,
+                  "label": "Profit brut usagé",
+                  "raw_label": "Véhicules usagés",
+                  "group": "profit"
+                },
+                "pb_service": {
+                  "real": 74797,
+                  "budget": null,
+                  "delta_budget": null,
+                  "prior_year": null,
+                  "delta_prior_year": null,
+                  "label": "Profit brut service",
+                  "raw_label": "Service",
+                  "group": "profit"
+                },
+                "pb_carrosserie": {
+                  "real": 16745,
+                  "budget": null,
+                  "delta_budget": null,
+                  "prior_year": null,
+                  "delta_prior_year": null,
+                  "label": "Profit brut carrosserie",
+                  "raw_label": "Carrosserie",
+                  "group": "profit"
+                },
+                "pb_pieces": {
+                  "real": 53782,
+                  "budget": null,
+                  "delta_budget": null,
+                  "prior_year": null,
+                  "delta_prior_year": null,
+                  "label": "Profit brut pièces",
+                  "raw_label": "Pièces",
+                  "group": "profit"
+                },
+                "unites_neuf": {
+                  "label": "Unités neuf",
+                  "raw_label": "Véhicules neufs",
+                  "group": "volume",
+                  "real": 110,
+                  "budget": null,
+                  "delta_budget": null,
+                  "prior_year": null,
+                  "delta_prior_year": null
+                },
+                "unites_usage": {
+                  "label": "Unités usagé",
+                  "raw_label": "Véhicules usagés",
+                  "group": "volume",
+                  "real": 10,
+                  "budget": null,
+                  "delta_budget": null,
+                  "prior_year": null,
+                  "delta_prior_year": null
+                },
+                "unites_flottes": {
+                  "label": "Unités flottes",
+                  "raw_label": "Flottes",
+                  "group": "volume",
+                  "real": 70,
+                  "budget": null,
+                  "delta_budget": null,
+                  "prior_year": null,
+                  "delta_prior_year": null
+                },
+                "pb_total": {
+                  "real": 334368,
+                  "budget": null,
+                  "delta_budget": null,
+                  "prior_year": null,
+                  "delta_prior_year": null,
+                  "label": "Total profit brut",
+                  "raw_label": "Profit brut",
+                  "group": "profit"
+                },
+                "autres_revenus": {
+                  "real": 218987,
+                  "budget": null,
+                  "delta_budget": null,
+                  "prior_year": null,
+                  "delta_prior_year": null,
+                  "label": "Autres revenus",
+                  "raw_label": "Total autres revenus",
+                  "group": "revenue_expense"
+                },
+                "depenses": {
+                  "real": -451231,
+                  "budget": null,
+                  "prior_year": null,
+                  "delta_budget": null,
+                  "delta_prior_year": null,
+                  "label": "Dépenses",
+                  "raw_label": "Total des dépenses",
+                  "group": "revenue_expense"
+                },
+                "profit_net": {
+                  "real": 102124,
+                  "budget": null,
+                  "delta_budget": null,
+                  "prior_year": null,
+                  "delta_prior_year": null,
+                  "label": "Profit net",
+                  "raw_label": "Profit Net",
+                  "group": "net"
+                },
+                "ventes_nettes": {
+                  "real": 13253346,
+                  "budget": null,
+                  "delta_budget": null,
+                  "prior_year": null,
+                  "delta_prior_year": null,
+                  "label": "Ventes nettes",
+                  "raw_label": "Ventes nettes",
+                  "group": "ebitda"
+                },
+                "ebt": {
+                  "real": 102124,
+                  "budget": null,
+                  "delta_budget": null,
+                  "prior_year": null,
+                  "delta_prior_year": null,
+                  "label": "Profit net avant impôt (EBT)",
+                  "raw_label": "Profit Net",
+                  "group": "ebitda"
+                },
+                "impot": {
+                  "real": 0,
+                  "budget": null,
+                  "delta_budget": null,
+                  "prior_year": null,
+                  "delta_prior_year": null,
+                  "label": "Impôt exigible",
+                  "raw_label": "Impôt exigible",
+                  "group": "ebitda"
+                },
+                "profit_net_apres_impot": {
+                  "real": 102124,
+                  "budget": null,
+                  "delta_budget": null,
+                  "prior_year": null,
+                  "delta_prior_year": null,
+                  "label": "Profit net après impôt",
+                  "raw_label": "Profit Net après impôt",
+                  "group": "ebitda"
+                },
+                "ebt_pct_profit_brut": {
+                  "real": 0.30542396401569527,
+                  "budget": null,
+                  "prior_year": null,
+                  "delta_budget": null,
+                  "delta_prior_year": null,
+                  "label": "EBT % du profit brut",
+                  "raw_label": "EBT % of Gross Profit",
+                  "group": "ebitda",
+                  "format": "percent"
+                },
+                "ros": {
+                  "real": 0.0077055258347590114,
+                  "budget": null,
+                  "prior_year": null,
+                  "delta_budget": null,
+                  "delta_prior_year": null,
+                  "label": "EBT % des ventes (ROS)",
+                  "raw_label": "EBT % of Sales (ROS)",
+                  "group": "ebitda",
+                  "format": "percent"
+                }
+              },
+              "departments": {
+                "Véhicules neufs": {
+                  "profit_brut": {
+                    "real": 122446,
+                    "budget": null,
+                    "delta_budget": null,
+                    "prior_year": null,
+                    "delta_prior_year": null
+                  },
+                  "total_variables": {
+                    "real": 22483,
+                    "budget": null,
+                    "delta_budget": null,
+                    "prior_year": null,
+                    "delta_prior_year": null
+                  },
+                  "total_personnel": {
+                    "real": 88416,
+                    "budget": null,
+                    "delta_budget": null,
+                    "prior_year": null,
+                    "delta_prior_year": null
+                  },
+                  "total_semifixes": {
+                    "real": 25757,
+                    "budget": null,
+                    "delta_budget": null,
+                    "prior_year": null,
+                    "delta_prior_year": null
+                  },
+                  "total_depenses": {
+                    "real": 48240,
+                    "budget": null,
+                    "delta_budget": null,
+                    "prior_year": null,
+                    "delta_prior_year": null
+                  },
+                  "profit_departemental": {
+                    "real": 78273,
+                    "budget": null,
+                    "delta_budget": null,
+                    "prior_year": null,
+                    "delta_prior_year": null
+                  },
+                  "units": {
+                    "real": 110,
+                    "budget": null,
+                    "delta_budget": null,
+                    "prior_year": null,
+                    "delta_prior_year": null
+                  },
+                  "units_flottes": {
+                    "real": 70,
+                    "budget": null,
+                    "delta_budget": null,
+                    "prior_year": null,
+                    "delta_prior_year": null
+                  },
+                  "line_items": []
+                },
+                "Véhicules usagés": {
+                  "profit_brut": {
+                    "real": 51604,
+                    "budget": null,
+                    "delta_budget": null,
+                    "prior_year": null,
+                    "delta_prior_year": null
+                  },
+                  "total_variables": {
+                    "real": 24255,
+                    "budget": null,
+                    "delta_budget": null,
+                    "prior_year": null,
+                    "delta_prior_year": null
+                  },
+                  "total_personnel": {
+                    "real": 56087,
+                    "budget": null,
+                    "delta_budget": null,
+                    "prior_year": null,
+                    "delta_prior_year": null
+                  },
+                  "total_semifixes": {
+                    "real": 147350,
+                    "budget": null,
+                    "delta_budget": null,
+                    "prior_year": null,
+                    "delta_prior_year": null
+                  },
+                  "total_depenses": {
+                    "real": 171605,
+                    "budget": null,
+                    "delta_budget": null,
+                    "prior_year": null,
+                    "delta_prior_year": null
+                  },
+                  "profit_departemental": {
+                    "real": -109074,
+                    "budget": null,
+                    "delta_budget": null,
+                    "prior_year": null,
+                    "delta_prior_year": null
+                  },
+                  "units": {
+                    "real": 10,
+                    "budget": null,
+                    "delta_budget": null,
+                    "prior_year": null,
+                    "delta_prior_year": null
+                  },
+                  "line_items": []
+                },
+                "Service": {
+                  "profit_brut": {
+                    "real": 74797,
+                    "budget": null,
+                    "delta_budget": null,
+                    "prior_year": null,
+                    "delta_prior_year": null
+                  },
+                  "total_variables": {
+                    "real": null,
+                    "budget": null,
+                    "delta_budget": null,
+                    "prior_year": null,
+                    "delta_prior_year": null
+                  },
+                  "total_personnel": {
+                    "real": 57489,
+                    "budget": null,
+                    "delta_budget": null,
+                    "prior_year": null,
+                    "delta_prior_year": null
+                  },
+                  "total_semifixes": {
+                    "real": 142713,
+                    "budget": null,
+                    "delta_budget": null,
+                    "prior_year": null,
+                    "delta_prior_year": null
+                  },
+                  "total_depenses": {
+                    "real": 142713,
+                    "budget": null,
+                    "delta_budget": null,
+                    "prior_year": null,
+                    "delta_prior_year": null
+                  },
+                  "profit_departemental": {
+                    "real": -60390,
+                    "budget": null,
+                    "delta_budget": null,
+                    "prior_year": null,
+                    "delta_prior_year": null
+                  },
+                  "line_items": []
+                },
+                "Carrosserie": {
+                  "profit_brut": {
+                    "real": 16745,
+                    "budget": null,
+                    "delta_budget": null,
+                    "prior_year": null,
+                    "delta_prior_year": null
+                  },
+                  "total_variables": {
+                    "real": null,
+                    "budget": null,
+                    "delta_budget": null,
+                    "prior_year": null,
+                    "delta_prior_year": null
+                  },
+                  "total_personnel": {
+                    "real": 26763,
+                    "budget": null,
+                    "delta_budget": null,
+                    "prior_year": null,
+                    "delta_prior_year": null
+                  },
+                  "total_semifixes": {
+                    "real": 47138,
+                    "budget": null,
+                    "delta_budget": null,
+                    "prior_year": null,
+                    "delta_prior_year": null
+                  },
+                  "total_depenses": {
+                    "real": 47138,
+                    "budget": null,
+                    "delta_budget": null,
+                    "prior_year": null,
+                    "delta_prior_year": null
+                  },
+                  "profit_departemental": {
+                    "real": -30393,
+                    "budget": null,
+                    "delta_budget": null,
+                    "prior_year": null,
+                    "delta_prior_year": null
+                  },
+                  "line_items": []
+                },
+                "Pièces": {
+                  "profit_brut": {
+                    "real": 53782,
+                    "budget": null,
+                    "delta_budget": null,
+                    "prior_year": null,
+                    "delta_prior_year": null
+                  },
+                  "total_variables": {
+                    "real": null,
+                    "budget": null,
+                    "delta_budget": null,
+                    "prior_year": null,
+                    "delta_prior_year": null
+                  },
+                  "total_personnel": {
+                    "real": 19988,
+                    "budget": null,
+                    "delta_budget": null,
+                    "prior_year": null,
+                    "delta_prior_year": null
+                  },
+                  "total_semifixes": {
+                    "real": 41535,
+                    "budget": null,
+                    "delta_budget": null,
+                    "prior_year": null,
+                    "delta_prior_year": null
+                  },
+                  "total_depenses": {
+                    "real": 41535,
+                    "budget": null,
+                    "delta_budget": null,
+                    "prior_year": null,
+                    "delta_prior_year": null
+                  },
+                  "profit_departemental": {
+                    "real": 4721,
+                    "budget": null,
+                    "delta_budget": null,
+                    "prior_year": null,
+                    "delta_prior_year": null
+                  },
+                  "line_items": []
+                }
+              }
+            },
+            "ytd": {
+              "source_title": "AAD Décembre",
+              "kpis": {
+                "pb_neuf": {
+                  "real": 1698893,
+                  "budget": null,
+                  "delta_budget": null,
+                  "prior_year": null,
+                  "delta_prior_year": null,
+                  "label": "Profit brut neuf",
+                  "raw_label": "Véhicules neufs",
+                  "group": "profit"
+                },
+                "pb_usage": {
+                  "real": 1914185,
+                  "budget": null,
+                  "delta_budget": null,
+                  "prior_year": null,
+                  "delta_prior_year": null,
+                  "label": "Profit brut usagé",
+                  "raw_label": "Véhicules usagés",
+                  "group": "profit"
+                },
+                "pb_service": {
+                  "real": 980290,
+                  "budget": null,
+                  "delta_budget": null,
+                  "prior_year": null,
+                  "delta_prior_year": null,
+                  "label": "Profit brut service",
+                  "raw_label": "Service",
+                  "group": "profit"
+                },
+                "pb_carrosserie": {
+                  "real": 413415,
+                  "budget": null,
+                  "delta_budget": null,
+                  "prior_year": null,
+                  "delta_prior_year": null,
+                  "label": "Profit brut carrosserie",
+                  "raw_label": "Carrosserie",
+                  "group": "profit"
+                },
+                "pb_pieces": {
+                  "real": 639969,
+                  "budget": null,
+                  "delta_budget": null,
+                  "prior_year": null,
+                  "delta_prior_year": null,
+                  "label": "Profit brut pièces",
+                  "raw_label": "Pièces",
+                  "group": "profit"
+                },
+                "unites_neuf": {
+                  "label": "Unités neuf",
+                  "raw_label": "Véhicules neufs",
+                  "group": "volume",
+                  "real": 679,
+                  "budget": null,
+                  "delta_budget": null,
+                  "prior_year": null,
+                  "delta_prior_year": null
+                },
+                "unites_usage": {
+                  "label": "Unités usagé",
+                  "raw_label": "Véhicules usagés",
+                  "group": "volume",
+                  "real": 162,
+                  "budget": null,
+                  "delta_budget": null,
+                  "prior_year": null,
+                  "delta_prior_year": null
+                },
+                "unites_flottes": {
+                  "label": "Unités flottes",
+                  "raw_label": "Flottes",
+                  "group": "volume",
+                  "real": 114,
+                  "budget": null,
+                  "delta_budget": null,
+                  "prior_year": null,
+                  "delta_prior_year": null
+                },
+                "pb_total": {
+                  "real": 5898232,
+                  "budget": null,
+                  "delta_budget": null,
+                  "prior_year": null,
+                  "delta_prior_year": null,
+                  "label": "Total profit brut",
+                  "raw_label": "Profit brut",
+                  "group": "profit"
+                },
+                "autres_revenus": {
+                  "real": 1035534,
+                  "budget": null,
+                  "delta_budget": null,
+                  "prior_year": null,
+                  "delta_prior_year": null,
+                  "label": "Autres revenus",
+                  "raw_label": "Total autres revenus",
+                  "group": "revenue_expense"
+                },
+                "depenses": {
+                  "real": -5470024,
+                  "budget": null,
+                  "prior_year": null,
+                  "delta_budget": null,
+                  "delta_prior_year": null,
+                  "label": "Dépenses",
+                  "raw_label": "Total des dépenses",
+                  "group": "revenue_expense"
+                },
+                "profit_net": {
+                  "real": 1463742,
+                  "budget": null,
+                  "delta_budget": null,
+                  "prior_year": null,
+                  "delta_prior_year": null,
+                  "label": "Profit net",
+                  "raw_label": "Profit Net",
+                  "group": "net"
+                },
+                "ventes_nettes": {
+                  "real": 116405908,
+                  "budget": null,
+                  "delta_budget": null,
+                  "prior_year": null,
+                  "delta_prior_year": null,
+                  "label": "Ventes nettes",
+                  "raw_label": "Ventes nettes",
+                  "group": "ebitda"
+                },
+                "ebt": {
+                  "real": 1463742,
+                  "budget": null,
+                  "delta_budget": null,
+                  "prior_year": null,
+                  "delta_prior_year": null,
+                  "label": "Profit net avant impôt (EBT)",
+                  "raw_label": "Profit Net",
+                  "group": "ebitda"
+                },
+                "impot": {
+                  "real": 0,
+                  "budget": null,
+                  "delta_budget": null,
+                  "prior_year": null,
+                  "delta_prior_year": null,
+                  "label": "Impôt exigible",
+                  "raw_label": "Impôt exigible",
+                  "group": "ebitda"
+                },
+                "profit_net_apres_impot": {
+                  "real": 1463742,
+                  "budget": null,
+                  "delta_budget": null,
+                  "prior_year": null,
+                  "delta_prior_year": null,
+                  "label": "Profit net après impôt",
+                  "raw_label": "Profit Net après impôt",
+                  "group": "ebitda"
+                },
+                "ebt_pct_profit_brut": {
+                  "real": 0.24816623015167935,
+                  "budget": null,
+                  "prior_year": null,
+                  "delta_budget": null,
+                  "delta_prior_year": null,
+                  "label": "EBT % du profit brut",
+                  "raw_label": "EBT % of Gross Profit",
+                  "group": "ebitda",
+                  "format": "percent"
+                },
+                "ros": {
+                  "real": 0.012574464863072071,
+                  "budget": null,
+                  "prior_year": null,
+                  "delta_budget": null,
+                  "delta_prior_year": null,
+                  "label": "EBT % des ventes (ROS)",
+                  "raw_label": "EBT % of Sales (ROS)",
+                  "group": "ebitda",
+                  "format": "percent"
+                }
+              },
+              "departments": {
+                "Véhicules neufs": {
+                  "profit_brut": {
+                    "real": 1698893,
+                    "budget": null,
+                    "delta_budget": null,
+                    "prior_year": null,
+                    "delta_prior_year": null
+                  },
+                  "total_variables": {
+                    "real": 305314,
+                    "budget": null,
+                    "delta_budget": null,
+                    "prior_year": null,
+                    "delta_prior_year": null
+                  },
+                  "total_personnel": {
+                    "real": 993170,
+                    "budget": null,
+                    "delta_budget": null,
+                    "prior_year": null,
+                    "delta_prior_year": null
+                  },
+                  "total_semifixes": {
+                    "real": 1112981,
+                    "budget": null,
+                    "delta_budget": null,
+                    "prior_year": null,
+                    "delta_prior_year": null
+                  },
+                  "total_depenses": {
+                    "real": 1418295,
+                    "budget": null,
+                    "delta_budget": null,
+                    "prior_year": null,
+                    "delta_prior_year": null
+                  },
+                  "profit_departemental": {
+                    "real": 430474,
+                    "budget": null,
+                    "delta_budget": null,
+                    "prior_year": null,
+                    "delta_prior_year": null
+                  },
+                  "units": {
+                    "real": 679,
+                    "budget": null,
+                    "delta_budget": null,
+                    "prior_year": null,
+                    "delta_prior_year": null
+                  },
+                  "units_flottes": {
+                    "real": 114,
+                    "budget": null,
+                    "delta_budget": null,
+                    "prior_year": null,
+                    "delta_prior_year": null
+                  },
+                  "line_items": []
+                },
+                "Véhicules usagés": {
+                  "profit_brut": {
+                    "real": 1914185,
+                    "budget": null,
+                    "delta_budget": null,
+                    "prior_year": null,
+                    "delta_prior_year": null
+                  },
+                  "total_variables": {
+                    "real": 233334,
+                    "budget": null,
+                    "delta_budget": null,
+                    "prior_year": null,
+                    "delta_prior_year": null
+                  },
+                  "total_personnel": {
+                    "real": 508550,
+                    "budget": null,
+                    "delta_budget": null,
+                    "prior_year": null,
+                    "delta_prior_year": null
+                  },
+                  "total_semifixes": {
+                    "real": 1476316,
+                    "budget": null,
+                    "delta_budget": null,
+                    "prior_year": null,
+                    "delta_prior_year": null
+                  },
+                  "total_depenses": {
+                    "real": 1709650,
+                    "budget": null,
+                    "delta_budget": null,
+                    "prior_year": null,
+                    "delta_prior_year": null
+                  },
+                  "profit_departemental": {
+                    "real": 306139,
+                    "budget": null,
+                    "delta_budget": null,
+                    "prior_year": null,
+                    "delta_prior_year": null
+                  },
+                  "units": {
+                    "real": 162,
+                    "budget": null,
+                    "delta_budget": null,
+                    "prior_year": null,
+                    "delta_prior_year": null
+                  },
+                  "line_items": []
+                },
+                "Service": {
+                  "profit_brut": {
+                    "real": 980290,
+                    "budget": null,
+                    "delta_budget": null,
+                    "prior_year": null,
+                    "delta_prior_year": null
+                  },
+                  "total_variables": {
+                    "real": null,
+                    "budget": null,
+                    "delta_budget": null,
+                    "prior_year": null,
+                    "delta_prior_year": null
+                  },
+                  "total_personnel": {
+                    "real": 748807,
+                    "budget": null,
+                    "delta_budget": null,
+                    "prior_year": null,
+                    "delta_prior_year": null
+                  },
+                  "total_semifixes": {
+                    "real": 1401764,
+                    "budget": null,
+                    "delta_budget": null,
+                    "prior_year": null,
+                    "delta_prior_year": null
+                  },
+                  "total_depenses": {
+                    "real": 1401764,
+                    "budget": null,
+                    "delta_budget": null,
+                    "prior_year": null,
+                    "delta_prior_year": null
+                  },
+                  "profit_departemental": {
+                    "real": -317285,
+                    "budget": null,
+                    "delta_budget": null,
+                    "prior_year": null,
+                    "delta_prior_year": null
+                  },
+                  "line_items": []
+                },
+                "Carrosserie": {
+                  "profit_brut": {
+                    "real": 413415,
+                    "budget": null,
+                    "delta_budget": null,
+                    "prior_year": null,
+                    "delta_prior_year": null
+                  },
+                  "total_variables": {
+                    "real": null,
+                    "budget": null,
+                    "delta_budget": null,
+                    "prior_year": null,
+                    "delta_prior_year": null
+                  },
+                  "total_personnel": {
+                    "real": 287092,
+                    "budget": null,
+                    "delta_budget": null,
+                    "prior_year": null,
+                    "delta_prior_year": null
+                  },
+                  "total_semifixes": {
+                    "real": 494562,
+                    "budget": null,
+                    "delta_budget": null,
+                    "prior_year": null,
+                    "delta_prior_year": null
+                  },
+                  "total_depenses": {
+                    "real": 494562,
+                    "budget": null,
+                    "delta_budget": null,
+                    "prior_year": null,
+                    "delta_prior_year": null
+                  },
+                  "profit_departemental": {
+                    "real": -81147,
+                    "budget": null,
+                    "delta_budget": null,
+                    "prior_year": null,
+                    "delta_prior_year": null
+                  },
+                  "line_items": []
+                },
+                "Pièces": {
+                  "profit_brut": {
+                    "real": 639969,
+                    "budget": null,
+                    "delta_budget": null,
+                    "prior_year": null,
+                    "delta_prior_year": null
+                  },
+                  "total_variables": {
+                    "real": null,
+                    "budget": null,
+                    "delta_budget": null,
+                    "prior_year": null,
+                    "delta_prior_year": null
+                  },
+                  "total_personnel": {
+                    "real": 219133,
+                    "budget": null,
+                    "delta_budget": null,
+                    "prior_year": null,
+                    "delta_prior_year": null
+                  },
+                  "total_semifixes": {
+                    "real": 445753,
+                    "budget": null,
+                    "delta_budget": null,
+                    "prior_year": null,
+                    "delta_prior_year": null
+                  },
+                  "total_depenses": {
+                    "real": 445753,
+                    "budget": null,
+                    "delta_budget": null,
+                    "prior_year": null,
+                    "delta_prior_year": null
+                  },
+                  "profit_departemental": {
+                    "real": 90027,
+                    "budget": null,
+                    "delta_budget": null,
+                    "prior_year": null,
+                    "delta_prior_year": null
+                  },
+                  "line_items": []
+                }
+              }
+            }
+          }
+        },
+        "2026-06": {
+          "month_name": "Juin",
+          "month_num": 6,
+          "year": 2026,
+          "sections": {
+            "month": {
+              "source_title": "Juin",
+              "kpis": {
+                "pb_neuf": {
+                  "real": 121448,
+                  "budget": null,
+                  "delta_budget": null,
+                  "prior_year": null,
+                  "delta_prior_year": null,
+                  "label": "Profit brut neuf",
+                  "raw_label": "Véhicules neufs",
+                  "group": "profit"
+                },
+                "pb_usage": {
+                  "real": 217969,
+                  "budget": null,
+                  "delta_budget": null,
+                  "prior_year": null,
+                  "delta_prior_year": null,
+                  "label": "Profit brut usagé",
+                  "raw_label": "Véhicules usagés",
+                  "group": "profit"
+                },
+                "pb_service": {
+                  "real": 114413,
+                  "budget": null,
+                  "delta_budget": null,
+                  "prior_year": null,
+                  "delta_prior_year": null,
+                  "label": "Profit brut service",
+                  "raw_label": "Service",
+                  "group": "profit"
+                },
+                "pb_carrosserie": {
+                  "real": 56382,
+                  "budget": null,
+                  "delta_budget": null,
+                  "prior_year": null,
+                  "delta_prior_year": null,
+                  "label": "Profit brut carrosserie",
+                  "raw_label": "Carrosserie",
+                  "group": "profit"
+                },
+                "pb_pieces": {
+                  "real": 64167,
+                  "budget": null,
+                  "delta_budget": null,
+                  "prior_year": null,
+                  "delta_prior_year": null,
+                  "label": "Profit brut pièces",
+                  "raw_label": "Pièces",
+                  "group": "profit"
+                },
+                "unites_neuf": {
+                  "label": "Unités neuf",
+                  "raw_label": "Véhicules neufs",
+                  "group": "volume",
+                  "real": 49,
+                  "budget": null,
+                  "delta_budget": null,
+                  "prior_year": null,
+                  "delta_prior_year": null
+                },
+                "unites_usage": {
+                  "label": "Unités usagé",
+                  "raw_label": "Véhicules usagés",
+                  "group": "volume",
+                  "real": 18,
+                  "budget": null,
+                  "delta_budget": null,
+                  "prior_year": null,
+                  "delta_prior_year": null
+                },
+                "unites_flottes": {
+                  "label": "Unités flottes",
+                  "raw_label": "Flottes",
+                  "group": "volume",
+                  "real": 0,
+                  "budget": null,
+                  "delta_budget": null,
+                  "prior_year": null,
+                  "delta_prior_year": null
+                },
+                "pb_total": {
+                  "real": 644657,
+                  "budget": null,
+                  "delta_budget": null,
+                  "prior_year": null,
+                  "delta_prior_year": null,
+                  "label": "Total profit brut",
+                  "raw_label": "Profit brut",
+                  "group": "profit"
+                },
+                "autres_revenus": {
+                  "real": 130176,
+                  "budget": null,
+                  "delta_budget": null,
+                  "prior_year": null,
+                  "delta_prior_year": null,
+                  "label": "Autres revenus",
+                  "raw_label": "Total autres revenus",
+                  "group": "revenue_expense"
+                },
+                "depenses": {
+                  "real": -467280,
+                  "budget": null,
+                  "prior_year": null,
+                  "delta_budget": null,
+                  "delta_prior_year": null,
+                  "label": "Dépenses",
+                  "raw_label": "Total des dépenses",
+                  "group": "revenue_expense"
+                },
+                "profit_net": {
+                  "real": 307553,
+                  "budget": null,
+                  "delta_budget": null,
+                  "prior_year": null,
+                  "delta_prior_year": null,
+                  "label": "Profit net",
+                  "raw_label": "Profit Net",
+                  "group": "net"
+                },
+                "ventes_nettes": {
+                  "real": 9197494,
+                  "budget": null,
+                  "delta_budget": null,
+                  "prior_year": null,
+                  "delta_prior_year": null,
+                  "label": "Ventes nettes",
+                  "raw_label": "Ventes nettes",
+                  "group": "ebitda"
+                },
+                "ebt": {
+                  "real": 307553,
+                  "budget": null,
+                  "delta_budget": null,
+                  "prior_year": null,
+                  "delta_prior_year": null,
+                  "label": "Profit net avant impôt (EBT)",
+                  "raw_label": "Profit Net",
+                  "group": "ebitda"
+                },
+                "impot": {
+                  "real": 0,
+                  "budget": null,
+                  "delta_budget": null,
+                  "prior_year": null,
+                  "delta_prior_year": null,
+                  "label": "Impôt exigible",
+                  "raw_label": "Impôt exigible",
+                  "group": "ebitda"
+                },
+                "profit_net_apres_impot": {
+                  "real": 307553,
+                  "budget": null,
+                  "delta_budget": null,
+                  "prior_year": null,
+                  "delta_prior_year": null,
+                  "label": "Profit net après impôt",
+                  "raw_label": "Profit Net après impôt",
+                  "group": "ebitda"
+                },
+                "ebt_pct_profit_brut": {
+                  "real": 0.4770800596286087,
+                  "budget": null,
+                  "prior_year": null,
+                  "delta_budget": null,
+                  "delta_prior_year": null,
+                  "label": "EBT % du profit brut",
+                  "raw_label": "EBT % of Gross Profit",
+                  "group": "ebitda",
+                  "format": "percent"
+                },
+                "ros": {
+                  "real": 0.033438782346582666,
+                  "budget": null,
+                  "prior_year": null,
+                  "delta_budget": null,
+                  "delta_prior_year": null,
+                  "label": "EBT % des ventes (ROS)",
+                  "raw_label": "EBT % of Sales (ROS)",
+                  "group": "ebitda",
+                  "format": "percent"
+                }
+              },
+              "departments": {
+                "Véhicules neufs": {
+                  "profit_brut": {
+                    "real": 121448,
+                    "budget": null,
+                    "delta_budget": null,
+                    "prior_year": null,
+                    "delta_prior_year": null
+                  },
+                  "total_variables": {
+                    "real": 24847,
+                    "budget": null,
+                    "delta_budget": null,
+                    "prior_year": null,
+                    "delta_prior_year": null
+                  },
+                  "total_personnel": {
+                    "real": 107923,
+                    "budget": null,
+                    "delta_budget": null,
+                    "prior_year": null,
+                    "delta_prior_year": null
+                  },
+                  "total_semifixes": {
+                    "real": 108004,
+                    "budget": null,
+                    "delta_budget": null,
+                    "prior_year": null,
+                    "delta_prior_year": null
+                  },
+                  "total_depenses": {
+                    "real": 132851,
+                    "budget": null,
+                    "delta_budget": null,
+                    "prior_year": null,
+                    "delta_prior_year": null
+                  },
+                  "profit_departemental": {
+                    "real": 42344,
+                    "budget": null,
+                    "delta_budget": null,
+                    "prior_year": null,
+                    "delta_prior_year": null
+                  },
+                  "units": {
+                    "real": 49,
+                    "budget": null,
+                    "delta_budget": null,
+                    "prior_year": null,
+                    "delta_prior_year": null
+                  },
+                  "units_flottes": {
+                    "real": 0,
+                    "budget": null,
+                    "delta_budget": null,
+                    "prior_year": null,
+                    "delta_prior_year": null
+                  },
+                  "line_items": []
+                },
+                "Véhicules usagés": {
+                  "profit_brut": {
+                    "real": 217969,
+                    "budget": null,
+                    "delta_budget": null,
+                    "prior_year": null,
+                    "delta_prior_year": null
+                  },
+                  "total_variables": {
+                    "real": 17233,
+                    "budget": null,
+                    "delta_budget": null,
+                    "prior_year": null,
+                    "delta_prior_year": null
+                  },
+                  "total_personnel": {
+                    "real": 52698,
+                    "budget": null,
+                    "delta_budget": null,
+                    "prior_year": null,
+                    "delta_prior_year": null
+                  },
+                  "total_semifixes": {
+                    "real": 118264,
+                    "budget": null,
+                    "delta_budget": null,
+                    "prior_year": null,
+                    "delta_prior_year": null
+                  },
+                  "total_depenses": {
+                    "real": 135497,
+                    "budget": null,
+                    "delta_budget": null,
+                    "prior_year": null,
+                    "delta_prior_year": null
+                  },
+                  "profit_departemental": {
+                    "real": 99003,
+                    "budget": null,
+                    "delta_budget": null,
+                    "prior_year": null,
+                    "delta_prior_year": null
+                  },
+                  "units": {
+                    "real": 18,
+                    "budget": null,
+                    "delta_budget": null,
+                    "prior_year": null,
+                    "delta_prior_year": null
+                  },
+                  "line_items": []
+                },
+                "Service": {
+                  "profit_brut": {
+                    "real": 114413,
+                    "budget": null,
+                    "delta_budget": null,
+                    "prior_year": null,
+                    "delta_prior_year": null
+                  },
+                  "total_variables": {
+                    "real": null,
+                    "budget": null,
+                    "delta_budget": null,
+                    "prior_year": null,
+                    "delta_prior_year": null
+                  },
+                  "total_personnel": {
+                    "real": 68210,
+                    "budget": null,
+                    "delta_budget": null,
+                    "prior_year": null,
+                    "delta_prior_year": null
+                  },
+                  "total_semifixes": {
+                    "real": 122319,
+                    "budget": null,
+                    "delta_budget": null,
+                    "prior_year": null,
+                    "delta_prior_year": null
+                  },
+                  "total_depenses": {
+                    "real": 122319,
+                    "budget": null,
+                    "delta_budget": null,
+                    "prior_year": null,
+                    "delta_prior_year": null
+                  },
+                  "profit_departemental": {
+                    "real": 4208,
+                    "budget": null,
+                    "delta_budget": null,
+                    "prior_year": null,
+                    "delta_prior_year": null
+                  },
+                  "line_items": []
+                },
+                "Carrosserie": {
+                  "profit_brut": {
+                    "real": 56382,
+                    "budget": null,
+                    "delta_budget": null,
+                    "prior_year": null,
+                    "delta_prior_year": null
+                  },
+                  "total_variables": {
+                    "real": null,
+                    "budget": null,
+                    "delta_budget": null,
+                    "prior_year": null,
+                    "delta_prior_year": null
+                  },
+                  "total_personnel": {
+                    "real": 26190,
+                    "budget": null,
+                    "delta_budget": null,
+                    "prior_year": null,
+                    "delta_prior_year": null
+                  },
+                  "total_semifixes": {
+                    "real": 37100,
+                    "budget": null,
+                    "delta_budget": null,
+                    "prior_year": null,
+                    "delta_prior_year": null
+                  },
+                  "total_depenses": {
+                    "real": 37100,
+                    "budget": null,
+                    "delta_budget": null,
+                    "prior_year": null,
+                    "delta_prior_year": null
+                  },
+                  "profit_departemental": {
+                    "real": 19282,
+                    "budget": null,
+                    "delta_budget": null,
+                    "prior_year": null,
+                    "delta_prior_year": null
+                  },
+                  "line_items": []
+                },
+                "Pièces": {
+                  "profit_brut": {
+                    "real": 64167,
+                    "budget": null,
+                    "delta_budget": null,
+                    "prior_year": null,
+                    "delta_prior_year": null
+                  },
+                  "total_variables": {
+                    "real": null,
+                    "budget": null,
+                    "delta_budget": null,
+                    "prior_year": null,
+                    "delta_prior_year": null
+                  },
+                  "total_personnel": {
+                    "real": 23644,
+                    "budget": null,
+                    "delta_budget": null,
+                    "prior_year": null,
+                    "delta_prior_year": null
+                  },
+                  "total_semifixes": {
+                    "real": 39513,
+                    "budget": null,
+                    "delta_budget": null,
+                    "prior_year": null,
+                    "delta_prior_year": null
+                  },
+                  "total_depenses": {
+                    "real": 39513,
+                    "budget": null,
+                    "delta_budget": null,
+                    "prior_year": null,
+                    "delta_prior_year": null
+                  },
+                  "profit_departemental": {
+                    "real": 12540,
+                    "budget": null,
+                    "delta_budget": null,
+                    "prior_year": null,
+                    "delta_prior_year": null
+                  },
+                  "line_items": []
+                }
+              }
+            },
+            "ytd": {
+              "source_title": "AAD Juin",
+              "kpis": {
+                "pb_neuf": {
+                  "real": 729791,
+                  "budget": null,
+                  "delta_budget": null,
+                  "prior_year": null,
+                  "delta_prior_year": null,
+                  "label": "Profit brut neuf",
+                  "raw_label": "Véhicules neufs",
+                  "group": "profit"
+                },
+                "pb_usage": {
+                  "real": 818757,
+                  "budget": null,
+                  "delta_budget": null,
+                  "prior_year": null,
+                  "delta_prior_year": null,
+                  "label": "Profit brut usagé",
+                  "raw_label": "Véhicules usagés",
+                  "group": "profit"
+                },
+                "pb_service": {
+                  "real": 540675,
+                  "budget": null,
+                  "delta_budget": null,
+                  "prior_year": null,
+                  "delta_prior_year": null,
+                  "label": "Profit brut service",
+                  "raw_label": "Service",
+                  "group": "profit"
+                },
+                "pb_carrosserie": {
+                  "real": 283615,
+                  "budget": null,
+                  "delta_budget": null,
+                  "prior_year": null,
+                  "delta_prior_year": null,
+                  "label": "Profit brut carrosserie",
+                  "raw_label": "Carrosserie",
+                  "group": "profit"
+                },
+                "pb_pieces": {
+                  "real": 340102,
+                  "budget": null,
+                  "delta_budget": null,
+                  "prior_year": null,
+                  "delta_prior_year": null,
+                  "label": "Profit brut pièces",
+                  "raw_label": "Pièces",
+                  "group": "profit"
+                },
+                "unites_neuf": {
+                  "label": "Unités neuf",
+                  "raw_label": "Véhicules neufs",
+                  "group": "volume",
+                  "real": 283,
+                  "budget": null,
+                  "delta_budget": null,
+                  "prior_year": null,
+                  "delta_prior_year": null
+                },
+                "unites_usage": {
+                  "label": "Unités usagé",
+                  "raw_label": "Véhicules usagés",
+                  "group": "volume",
+                  "real": 116,
+                  "budget": null,
+                  "delta_budget": null,
+                  "prior_year": null,
+                  "delta_prior_year": null
+                },
+                "unites_flottes": {
+                  "label": "Unités flottes",
+                  "raw_label": "Flottes",
+                  "group": "volume",
+                  "real": 41,
+                  "budget": null,
+                  "delta_budget": null,
+                  "prior_year": null,
+                  "delta_prior_year": null
+                },
+                "pb_total": {
+                  "real": 3001634,
+                  "budget": null,
+                  "delta_budget": null,
+                  "prior_year": null,
+                  "delta_prior_year": null,
+                  "label": "Total profit brut",
+                  "raw_label": "Profit brut",
+                  "group": "profit"
+                },
+                "autres_revenus": {
+                  "real": 547383,
+                  "budget": null,
+                  "delta_budget": null,
+                  "prior_year": null,
+                  "delta_prior_year": null,
+                  "label": "Autres revenus",
+                  "raw_label": "Total autres revenus",
+                  "group": "revenue_expense"
+                },
+                "depenses": {
+                  "real": -2884439,
+                  "budget": null,
+                  "prior_year": null,
+                  "delta_budget": null,
+                  "delta_prior_year": null,
+                  "label": "Dépenses",
+                  "raw_label": "Total des dépenses",
+                  "group": "revenue_expense"
+                },
+                "profit_net": {
+                  "real": 664578,
+                  "budget": null,
+                  "delta_budget": null,
+                  "prior_year": null,
+                  "delta_prior_year": null,
+                  "label": "Profit net",
+                  "raw_label": "Profit Net",
+                  "group": "net"
+                },
+                "ventes_nettes": {
+                  "real": 57517015,
+                  "budget": null,
+                  "delta_budget": null,
+                  "prior_year": null,
+                  "delta_prior_year": null,
+                  "label": "Ventes nettes",
+                  "raw_label": "Ventes nettes",
+                  "group": "ebitda"
+                },
+                "ebt": {
+                  "real": 664578,
+                  "budget": null,
+                  "delta_budget": null,
+                  "prior_year": null,
+                  "delta_prior_year": null,
+                  "label": "Profit net avant impôt (EBT)",
+                  "raw_label": "Profit Net",
+                  "group": "ebitda"
+                },
+                "impot": {
+                  "real": 0,
+                  "budget": null,
+                  "delta_budget": null,
+                  "prior_year": null,
+                  "delta_prior_year": null,
+                  "label": "Impôt exigible",
+                  "raw_label": "Impôt exigible",
+                  "group": "ebitda"
+                },
+                "profit_net_apres_impot": {
+                  "real": 664578,
+                  "budget": null,
+                  "delta_budget": null,
+                  "prior_year": null,
+                  "delta_prior_year": null,
+                  "label": "Profit net après impôt",
+                  "raw_label": "Profit Net après impôt",
+                  "group": "ebitda"
+                },
+                "ebt_pct_profit_brut": {
+                  "real": 0.2214054078545219,
+                  "budget": null,
+                  "prior_year": null,
+                  "delta_budget": null,
+                  "delta_prior_year": null,
+                  "label": "EBT % du profit brut",
+                  "raw_label": "EBT % of Gross Profit",
+                  "group": "ebitda",
+                  "format": "percent"
+                },
+                "ros": {
+                  "real": 0.011554459145698016,
+                  "budget": null,
+                  "prior_year": null,
+                  "delta_budget": null,
+                  "delta_prior_year": null,
+                  "label": "EBT % des ventes (ROS)",
+                  "raw_label": "EBT % of Sales (ROS)",
+                  "group": "ebitda",
+                  "format": "percent"
+                }
+              },
+              "departments": {
+                "Véhicules neufs": {
+                  "profit_brut": {
+                    "real": 729791,
+                    "budget": null,
+                    "delta_budget": null,
+                    "prior_year": null,
+                    "delta_prior_year": null
+                  },
+                  "total_variables": {
+                    "real": 130535,
+                    "budget": null,
+                    "delta_budget": null,
+                    "prior_year": null,
+                    "delta_prior_year": null
+                  },
+                  "total_personnel": {
+                    "real": 581945,
+                    "budget": null,
+                    "delta_budget": null,
+                    "prior_year": null,
+                    "delta_prior_year": null
+                  },
+                  "total_semifixes": {
+                    "real": 814693,
+                    "budget": null,
+                    "delta_budget": null,
+                    "prior_year": null,
+                    "delta_prior_year": null
+                  },
+                  "total_depenses": {
+                    "real": 945228,
+                    "budget": null,
+                    "delta_budget": null,
+                    "prior_year": null,
+                    "delta_prior_year": null
+                  },
+                  "profit_departemental": {
+                    "real": -32307,
+                    "budget": null,
+                    "delta_budget": null,
+                    "prior_year": null,
+                    "delta_prior_year": null
+                  },
+                  "units": {
+                    "real": 283,
+                    "budget": null,
+                    "delta_budget": null,
+                    "prior_year": null,
+                    "delta_prior_year": null
+                  },
+                  "units_flottes": {
+                    "real": 41,
+                    "budget": null,
+                    "delta_budget": null,
+                    "prior_year": null,
+                    "delta_prior_year": null
+                  },
+                  "line_items": []
+                },
+                "Véhicules usagés": {
+                  "profit_brut": {
+                    "real": 818757,
+                    "budget": null,
+                    "delta_budget": null,
+                    "prior_year": null,
+                    "delta_prior_year": null
+                  },
+                  "total_variables": {
+                    "real": 118398,
+                    "budget": null,
+                    "delta_budget": null,
+                    "prior_year": null,
+                    "delta_prior_year": null
+                  },
+                  "total_personnel": {
+                    "real": 249145,
+                    "budget": null,
+                    "delta_budget": null,
+                    "prior_year": null,
+                    "delta_prior_year": null
+                  },
+                  "total_semifixes": {
+                    "real": 689802,
+                    "budget": null,
+                    "delta_budget": null,
+                    "prior_year": null,
+                    "delta_prior_year": null
+                  },
+                  "total_depenses": {
+                    "real": 808200,
+                    "budget": null,
+                    "delta_budget": null,
+                    "prior_year": null,
+                    "delta_prior_year": null
+                  },
+                  "profit_departemental": {
+                    "real": 116121,
+                    "budget": null,
+                    "delta_budget": null,
+                    "prior_year": null,
+                    "delta_prior_year": null
+                  },
+                  "units": {
+                    "real": 116,
+                    "budget": null,
+                    "delta_budget": null,
+                    "prior_year": null,
+                    "delta_prior_year": null
+                  },
+                  "line_items": []
+                },
+                "Service": {
+                  "profit_brut": {
+                    "real": 540675,
+                    "budget": null,
+                    "delta_budget": null,
+                    "prior_year": null,
+                    "delta_prior_year": null
+                  },
+                  "total_variables": {
+                    "real": null,
+                    "budget": null,
+                    "delta_budget": null,
+                    "prior_year": null,
+                    "delta_prior_year": null
+                  },
+                  "total_personnel": {
+                    "real": 349589,
+                    "budget": null,
+                    "delta_budget": null,
+                    "prior_year": null,
+                    "delta_prior_year": null
+                  },
+                  "total_semifixes": {
+                    "real": 683040,
+                    "budget": null,
+                    "delta_budget": null,
+                    "prior_year": null,
+                    "delta_prior_year": null
+                  },
+                  "total_depenses": {
+                    "real": 683040,
+                    "budget": null,
+                    "delta_budget": null,
+                    "prior_year": null,
+                    "delta_prior_year": null
+                  },
+                  "profit_departemental": {
+                    "real": -93201,
+                    "budget": null,
+                    "delta_budget": null,
+                    "prior_year": null,
+                    "delta_prior_year": null
+                  },
+                  "line_items": []
+                },
+                "Carrosserie": {
+                  "profit_brut": {
+                    "real": 283615,
+                    "budget": null,
+                    "delta_budget": null,
+                    "prior_year": null,
+                    "delta_prior_year": null
+                  },
+                  "total_variables": {
+                    "real": null,
+                    "budget": null,
+                    "delta_budget": null,
+                    "prior_year": null,
+                    "delta_prior_year": null
+                  },
+                  "total_personnel": {
+                    "real": 132357,
+                    "budget": null,
+                    "delta_budget": null,
+                    "prior_year": null,
+                    "delta_prior_year": null
+                  },
+                  "total_semifixes": {
+                    "real": 222718,
+                    "budget": null,
+                    "delta_budget": null,
+                    "prior_year": null,
+                    "delta_prior_year": null
+                  },
+                  "total_depenses": {
+                    "real": 222718,
+                    "budget": null,
+                    "delta_budget": null,
+                    "prior_year": null,
+                    "delta_prior_year": null
+                  },
+                  "profit_departemental": {
+                    "real": 60897,
+                    "budget": null,
+                    "delta_budget": null,
+                    "prior_year": null,
+                    "delta_prior_year": null
+                  },
+                  "line_items": []
+                },
+                "Pièces": {
+                  "profit_brut": {
+                    "real": 340102,
+                    "budget": null,
+                    "delta_budget": null,
+                    "prior_year": null,
+                    "delta_prior_year": null
+                  },
+                  "total_variables": {
+                    "real": null,
+                    "budget": null,
+                    "delta_budget": null,
+                    "prior_year": null,
+                    "delta_prior_year": null
+                  },
+                  "total_personnel": {
+                    "real": 125896,
+                    "budget": null,
+                    "delta_budget": null,
+                    "prior_year": null,
+                    "delta_prior_year": null
+                  },
+                  "total_semifixes": {
+                    "real": 225253,
+                    "budget": null,
+                    "delta_budget": null,
+                    "prior_year": null,
+                    "delta_prior_year": null
+                  },
+                  "total_depenses": {
+                    "real": 225253,
+                    "budget": null,
+                    "delta_budget": null,
+                    "prior_year": null,
+                    "delta_prior_year": null
+                  },
+                  "profit_departemental": {
+                    "real": 65685,
+                    "budget": null,
+                    "delta_budget": null,
+                    "prior_year": null,
+                    "delta_prior_year": null
+                  },
+                  "line_items": []
+                }
+              }
+            }
+          }
+        }
+      }
     }
   }
 }

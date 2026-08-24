@@ -143,6 +143,12 @@ def build_html(store, generated_at_label):
   .pill.active { background: var(--text-primary); color: var(--page); border-color: var(--text-primary); }
   .month-select { border:1px solid var(--border); background: var(--page); color: var(--text-primary); border-radius:8px; padding:6px 10px; font-size:12.5px; cursor:pointer; min-width:160px; }
   .month-select:focus { outline: 1px solid var(--text-secondary); }
+  .dropdown-multi { position: relative; }
+  .dropdown-multi summary { border:1px solid var(--border); background: var(--page); color: var(--text-primary); border-radius:8px; padding:6px 10px; font-size:12.5px; cursor:pointer; min-width:160px; list-style:none; }
+  .dropdown-multi summary::-webkit-details-marker { display:none; }
+  .dropdown-multi summary::after { content: ' \\25BE'; color: var(--muted); }
+  .dropdown-multi[open] summary::after { content: ' \\25B4'; }
+  .dropdown-multi .dropdown-panel { position:absolute; z-index:20; top: calc(100% + 6px); left:0; background: var(--surface-1); border:1px solid var(--border); border-radius:10px; padding:10px; display:flex; flex-direction:column; gap:6px; min-width:220px; box-shadow: 0 6px 18px rgba(0,0,0,0.12); }
   .dealer-check { display:flex; align-items:center; gap:5px; font-size:12.5px; border:1px solid var(--border); border-radius:999px; padding:4px 10px 4px 8px; cursor:pointer; color: var(--text-secondary); }
   .dealer-check input { accent-color: currentColor; }
   .dealer-check.pending { opacity: 0.55; font-style: italic; border-style: dashed; }
@@ -241,29 +247,34 @@ def build_html(store, generated_at_label):
   <div class="legend-row" id="legendRow"></div>
 
   <div class="controls">
-    <div class="control-group" id="dealerFilter"></div>
     <div class="control-group">
-      <label class="dealer-check" id="combinedToggleWrap" style="border-style:dashed;">
-        <input type="checkbox" id="combinedToggle" checked>
-        <span>Total (combiné)</span>
-      </label>
+      <span class="control-label">Concessionnaires</span>
+      <details class="dropdown-multi" id="dealerDropdown">
+        <summary id="dealerDropdownSummary">Concessionnaires</summary>
+        <div class="dropdown-panel">
+          <div id="dealerFilter"></div>
+          <label class="dealer-check" id="combinedToggleWrap" style="border-style:dashed;">
+            <input type="checkbox" id="combinedToggle" checked>
+            <span>Total (combiné)</span>
+          </label>
+        </div>
+      </details>
     </div>
-    <div class="spacer"></div>
     <div class="control-group">
       <span class="control-label">Mois de référence</span>
       <select id="refPeriodSelect" class="month-select"></select>
     </div>
     <div class="control-group">
       <span class="control-label">Période</span>
-      <div id="periodTabs" class="view-toggle"></div>
+      <select id="periodSelect" class="month-select"></select>
     </div>
     <div class="control-group">
       <span class="control-label">Comparer vs</span>
-      <div id="basisTabs" class="view-toggle"></div>
+      <select id="basisSelect" class="month-select"></select>
     </div>
     <div class="control-group">
       <span class="control-label">Vue</span>
-      <div id="viewTabs" class="view-toggle"></div>
+      <select id="viewSelect" class="month-select"></select>
     </div>
   </div>
 
@@ -645,9 +656,22 @@ function renderLegend() {
   });
 }
 
+// Dealer selection stays multi-select (several dealers can be shown at once),
+// so a plain <select> doesn't fit -- instead the checkboxes live inside a
+// <details>/<summary> dropdown panel, which is the closest compact
+// "menu déroulant" equivalent for a multi-choice control. The summary label
+// itself is kept in sync so the collapsed button always shows what's picked.
+function updateDealerDropdownSummary() {
+  const summary = document.getElementById('dealerDropdownSummary');
+  if (!summary) return;
+  const total = DEALER_ROSTER.length;
+  const n = state.dealers.size;
+  summary.textContent = n === total ? 'Tous les concessionnaires' : `Concessionnaires (${n}/${total})`;
+}
+
 function renderDealerFilter() {
   const el = document.getElementById('dealerFilter');
-  el.innerHTML = '<span class="control-label">Concessionnaires</span>';
+  el.innerHTML = '';
   DEALER_ROSTER.forEach(({ key, label }) => {
     const has = !!STORE.dealers[key];
     const wrap = document.createElement('label');
@@ -658,6 +682,7 @@ function renderDealerFilter() {
     cb.checked = state.dealers.has(key);
     cb.addEventListener('change', () => {
       if (cb.checked) state.dealers.add(key); else state.dealers.delete(key);
+      updateDealerDropdownSummary();
       renderContent();
     });
     wrap.appendChild(cb);
@@ -666,18 +691,27 @@ function renderDealerFilter() {
     wrap.appendChild(span);
     el.appendChild(wrap);
   });
+  updateDealerDropdownSummary();
 }
 
-function makePills(container, options, activeKey, onSelect) {
+// Close the dealer dropdown when clicking anywhere outside it -- <details>
+// only toggles on its own <summary> natively, which would otherwise leave it
+// stuck open while browsing the rest of the page.
+document.addEventListener('click', (e) => {
+  const dd = document.getElementById('dealerDropdown');
+  if (dd && dd.open && !dd.contains(e.target)) dd.removeAttribute('open');
+});
+
+function makeSelect(container, options, activeKey, onSelect) {
   container.innerHTML = '';
   options.forEach(opt => {
-    const btn = document.createElement('button');
-    btn.className = 'pill' + (opt.key === activeKey ? ' active' : '');
-    btn.textContent = opt.label;
-    btn.type = 'button';
-    btn.addEventListener('click', () => { onSelect(opt.key); });
-    container.appendChild(btn);
+    const o = document.createElement('option');
+    o.value = opt.key;
+    o.textContent = opt.label;
+    if (opt.key === activeKey) o.selected = true;
+    container.appendChild(o);
   });
+  container.onchange = () => { onSelect(container.value); };
 }
 
 function renderRefPeriodSelect() {
@@ -700,18 +734,18 @@ function renderRefPeriodSelect() {
 function renderTopControls() {
   renderRefPeriodSelect();
 
-  makePills(document.getElementById('periodTabs'), [
+  makeSelect(document.getElementById('periodSelect'), [
     { key: 'month', label: 'Mois courant' },
     { key: 'ytd', label: 'Cumulatif annuel' },
     { key: 'quarter', label: 'Trimestre' }
   ], state.period, (k) => { state.period = k; renderAll(); });
 
-  makePills(document.getElementById('basisTabs'), [
+  makeSelect(document.getElementById('basisSelect'), [
     { key: 'budget', label: 'Budget' },
     { key: 'prior_year', label: 'Année précédente' }
   ], state.basis, (k) => { state.basis = k; renderTopControls(); renderContent(); });
 
-  makePills(document.getElementById('viewTabs'), [
+  makeSelect(document.getElementById('viewSelect'), [
     { key: 'chart', label: 'Graphiques' },
     { key: 'table', label: 'Tableau' }
   ], state.view, (k) => { state.view = k; renderTopControls(); renderContent(); });

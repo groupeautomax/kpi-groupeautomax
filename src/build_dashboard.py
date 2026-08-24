@@ -478,6 +478,40 @@ function sectionFor(dealer, period, periodMode) {
   return undefined;
 }
 
+// Same calendar month one year earlier, e.g. "2026-07" -> "2025-07" -- used
+// to compare a period against our own historical data when the source file
+// itself carries no prior-year column.
+function priorYearPeriodKey(periodKey) {
+  const m = /^(\d{4})-(\d{2})$/.exec(periodKey || '');
+  if (!m) return null;
+  return `${parseInt(m[1], 10) - 1}-${m[2]}`;
+}
+
+// HAWKS' and STM's GM "Composite Financial Statement" .xlsm months carry no
+// budget/prior-year columns at all, so extract.py always leaves kv.prior_year
+// null for them -- previously that meant no year-over-year comparison could
+// ever show for those months, even once a full calendar year of history was
+// on file. Now that HAWKS in particular has 2025 loaded alongside 2026, the
+// dashboard can compute that comparison itself: look up the same
+// dealer/metric/month a year earlier in our own store and use its real value
+// as the comparison base. `lookupSameMetric(section)` re-runs the same
+// sec -> value path the caller used (sec.kpis[key], or
+// sec.departments[dept][metricKey]) against the prior year's section, so this
+// works for both top-line KPIs and department metrics without duplicating
+// that lookup logic here. An explicit prior_year already provided by a
+// source file (the xlsx dealers) is always left untouched.
+function withSynthesizedPriorYear(dealer, period, periodMode, kv, lookupSameMetric) {
+  if (!kv) return kv;
+  if (kv.prior_year !== null && kv.prior_year !== undefined) return kv;
+  if (kv.real === null || kv.real === undefined) return kv;
+  const pyPeriod = priorYearPeriodKey(period);
+  if (!pyPeriod || !STORE.dealers[dealer]?.periods?.[pyPeriod]) return kv;
+  const pySec = sectionFor(dealer, pyPeriod, periodMode);
+  const pyKv = pySec ? lookupSameMetric(pySec) : undefined;
+  if (!pyKv || pyKv.real === null || pyKv.real === undefined) return kv;
+  return Object.assign({}, kv, { prior_year: pyKv.real, delta_prior_year: kv.real - pyKv.real });
+}
+
 function collectKpiKeys(group) {
   const keys = new Map(); // key -> label
   orderedKeys(state.dealers).forEach(dealer => {
@@ -550,7 +584,8 @@ function combinedKpiFor(key) {
   orderedKeys(state.dealers).forEach(dealer => {
     const period = resolvedPeriod(dealer);
     const sec = period ? sectionFor(dealer, period, state.period) : undefined;
-    const kpi = sec ? sec.kpis[key] : undefined;
+    let kpi = sec ? sec.kpis[key] : undefined;
+    if (kpi) kpi = withSynthesizedPriorYear(dealer, period, state.period, kpi, (pySec) => pySec.kpis[key]);
     if (kpi) items.push(kpi);
   });
   if (!items.length) return null;
@@ -588,9 +623,18 @@ function combinedDeptMetricFor(deptName, metricKey) {
     const sec = period ? sectionFor(dealer, period, state.period) : undefined;
     const dept = sec && sec.departments ? sec.departments[deptName] : undefined;
     if (!dept) return;
-    const metric = dept[metricKey];
-    if (metric) items.push(metric);
-    if (dept.profit_brut) pbItems.push(dept.profit_brut);
+    let metric = dept[metricKey];
+    if (metric) {
+      metric = withSynthesizedPriorYear(dealer, period, state.period, metric,
+        (pySec) => pySec.departments && pySec.departments[deptName] ? pySec.departments[deptName][metricKey] : undefined);
+      items.push(metric);
+    }
+    let pb = dept.profit_brut;
+    if (pb) {
+      pb = withSynthesizedPriorYear(dealer, period, state.period, pb,
+        (pySec) => pySec.departments && pySec.departments[deptName] ? pySec.departments[deptName].profit_brut : undefined);
+      pbItems.push(pb);
+    }
   });
   if (!items.length) return null;
   const combined = sumKv(items);
@@ -1143,7 +1187,8 @@ function buildRowsForKpi(key) {
     }
     const period = resolvedPeriod(dealer);
     const sec = period ? sectionFor(dealer, period, state.period) : undefined;
-    const kpi = sec ? sec.kpis[key] : undefined;
+    let kpi = sec ? sec.kpis[key] : undefined;
+    if (kpi) kpi = withSynthesizedPriorYear(dealer, period, state.period, kpi, (pySec) => pySec.kpis[key]);
     if (kpi) {
       rows.push(Object.assign({ dealer }, kpi));
     } else {
@@ -1207,6 +1252,7 @@ function renderTableView(container) {
         const period = resolvedPeriod(dealer);
         const sec = period ? sectionFor(dealer, period, state.period) : undefined;
         kpi = sec ? sec.kpis[key] : undefined;
+        if (kpi) kpi = withSynthesizedPriorYear(dealer, period, state.period, kpi, (pySec) => pySec.kpis[key]);
       }
       const real = kpi ? kpi.real : null;
       const delta = hasCompareData(kpi) ? kpi[deltaFieldForBasis()] : null;

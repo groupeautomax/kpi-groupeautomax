@@ -47,6 +47,8 @@
   .control-label { font-size:11px; text-transform:uppercase; letter-spacing:0.04em; color: var(--muted); margin-right:4px; }
   .pill { border:1px solid var(--border); background:transparent; color:var(--text-secondary); border-radius:999px; padding:5px 12px; font-size:12.5px; cursor:pointer; }
   .pill.active { background: var(--text-primary); color: var(--page); border-color: var(--text-primary); }
+  .month-select { border:1px solid var(--border); background: var(--page); color: var(--text-primary); border-radius:8px; padding:6px 10px; font-size:12.5px; cursor:pointer; min-width:160px; }
+  .month-select:focus { outline: 1px solid var(--text-secondary); }
   .dealer-check { display:flex; align-items:center; gap:5px; font-size:12.5px; border:1px solid var(--border); border-radius:999px; padding:4px 10px 4px 8px; cursor:pointer; color: var(--text-secondary); }
   .dealer-check input { accent-color: currentColor; }
   .dealer-check.pending { opacity: 0.55; font-style: italic; border-style: dashed; }
@@ -155,7 +157,7 @@
     <div class="spacer"></div>
     <div class="control-group">
       <span class="control-label">Mois de référence</span>
-      <div id="refPeriodTabs" class="view-toggle"></div>
+      <select id="refPeriodSelect" class="month-select"></select>
     </div>
     <div class="control-group">
       <span class="control-label">Période</span>
@@ -584,10 +586,25 @@ function makePills(container, options, activeKey, onSelect) {
   });
 }
 
+function renderRefPeriodSelect() {
+  const el = document.getElementById('refPeriodSelect');
+  el.innerHTML = '';
+  // Chronological list can now span 15-20+ months across all dealers combined
+  // (e.g. HAWKS' full historical year) -- a dropdown keeps this compact
+  // instead of wrapping a huge row of pill buttons. Most recent month first
+  // so the common case (current month) doesn't require scrolling the list.
+  PERIOD_LIST.slice().reverse().forEach(p => {
+    const opt = document.createElement('option');
+    opt.value = p.key;
+    opt.textContent = p.label;
+    if (p.key === state.refPeriod) opt.selected = true;
+    el.appendChild(opt);
+  });
+  el.onchange = () => { state.refPeriod = el.value; renderAll(); };
+}
+
 function renderTopControls() {
-  makePills(document.getElementById('refPeriodTabs'),
-    PERIOD_LIST.map(p => ({ key: p.key, label: p.label })),
-    state.refPeriod, (k) => { state.refPeriod = k; renderAll(); });
+  renderRefPeriodSelect();
 
   makePills(document.getElementById('periodTabs'), [
     { key: 'month', label: 'Mois courant' },
@@ -957,6 +974,17 @@ function renderChartCard(key, label, rows, detailOpts) {
       badge.innerHTML = (delta >= 0 ? '▲ ' : '▼ ') + fmtValue(rows.__group, Math.abs(delta)) +
         (pctSpan ? `<span class="delta-pct">${pctSpan}</span>` : '');
       valueWrap.appendChild(badge);
+    } else if (r.real !== null && r.real !== undefined) {
+      // Real figure exists but this dealer's source file has no budget /
+      // prior-year columns at all (e.g. HAWKS' and STM's GM "Composite
+      // Financial Statement" .xlsm months) -- make that explicit instead of
+      // silently omitting the comparison line, which read as a bug.
+      const ndBadge = document.createElement('div');
+      ndBadge.className = 'delta-badge';
+      ndBadge.style.textAlign = 'right';
+      ndBadge.style.color = 'var(--muted)';
+      ndBadge.textContent = `n/d vs ${compareLabel()}`;
+      valueWrap.appendChild(ndBadge);
     }
     const deptPct = deptPctLineText(r);
     if (deptPct) {

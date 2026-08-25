@@ -30,6 +30,13 @@ from googleapiclient.http import MediaIoBaseDownload
 
 SCOPES = ["https://www.googleapis.com/auth/drive.readonly"]
 
+# Adresse d'un utilisateur interne (Google Workspace) que le compte de
+# service va "impersonater" grâce à la délégation à l'échelle du domaine
+# (Admin Console > Sécurité > Contrôles des API > Délégation à l'échelle du
+# domaine). Cet utilisateur a déjà accès en lecture à tous les dossiers
+# Drive des concessionnaires, donc aucun partage individuel n'est requis.
+IMPERSONATE_USER = "mallard@groupeautomax.com"
+
 SOURCES_DIR = "sources"
 MANIFEST_PATH = os.path.join(SOURCES_DIR, ".drive_manifest.json")
 
@@ -94,6 +101,12 @@ def build_drive_service():
         sys.exit(1)
     info = json.loads(raw_key)
     creds = service_account.Credentials.from_service_account_info(info, scopes=SCOPES)
+    # Impersonation via la délégation à l'échelle du domaine : le compte de
+    # service agit "comme si" c'était IMPERSONATE_USER, qui a déjà accès en
+    # lecture à tous les dossiers Drive des concessionnaires. Ça évite
+    # d'avoir à partager individuellement chaque dossier avec le compte de
+    # service.
+    creds = creds.with_subject(IMPERSONATE_USER)
     return build("drive", "v3", credentials=creds, cache_discovery=False)
 
 

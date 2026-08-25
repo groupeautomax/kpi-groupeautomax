@@ -736,9 +736,28 @@ if __name__ == "__main__":
     repo_root = Path(__file__).resolve().parent.parent
     store_path = str(repo_root / "data" / "data.json")
     store = load_store(store_path)
+    skipped = []
     for path in sys.argv[1:]:
-        extracted = extract_any_file(path)
+        # sources/ est maintenant alimenté automatiquement par drive_sync.py,
+        # qui récupère TOUT ce qui se trouve dans les dossiers Drive de
+        # chaque concessionnaire -- pas seulement les rapports "Réalisé"
+        # mensuels que ce script sait lire. Des fichiers annexes (2 pagers,
+        # analyses de gross, bonis cadres, inventaires, rapports de ventes
+        # privées, etc.) s'y retrouvent donc aussi. On ignore ces fichiers
+        # avec un avertissement plutôt que de faire échouer toute la
+        # reconstruction du tableau de bord à cause d'un seul fichier
+        # inattendu.
+        try:
+            extracted = extract_any_file(path)
+        except Exception as exc:  # noqa: BLE001 - on veut logguer et continuer
+            skipped.append((path, str(exc)))
+            print(f"IGNORÉ (format non reconnu): {path} -- {exc}", file=sys.stderr)
+            continue
         print(f"Extracted: {extracted['company']} - {extracted['period_key']} -- sections: {list(extracted['sections'].keys())}")
         merge_into_store(store, extracted)
     save_store(store, store_path)
     print("Saved store to", store_path)
+    if skipped:
+        print(f"--- {len(skipped)} fichier(s) ignoré(s) (format non reconnu) ---", file=sys.stderr)
+        for path, reason in skipped:
+            print(f"  - {path}: {reason}", file=sys.stderr)

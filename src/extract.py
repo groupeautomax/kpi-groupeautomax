@@ -597,7 +597,11 @@ HAWKS_MONTHS = ["", "Janvier", "Février", "Mars", "Avril", "Mai", "Juin",
 # row must be summed for the dealership-wide new-unit count (each brand's
 # total already folds in that brand's fleet/parcs units -- see
 # hawks_fleet_units below, which reads the *same* units as a separate memo
-# breakout, not an additional amount to add on top).
+# breakout, not an additional amount to add on top). Also doubles as the
+# source for the "Véhicules neufs" department's "ventes" line-item detail
+# (hawks_new_vehicle_line_items below), summed across all 8 into the same
+# Autos/Camions split every other dealer's detail already uses -- not shown
+# brand by brand.
 HAWKS_NEW_VEHICLE_BRAND_SHEETS = [
     "Page5_CHV_MCI", "Page5_CHV_VE", "Page5_BUI_MCI", "Page5_BUI_VE",
     "Page5_GMC_MCI", "Page5_GMC_VE", "Page5_CAD_MCI", "Page5_CAD_VE",
@@ -699,6 +703,73 @@ def hawks_used_vehicle_units(wb):
         return None, None
     return real_only_kv(ws.cell(row=row, column=6).value), real_only_kv(ws.cell(row=row, column=11).value)
 
+def hawks_new_vehicle_line_items(wb, unit_col, profit_col):
+    """Sales detail behind the "Véhicules neufs" department's "Unités"/
+    "Profit brut" cards, summed across the 8 per-brand sheets (see
+    HAWKS_NEW_VEHICLE_BRAND_SHEETS) into the SAME two categories a
+    Quotus-template dealer's own detail already shows -- "Autos détail" /
+    "Camions détail" / "Total Neufs" -- rather than broken out brand by
+    brand or model by model. Every dealer's drill-down should have the same
+    shape; HAWKS' data just happens to start out sliced a different way
+    (by GM brand) before landing in the same two buckets everyone else's
+    does."""
+    car_units = car_profit = truck_units = truck_profit = 0
+    any_found = False
+    for sheet_name in HAWKS_NEW_VEHICLE_BRAND_SHEETS:
+        if sheet_name not in wb.sheetnames:
+            continue
+        ws = wb[sheet_name]
+        car_row = hawks_find_row(ws, "total voitures neuves")
+        truck_row = hawks_find_row(ws, "total camions neufs")
+        if car_row:
+            any_found = True
+            car_units += ws.cell(row=car_row, column=unit_col).value or 0
+            car_profit += ws.cell(row=car_row, column=profit_col).value or 0
+        if truck_row:
+            any_found = True
+            truck_units += ws.cell(row=truck_row, column=unit_col).value or 0
+            truck_profit += ws.cell(row=truck_row, column=profit_col).value or 0
+    if not any_found:
+        return []
+    return [
+        {"label": "Autos détail", "section": "ventes", "is_total": False,
+         "units": real_only_kv(car_units), "money": real_only_kv(car_profit), "pct": None},
+        {"label": "Camions détail", "section": "ventes", "is_total": False,
+         "units": real_only_kv(truck_units), "money": real_only_kv(truck_profit), "pct": None},
+        {"label": "Total Neufs", "section": "ventes", "is_total": True,
+         "units": real_only_kv(car_units + truck_units), "money": real_only_kv(car_profit + truck_profit), "pct": None},
+    ]
+
+# Rows within Page6 covering the "Véhicules d'occasion" retail-vs-wholesale
+# split, relabeled to match the exact category names a Quotus-template
+# dealer's own detail uses for the same two-way split ("Total Usagés" /
+# "Ventes au Gros"). GM's own finer breakout here (Optimum/VUDS vs Autre, by
+# vehicle type) doesn't map cleanly onto Quotus's certification-based
+# Certifié/Non Certifié categories, so it's rolled up into the one
+# unambiguous distinction (retail vs wholesale) both templates share, rather
+# than guessed at.
+HAWKS_USED_VEHICLE_ROWS = (
+    (10, "Total Usagés", True),     # Total véh. d'occasion détail (retail)
+    (15, "Ventes au Gros", False),  # Total d'occ. en gros et rectif. (wholesale)
+)
+
+def hawks_used_vehicle_line_items(ws, unit_col, profit_col):
+    items = []
+    for row, label, is_total in HAWKS_USED_VEHICLE_ROWS:
+        units = norm_num(ws.cell(row=row, column=unit_col).value)
+        profit = norm_num(ws.cell(row=row, column=profit_col).value)
+        if units is None and profit is None:
+            continue
+        items.append({
+            "label": label,
+            "section": "ventes",
+            "is_total": is_total,
+            "units": real_only_kv(units),
+            "money": real_only_kv(profit),
+            "pct": None,
+        })
+    return items
+
 def hawks_line_items(ws, money_col):
     """Every individually labeled row behind a HAWKS department's subtotals,
     tagged by section exactly like extract_line_items() does for the Quotus
@@ -798,6 +869,18 @@ def extract_hawks_file(path):
     for name, (sheet, mcol, ycol, (u_m, u_y), (f_m, f_y)) in dept_specs.items():
         departments_month[name] = hawks_department_section(wb, sheet, mcol, units_kv=u_m, units_flottes_kv=f_m)
         departments_ytd[name] = hawks_department_section(wb, sheet, ycol, units_kv=u_y, units_flottes_kv=f_y)
+
+    # Per-model/per-category sales detail (Page5_* brand sheets for Véhicules
+    # neufs, Page6 for Véhicules usagés) -- appended on top of the generic
+    # Ventes nettes/Profit brut line items hawks_department_section() already
+    # builds from Page3 itself, so "Voir le détail des postes" shows the same
+    # depth of sales breakdown for HAWKS as it does for the Quotus dealers.
+    departments_month["Véhicules neufs"]["line_items"] += hawks_new_vehicle_line_items(wb, 6, 9)
+    departments_ytd["Véhicules neufs"]["line_items"] += hawks_new_vehicle_line_items(wb, 11, 14)
+    if "Page6" in wb.sheetnames:
+        ws6 = wb["Page6"]
+        departments_month["Véhicules usagés"]["line_items"] += hawks_used_vehicle_line_items(ws6, 6, 9)
+        departments_ytd["Véhicules usagés"]["line_items"] += hawks_used_vehicle_line_items(ws6, 11, 14)
 
     ws2 = wb["Page2"]
     summary_month = hawks_summary_section(ws2, 7)   # G = MOIS

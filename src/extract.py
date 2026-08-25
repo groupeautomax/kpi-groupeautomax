@@ -606,18 +606,46 @@ HAWKS_NEW_VEHICLE_BRAND_SHEETS = [
 # Fixed row numbers within Page3 ("Véhicules neufs" / "Véhicules d'occasion")
 # and Page4 ("Mécanique" / "Carrosserie" / "Pièces et accessoires") -- these
 # are printed-form line numbers on GM's standardized statement, stable across
-# reporting periods for a given dealer (verified against both the December
-# 2025 and June 2026 HAWKS files).
+# reporting periods for a given dealer (verified against the December 2025,
+# June 2026 and July 2026 HAWKS files, both sheets, every department/column).
+#
+# NOTE on "total_semifixes": row 59 ("TOTAL FRAIS GÉNÉRAUX FIXES") is NOT
+# semi-fixes+fixe alone -- it's personnel + semi-fixes + fixe combined
+# (verified: row20 + row43 + row58 == row59 to the dollar, every file/dept/
+# column checked). Reading it directly here would double-count personnel,
+# which is already reported separately under total_personnel. The
+# Quotus-comparable "semi-fixes" figure (excluding personnel) is built from
+# rows 43 + 58 alone -- see hawks_department_section() below, which
+# overrides this row-59 default after the dict comprehension runs.
 HAWKS_DEPT_ROWS = {
     "profit_brut": 5,
     "total_variables": 10,
     "total_personnel": 20,
-    "total_semifixes": 59,  # GM's "semi-fixes" + "fixe" combined subtotal --
-                             # the closest single-bucket match to the Quotus
-                             # template's one "total semi-fixes" line.
+    "total_semifixes": 59,  # placeholder -- overridden below with rows 43+58
     "total_depenses": 60,
     "profit_departemental": 64,
 }
+
+# Same fixed row layout as HAWKS_DEPT_ROWS above, broken down into the
+# individually labeled source lines behind each subtotal -- lets the
+# dashboard's "Voir le détail des postes" drill-down work for HAWKS the same
+# way it already does for the Quotus-template dealers. Row ranges are
+# inclusive of their closing subtotal row (e.g. "variables" ends at row 10,
+# TOTAL FRAIS VARIABLES itself), matching extract_line_items()'s convention
+# for the Quotus parser. Rows 44-58 (GM's "fixe" block) are tagged
+# "semifixes" too, not a separate section -- since total_semifixes is now
+# built from rows 43+58 combined (see note above), the line items need to
+# sum to that same figure. Rows 59/60 (both redundant combined subtotals)
+# are deliberately excluded -- nothing above needs a stand-alone line for
+# them.
+HAWKS_LINE_ITEM_SECTIONS = (
+    ("ventes", range(4, 6)),
+    ("variables", range(7, 11)),
+    ("personnel", range(11, 21)),
+    ("semifixes", range(21, 59)),
+    ("autres", range(61, 65)),
+)
+HAWKS_LINE_ITEM_TOTAL_ROWS = {10, 20, 43, 58, 64}
 
 def real_only_kv(value):
     """A real-only kv (no budget/prior-year exists in HAWKS' source file)."""
@@ -671,17 +699,66 @@ def hawks_used_vehicle_units(wb):
         return None, None
     return real_only_kv(ws.cell(row=row, column=6).value), real_only_kv(ws.cell(row=row, column=11).value)
 
+def hawks_line_items(ws, money_col):
+    """Every individually labeled row behind a HAWKS department's subtotals,
+    tagged by section exactly like extract_line_items() does for the Quotus
+    template -- see HAWKS_LINE_ITEM_SECTIONS above for the row->section map
+    and why rows 44-58 fold into "semifixes" rather than a section of their
+    own."""
+    items = []
+    for section, rows in HAWKS_LINE_ITEM_SECTIONS:
+        for r in rows:
+            label = ws.cell(row=r, column=2).value
+            if not isinstance(label, str) or not label.strip():
+                continue
+            money = real_only_kv(ws.cell(row=r, column=money_col).value)
+            if money["real"] is None:
+                continue
+            items.append({
+                "label": label.strip(),
+                "section": section,
+                "is_total": r in HAWKS_LINE_ITEM_TOTAL_ROWS,
+                "units": None,
+                "money": money,
+                "pct": None,
+            })
+    return items
+
 def hawks_department_section(wb, sheet_name, money_col, units_kv=None, units_flottes_kv=None):
     """One department's data for one section (month or ytd), keyed exactly
     like analyze_department()'s output so it plugs into
     department_kpis_for_company_view() unchanged."""
     ws = wb[sheet_name]
     data = {key: real_only_kv(ws.cell(row=row, column=money_col).value) for key, row in HAWKS_DEPT_ROWS.items()}
+
+    # Override the row-59 placeholder with the Quotus-comparable semi-fixes
+    # figure (rows 43 + 58, excluding personnel -- see HAWKS_DEPT_ROWS note).
+    semifixes_true = ws.cell(row=43, column=money_col).value
+    fixe_true = ws.cell(row=58, column=money_col).value
+    if isinstance(semifixes_true, (int, float)) or isinstance(fixe_true, (int, float)):
+        data["total_semifixes"] = real_only_kv((semifixes_true or 0) + (fixe_true or 0))
+
     if units_kv is not None:
         data["units"] = units_kv
     if units_flottes_kv is not None:
         data["units_flottes"] = units_flottes_kv
-    data["line_items"] = []  # per-department detail drill-down not built for HAWKS yet
+
+    # "Autres revenus" derived algebraically (profit_departemental -
+    # profit_brut + total_depenses) rather than read off one fixed row --
+    # the row that plays this role (a "transfert"/"prorata" adjustment
+    # between the pre- and post-transfer department profit lines) carries a
+    # different label per department ("TRANSFERT REVENU F&A ET PLAN DE
+    # PROTECTION" for Véhicules neufs vs "TRANSFERT PROFIT BRUT PIÈCES AU
+    # CLIENT" for Pièces, etc.), so deriving it from figures already read
+    # above holds regardless of the exact wording. Verified against all 3
+    # HAWKS files: identity holds to the dollar for every department/column.
+    pb = data.get("profit_brut", {}).get("real")
+    td = data.get("total_depenses", {}).get("real")
+    pd = data.get("profit_departemental", {}).get("real")
+    if isinstance(pb, (int, float)) and isinstance(td, (int, float)) and isinstance(pd, (int, float)):
+        data["autres_revenus"] = real_only_kv(pd - pb + td)
+
+    data["line_items"] = hawks_line_items(ws, money_col)
     return data
 
 def hawks_summary_section(ws2, col):

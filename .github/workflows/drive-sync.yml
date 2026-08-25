@@ -1,11 +1,18 @@
 name: Sync depuis Google Drive
 
 # Va chercher automatiquement les nouveaux fichiers (Réalisé / EF) dans les
-# dossiers Google Drive de chaque concessionnaire (via un compte de service,
-# secret GDRIVE_SA_KEY) et les dépose dans sources/. Le simple fait de
-# pousser un changement dans sources/** déclenche ensuite automatiquement
-# "Update dashboard" (update-dashboard.yml) grâce à son filtre de chemin --
-# aucune autre action n'est nécessaire ici.
+# dossiers Google Drive de chaque concessionnaire (via un compte de service
+# avec délégation à l'échelle du domaine, secret GDRIVE_SA_KEY) et les
+# dépose dans sources/.
+#
+# Important : le push fait par ce workflow utilise le GITHUB_TOKEN par
+# défaut. GitHub empêche volontairement un push fait avec ce token de
+# déclencher un autre workflow "on: push" (pour éviter les boucles infinies)
+# -- donc "Update dashboard" (update-dashboard.yml), même avec son filtre
+# sources/**, ne se déclencherait PAS automatiquement après ce push. C'est
+# pourquoi la dernière étape ci-dessous déclenche explicitement
+# update-dashboard.yml via l'API GitHub (gh workflow run) quand de nouveaux
+# fichiers sont arrivés.
 on:
   schedule:
     # Toutes les 6 heures. Ajustable au besoin (format cron standard, UTC).
@@ -14,6 +21,7 @@ on:
 
 permissions:
   contents: write
+  actions: write
 
 concurrency:
   group: drive-sync
@@ -40,13 +48,22 @@ jobs:
         run: python src/drive_sync.py
 
       - name: Commit et push si de nouveaux fichiers sont arrivés
+        id: commit
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add sources/
           if git diff --staged --quiet; then
             echo "Aucun nouveau fichier depuis Google Drive."
+            echo "new_files=false" >> "$GITHUB_OUTPUT"
           else
             git commit -m "Sync automatique des fichiers Drive"
             git push
+            echo "new_files=true" >> "$GITHUB_OUTPUT"
           fi
+
+      - name: Déclencher la reconstruction du tableau de bord
+        if: steps.commit.outputs.new_files == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh workflow run update-dashboard.yml --ref main

@@ -484,6 +484,55 @@ def summary_kpis_for_company_view(summary):
 
     return kpis
 
+def sum_kv(kv_list):
+    """Sum a list of kv dicts (real/budget/prior_year) field-by-field,
+    ignoring any dict where a given field is missing/non-numeric -- mirrors
+    the dashboard's own client-side sumKv() so server-extracted combined
+    KPIs and client-combined dealer totals agree."""
+    kv_list = [kv for kv in kv_list if kv]
+    if not kv_list:
+        return None
+    out = {}
+    for k in ("real", "budget", "prior_year"):
+        vals = [kv.get(k) for kv in kv_list if isinstance(kv.get(k), (int, float))]
+        out[k] = sum(vals) if vals else None
+    out["delta_budget"] = (out["real"] - out["budget"]) if isinstance(out["real"], (int, float)) and isinstance(out["budget"], (int, float)) else None
+    out["delta_prior_year"] = (out["real"] - out["prior_year"]) if isinstance(out["real"], (int, float)) and isinstance(out["prior_year"], (int, float)) else None
+    return out
+
+def expense_breakdown_kpis_for_company_view(departments):
+    """Break the company-wide "Dépenses" total (revenue_expense tab) down by
+    category -- variables / personnel / semi-fixes -- by summing each
+    department's own subtotal (already extracted per-department, just never
+    rolled up to the company level before). Negated like "Dépenses" itself so
+    all three read as reductions alongside it, not raw expense magnitudes."""
+    kpis = {}
+    specs = (
+        ("total_variables", "depenses_variables", "Dépenses variables"),
+        ("total_personnel", "depenses_personnel", "Dépenses de personnel"),
+        ("total_semifixes", "depenses_semifixes", "Dépenses semi-fixes"),
+    )
+    for dept_key, kpi_key, label in specs:
+        combined = sum_kv([dept.get(dept_key) for dept in departments.values()])
+        if combined:
+            kpis[kpi_key] = dict(negate_kv(combined), label=label, raw_label=label, group="revenue_expense")
+    return kpis
+
+def unit_economics_kpis_for_company_view(kpis):
+    """Profit brut par unité (GPA/PVR) for the two departments where a
+    per-unit figure is meaningful -- derived from figures already extracted:
+    profit brut ÷ unités."""
+    out = {}
+    specs = (
+        ("pb_neuf", "unites_neuf", "gpa_neuf", "Profit brut par unité (neuf)"),
+        ("pb_usage", "unites_usage", "gpa_usage", "Profit brut par unité (usagé)"),
+    )
+    for pb_key, units_key, kpi_key, label in specs:
+        ratio = ratio_kv(kpis.get(pb_key), kpis.get(units_key))
+        if ratio:
+            out[kpi_key] = dict(ratio, label=label, raw_label=label, group="profit")
+    return out
+
 def extract_period(wb, sheet_candidates):
     ws = find_first_sheet(wb, sheet_candidates)
     if ws is None:
@@ -493,6 +542,8 @@ def extract_period(wb, sheet_candidates):
     kpis = {}
     kpis.update(department_kpis_for_company_view(departments))
     kpis.update(summary_kpis_for_company_view(summary))
+    kpis.update(expense_breakdown_kpis_for_company_view(departments))
+    kpis.update(unit_economics_kpis_for_company_view(kpis))
     return {"kpis": kpis, "departments": departments, "summary": summary}
 
 def extract_file(path):
@@ -678,9 +729,13 @@ def extract_hawks_file(path):
     kpis_month = {}
     kpis_month.update(department_kpis_for_company_view(departments_month))
     kpis_month.update(summary_kpis_for_company_view(summary_month))
+    kpis_month.update(expense_breakdown_kpis_for_company_view(departments_month))
+    kpis_month.update(unit_economics_kpis_for_company_view(kpis_month))
     kpis_ytd = {}
     kpis_ytd.update(department_kpis_for_company_view(departments_ytd))
     kpis_ytd.update(summary_kpis_for_company_view(summary_ytd))
+    kpis_ytd.update(expense_breakdown_kpis_for_company_view(departments_ytd))
+    kpis_ytd.update(unit_economics_kpis_for_company_view(kpis_ytd))
 
     return {
         "company": company.strip() if isinstance(company, str) else company,

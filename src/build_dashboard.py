@@ -183,7 +183,7 @@ def build_html(store, generated_at_label):
   .chart-card { background: var(--surface-1); border:1px solid var(--border); border-radius:12px; padding:16px 18px; margin-bottom:14px; }
   .chart-title { font-size:14px; font-weight:600; margin:0 0 2px; }
   .chart-meta { font-size:11.5px; color: var(--muted); margin-bottom:10px; }
-  .bar-row { display:grid; grid-template-columns: 168px 1fr 140px; align-items:center; gap:10px; padding:5px 0; }
+  .bar-row { display:grid; grid-template-columns: 168px 1fr 140px 68px; align-items:center; gap:10px; padding:5px 0; }
   .bar-row .dealer-name { font-size:12.5px; color: var(--text-secondary); display:flex; align-items:center; flex-wrap:wrap; gap:2px 6px; overflow:hidden; }
   .bar-row .dealer-name > span:first-of-type + span { white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
   .period-badge { flex-basis:100%; font-size:10px; color: var(--muted); font-style:italic; margin-left:16px; }
@@ -197,6 +197,10 @@ def build_html(store, generated_at_label):
   .delta-pct { font-weight:400; opacity:0.85; }
   .dept-pct-line { font-size:10px; color: var(--muted); text-align:right; font-variant-numeric: tabular-nums; margin-top:1px; }
   .no-data { color: var(--muted); font-size: 12.5px; font-style: italic; padding: 4px 0; }
+  .sparkline-wrap { display:flex; justify-content:center; align-items:center; }
+  .sparkline-wrap .no-data { font-size:10px; padding:0; text-align:center; }
+  .chart-title-row { display:flex; align-items:baseline; justify-content:space-between; gap:10px; }
+  .sparkline-col-label { font-size:9.5px; color: var(--muted); text-transform:uppercase; letter-spacing:0.03em; white-space:nowrap; }
 
   table.kpi-table { width:100%; border-collapse: collapse; font-size:12.5px; }
   table.kpi-table caption { text-align:left; font-weight:600; font-size:14px; margin-bottom:8px; }
@@ -682,6 +686,113 @@ function buildRowsForDept(deptName, metricKey) {
   return rows;
 }
 
+// --- Historical trend (sparkline) -------------------------------------
+// Every period a dealer has ever sent in is already sitting in STORE, so a
+// month-over-month (or AAD-over-AAD, depending on state.period) trend line
+// needs no new extraction work -- just walking the periods a card's own
+// `key` (company KPI) or deptName+key (department metric) already resolves
+// against, chronologically. Capped to the trailing 12 points so the line
+// stays readable as years of history accumulate, and never reaches past the
+// currently selected reference period (no showing the reader a "trend" that
+// dips into months they haven't selected yet).
+const TREND_MAX_POINTS = 12;
+
+function metricValueFromSection(sec, key, detailOpts) {
+  if (!sec) return undefined;
+  if (detailOpts) {
+    const dept = sec.departments ? sec.departments[detailOpts.deptName] : undefined;
+    return dept ? dept[key] : undefined;
+  }
+  return sec.kpis ? sec.kpis[key] : undefined;
+}
+
+function trailingPeriodKeys(periodKeys) {
+  const keys = periodKeys.filter(p => !state.refPeriod || p <= state.refPeriod).sort();
+  return keys.slice(-TREND_MAX_POINTS);
+}
+
+function historyFor(dealer, key, detailOpts) {
+  const periods = trailingPeriodKeys(Object.keys(STORE.dealers[dealer]?.periods || {}));
+  const points = [];
+  periods.forEach(periodKey => {
+    const sec = sectionFor(dealer, periodKey, state.period);
+    const val = metricValueFromSection(sec, key, detailOpts);
+    if (val && typeof val.real === 'number') points.push({ period: periodKey, value: val.real });
+  });
+  return points;
+}
+
+function historyForCombined(key, detailOpts) {
+  const dealers = orderedKeys(state.dealers);
+  const allPeriods = new Set();
+  dealers.forEach(d => Object.keys(STORE.dealers[d]?.periods || {}).forEach(p => allPeriods.add(p)));
+  const periods = trailingPeriodKeys(Array.from(allPeriods));
+  const points = [];
+  periods.forEach(periodKey => {
+    const vals = [];
+    dealers.forEach(d => {
+      const sec = sectionFor(d, periodKey, state.period);
+      const val = metricValueFromSection(sec, key, detailOpts);
+      if (val && typeof val.real === 'number') vals.push(val.real);
+    });
+    if (vals.length) points.push({ period: periodKey, value: vals.reduce((a, b) => a + b, 0) });
+  });
+  return points;
+}
+
+// 12-point sparkline in the muted/de-emphasis ink, current period picked out
+// as a filled dot in the dealer's own accent color -- trend shape carries
+// the "up or down lately" read, the dot ties it back to the bar it sits
+// beside. A native SVG <title> stands in for a full crosshair here (a
+// sparkline is a compact glance, not its own interactive chart).
+function renderSparkline(points, color, group) {
+  const wrap = document.createElement('div');
+  wrap.className = 'sparkline-wrap';
+  if (!points || points.length < 2) {
+    const nd = document.createElement('span');
+    nd.className = 'no-data';
+    nd.textContent = 'n/d';
+    wrap.appendChild(nd);
+    return wrap;
+  }
+  const w = 56, h = 22, pad = 3;
+  const vals = points.map(p => p.value);
+  const min = Math.min(...vals), max = Math.max(...vals);
+  const range = (max - min) || Math.abs(max) || 1;
+  const stepX = points.length > 1 ? (w - pad * 2) / (points.length - 1) : 0;
+  const xy = points.map((p, i) => {
+    const x = pad + i * stepX;
+    const y = h - pad - ((p.value - min) / range) * (h - pad * 2);
+    return [x, y];
+  });
+  const path = xy.map(([x, y], i) => (i === 0 ? 'M' : 'L') + x.toFixed(1) + ',' + y.toFixed(1)).join(' ');
+  const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+  svg.setAttribute('width', String(w));
+  svg.setAttribute('height', String(h));
+  svg.setAttribute('viewBox', `0 0 ${w} ${h}`);
+  svg.setAttribute('role', 'img');
+  const titleEl = document.createElementNS('http://www.w3.org/2000/svg', 'title');
+  titleEl.textContent = points.map(p => `${p.period}: ${fmtValue(group, p.value)}`).join(' · ');
+  svg.appendChild(titleEl);
+  const line = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+  line.setAttribute('d', path);
+  line.setAttribute('fill', 'none');
+  line.setAttribute('stroke', 'var(--muted)');
+  line.setAttribute('stroke-width', '1.5');
+  line.setAttribute('stroke-linecap', 'round');
+  line.setAttribute('stroke-linejoin', 'round');
+  svg.appendChild(line);
+  const [lastX, lastY] = xy[xy.length - 1];
+  const dot = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+  dot.setAttribute('cx', String(lastX));
+  dot.setAttribute('cy', String(lastY));
+  dot.setAttribute('r', '2.3');
+  dot.setAttribute('fill', color);
+  svg.appendChild(dot);
+  wrap.appendChild(svg);
+  return wrap;
+}
+
 function renderLegend() {
   const el = document.getElementById('legendRow');
   el.innerHTML = '';
@@ -1041,10 +1152,17 @@ function renderLineItemDetailTable(deptName, sections) {
 function renderChartCard(key, label, rows, detailOpts) {
   const card = document.createElement('div');
   card.className = 'chart-card';
+  const titleRow = document.createElement('div');
+  titleRow.className = 'chart-title-row';
   const title = document.createElement('p');
   title.className = 'chart-title';
   title.textContent = label;
-  card.appendChild(title);
+  titleRow.appendChild(title);
+  const trendLabel = document.createElement('span');
+  trendLabel.className = 'sparkline-col-label';
+  trendLabel.textContent = 'Tendance (12 derniers)';
+  titleRow.appendChild(trendLabel);
+  card.appendChild(titleRow);
   const meta = document.createElement('div');
   meta.className = 'chart-meta';
   meta.textContent = 'Comparaison par concessionnaire · vs ' + compareLabel();
@@ -1166,6 +1284,11 @@ function renderChartCard(key, label, rows, detailOpts) {
       valueWrap.appendChild(pctLine);
     }
     row.appendChild(valueWrap);
+
+    const sparkPoints = r.dealer === COMBINED_KEY
+      ? historyForCombined(key, detailOpts)
+      : historyFor(r.dealer, key, detailOpts);
+    row.appendChild(renderSparkline(sparkPoints, seriesColor(r.dealer), rows.__group));
 
     card.appendChild(row);
   });

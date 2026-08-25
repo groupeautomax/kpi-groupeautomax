@@ -71,11 +71,16 @@ DEALER_SOURCES = [
             "1-LMakwOxmlqn0IJCWoI_SL4Wpc8gJheB",  # 2025_EF_HAWKS
         ],
     },
-    # TODO: ajouter "vw" et "hyundai" une fois les dossiers Drive confirmés
-    # et partagés avec le compte de service (kpi-drive-sync@kpi-drive-sync
-    # .iam.gserviceaccount.com). Même format que ci-dessus :
-    # {"key": "vw", "label": "Volkswagen Brossard", "roots": ["<ID>"]},
-    # {"key": "hyundai", "label": "Hyundai Longueuil", "roots": ["<ID>"]},
+    {
+        "key": "vw",
+        "label": "Volkswagen Brossard",
+        "roots": ["0AMpyfj_TcWfvUk9PVA"],  # Drive partagé "VW Brossard"
+    },
+    {
+        "key": "hyundai",
+        "label": "Hyundai Longueuil",
+        "roots": ["0AP3GdpOFlum2Uk9PVA"],  # Drive partagé "Hyundai Longueuil"
+    },
 ]
 
 MAX_DEPTH = 5

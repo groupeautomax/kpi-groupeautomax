@@ -61,8 +61,10 @@ trimestre ne demande aucune modification de ces deux fichiers.
 
 ## Cadence et automatisation
 
-Un déclencheur planifié ("scheduled task") relance ce pipeline environ 5 jours
-ouvrables après la fin de chaque trimestre civil et livre les 6 PDF. Voir
+Un déclencheur planifié ("scheduled task") relance ce pipeline le 15 du mois
+suivant chaque fin de trimestre civil (15 janvier, avril, juillet, octobre) —
+choisi pour laisser le temps aux résultats du mois de se finaliser avant
+extraction — et livre les 6 PDF. Voir
 `NOTES.md` pour l'historique des exécutions, les limites connues et les pistes
 d'amélioration retenues pour les prochaines exécutions — chaque exécution
 planifiée démarre une session sans mémoire des précédentes; `NOTES.md` sert de

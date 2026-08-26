@@ -469,6 +469,8 @@ def summary_kpis_for_company_view(summary):
         kpis["ventes_nettes"] = dict(summary["ventes_nettes"], label="Ventes nettes", raw_label="Ventes nettes", group="ebitda")
     if summary.get("baiia_operationnel"):
         kpis["ebitda"] = dict(summary["baiia_operationnel"], label="BAIIA (EBITDA)", raw_label="BAIIA Opérationnel", group="ebitda")
+    if summary.get("amortissement"):
+        kpis["amortissement"] = dict(summary["amortissement"], label="Amortissement", raw_label="Amortissement", group="ebitda")
     if summary.get("profit_net"):
         kpis["ebt"] = dict(summary["profit_net"], label="Profit net avant impôt (EBT)", raw_label="Profit Net", group="ebitda")
     if summary.get("impot"):
@@ -833,14 +835,42 @@ def hawks_department_section(wb, sheet_name, money_col, units_kv=None, units_flo
     return data
 
 def hawks_summary_section(ws2, col):
+    profit_net = real_only_kv(ws2.cell(row=66, column=col).value)
+
+    # GM Canada's Page2 (the whole-dealership "ANALYSE DES DÉPENSES TOTALES
+    # DE L'EXPLOITATION" summary) doesn't carry a literal "BAIIA Opérationnel"
+    # line the way the Quotus template does -- but it DOES break out
+    # depreciation & amortization across three named rows within the fixed-
+    # expense section: "AMORTISSEMENT AMÉLIORATIONS LOCATIVES" (45),
+    # "AMORTISSEMENT - BÂT. ET AMÉLIORATIONS" (47), and "AMORTISSEMENT DE
+    # L'ÉQUIPEMENT" (56). Summed, these reconstruct an EBITDA figure
+    # (EBT + D&A) using the standard add-back convention -- confirmed against
+    # the Quotus dealers' own native BAIIA Opérationnel line, whose gap over
+    # EBT is consistently just D&A-sized (floor-plan interest is NOT added
+    # back on either side). This is a derived figure for HAWKS, not a native
+    # statement line like Quotus's -- kept under its own "amortissement" key
+    # too so the report can show its provenance rather than presenting
+    # "ebitda" as if HAWKS's statement named it directly.
+    amortissement = sum_kv([
+        real_only_kv(ws2.cell(row=45, column=col).value),
+        real_only_kv(ws2.cell(row=47, column=col).value),
+        real_only_kv(ws2.cell(row=56, column=col).value),
+    ])
+    baiia_operationnel = None
+    if profit_net and isinstance(profit_net.get("real"), (int, float)) \
+            and amortissement and isinstance(amortissement.get("real"), (int, float)):
+        baiia_operationnel = real_only_kv(profit_net["real"] + amortissement["real"])
+
     return {
         "ventes_nettes": real_only_kv(ws2.cell(row=4, column=col).value),
         "profit_brut": real_only_kv(ws2.cell(row=5, column=col).value),
         "total_depenses": real_only_kv(ws2.cell(row=60, column=col).value),
         "total_autres_revenus": real_only_kv(ws2.cell(row=62, column=col).value),
-        "profit_net": real_only_kv(ws2.cell(row=66, column=col).value),
+        "profit_net": profit_net,
         "impot": real_only_kv(ws2.cell(row=67, column=col).value),
         "profit_net_apres_impot": real_only_kv(ws2.cell(row=68, column=col).value),
+        "amortissement": amortissement,
+        "baiia_operationnel": baiia_operationnel,
     }
 
 def extract_hawks_file(path):

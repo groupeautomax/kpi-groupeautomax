@@ -72,7 +72,9 @@ mémoire persistante entre les trimestres.
 
 - Formatage fr-CA : séparateur de milliers = espace, décimale = virgule, suffixe
   " $" (ex. "35 113 964 $"). Deltas de ratios en points de base ("pdb").
-- Couleurs de marque : navy `#1a2b4a`, or `#c99a3d`, crème `#f4efe4`.
+- Couleurs de marque : charbon `#21201d`, rouille `#c1622f`, sable `#f2ece0`
+  (choisies pour se distinguer du gabarit d'exemple client "Horizon" —
+  voir `NOTES.md` § Décisions de conception avant de les changer).
 - Les champs `depenses_*` sont stockés en négatif dans data.json (sorties de
   caisse) — `build_report_data.py` calcule les variations sur la magnitude
   (`MAGNITUDE_FIELDS`) pour que le signe affiché corresponde à l'intuition

@@ -35,6 +35,12 @@
     "modifiedTime": "2026-01-14T23:58:06.000Z",
     "name": "2025-12_Réalisé_VW V0.xlsx"
   },
+  "13MHlgjVRf6DpRlGZFNMajLalqVYebFdy": {
+    "dealer": "vw",
+    "local_path": "sources/vw_Bonis_cadres_VW_2026-07.xlsx",
+    "modifiedTime": "2026-08-13T17:53:00.000Z",
+    "name": "Bonis cadres VW 2026-07.xlsx"
+  },
   "13uE8dAExJ2qbKhBz9iLtJ1PmoTc-TmIN": {
     "dealer": "vw",
     "local_path": "sources/vw_Bonis_cadres_VW_2025-12.xlsx",
@@ -94,6 +100,12 @@
     "local_path": "sources/vw_Analyse_Gross_August_2025.xlsx",
     "modifiedTime": "2025-09-17T10:57:16.000Z",
     "name": "Analyse Gross August 2025.xlsx"
+  },
+  "16Yt6wg8bFgGCzZxAaglcRxKrck6YrCbc": {
+    "dealer": "vw",
+    "local_path": "sources/vw_2026-07_R_alis_VW.xlsx",
+    "modifiedTime": "2026-08-25T15:23:47.000Z",
+    "name": "2026-07_Réalisé_VW.xlsx"
   },
   "16a8DABYFru7Dl90yrPMd7JTVOHqf7jWR": {
     "dealer": "stm",
@@ -569,6 +581,12 @@
     "modifiedTime": "2026-08-13T18:38:41.762Z",
     "name": "2026-07 Réalisé BMW Sher.xlsx"
   },
+  "1bb_RcQ3Ac7XbxkOsUi9gH5e3mrr_g26p": {
+    "dealer": "vw",
+    "local_path": "sources/vw_2026-07_R_alis_VW.xlsx",
+    "modifiedTime": "2026-08-25T14:25:10.000Z",
+    "name": "~$2026-07_Réalisé_VW.xlsx"
+  },
   "1bfIKYLB5xYTtBKF80u1mAOyvzOPwOd9b": {
     "dealer": "bmw",
     "local_path": "sources/bmw_2026-04_R_alis_BMW_Sher.xlsx",
@@ -719,6 +737,12 @@
     "modifiedTime": "2025-04-10T22:59:48.000Z",
     "name": "2025-03_Réalisé_VW.xlsx"
   },
+  "1j4tEqWSuW7CVseo0xjK1aUBKN7BAq6YS": {
+    "dealer": "vw",
+    "local_path": "sources/vw_V_hicules_avec_participation_dealer_sur_fid_lit_.xlsx",
+    "modifiedTime": "2026-08-03T22:19:32.000Z",
+    "name": "VÉhicules avec participation dealer sur fidélité.xlsx"
+  },
   "1j9lc8S3OrOa7fr6ag_FWD-JWbqmGVvfr": {
     "dealer": "vw",
     "local_path": "sources/vw_2025-12_R_alis_VW.xlsx",
@@ -772,6 +796,12 @@
     "local_path": "sources/vw_2025-12_R_alis_VW_V1.xlsx",
     "modifiedTime": "2026-01-20T23:34:25.000Z",
     "name": "2025-12_Réalisé_VW V1.xlsx"
+  },
+  "1mmtqewLFMYXIipojbrlkwFeQoxUZSAIw": {
+    "dealer": "vw",
+    "local_path": "sources/vw_2026-06_R_alis_VW.xlsx",
+    "modifiedTime": "2026-07-21T19:02:47.000Z",
+    "name": "2026-06_Réalisé_VW.xlsx"
   },
   "1mv0tahaLSfGNVB8JyXJrRgSUcmy9nL9V": {
     "dealer": "bmw",
@@ -862,6 +892,12 @@
     "local_path": "sources/hawks_2026_06_30_EF_HAWKS.xlsm",
     "modifiedTime": "2026-07-15T12:42:40.612Z",
     "name": "2026_06_30_EF_HAWKS.xlsm"
+  },
+  "1sOYMva-JEI5vyIF2V3rw8X_JorqgUoe4": {
+    "dealer": "vw",
+    "local_path": "sources/vw_2026-06_-_Inventaire.xlsx",
+    "modifiedTime": "2026-07-28T13:33:39.000Z",
+    "name": "2026-06 - Inventaire.xlsx"
   },
   "1sQmpUTn60qcm1cYsGY_eNIZkPKMuN4D6": {
     "dealer": "vw",

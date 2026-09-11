@@ -266,7 +266,7 @@
   "1D_T9ihPbRau9lJo9l9rzuO5eyyl8JBc8": {
     "dealer": "bmw",
     "local_path": "sources/bmw_2026-08_R_alis_BMW_Sher.xlsx",
-    "modifiedTime": "2026-09-10T20:21:47.921Z",
+    "modifiedTime": "2026-09-11T20:36:04.294Z",
     "name": "2026-08 Réalisé BMW Sher.xlsx"
   },
   "1Dm5PZQq2PtXLFDsTApv7I53o4GZSTw_M": {
@@ -364,6 +364,12 @@
     "local_path": "sources/stm_2025-10_R_alis_STM.xlsx",
     "modifiedTime": "2026-06-17T03:00:23.097Z",
     "name": "2025-10 Réalisé STM.xlsx"
+  },
+  "1K5kQyyOQIZunK3X9x-S7U5U38Ef6NgTt": {
+    "dealer": "hawks",
+    "local_path": "sources/hawks_2026_08_31_EF_HAWKS_DRAFT.xlsm",
+    "modifiedTime": "2026-09-11T19:26:16.239Z",
+    "name": "2026_08_31_EF_HAWKS_DRAFT"
   },
   "1KB1tWyc4C2FCtwcYoS4zCKPxjNVJtxjk": {
     "dealer": "hawks",

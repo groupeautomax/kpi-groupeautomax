@@ -521,11 +521,12 @@ def p_methode(part):
       <div class="eyebrow">Annexe</div>
       <h1>Méthode</h1>
       <h2>Sources</h2>
-      <p>Toutes les valeurs viennent du tableau de bord KPI, qui lit les fichiers « Réalisé » de chaque concession (gabarit financier standard du Groupe ;
-      relevé GM Canada pour HAWKS). Montants en k$ (milliers de dollars) sauf indication. Non audité.</p>
+      <p>Toutes les valeurs viennent du tableau de bord KPI, qui lit les fichiers de chaque concession : état financier du constructeur quand il est
+      fourni (GM Canada pour HAWKS et STM, Hyundai Canada pour Hyundai Longueuil), sinon le « Réalisé » (gabarit financier standard du Groupe).
+      Montants en k$ (milliers de dollars) sauf indication. Non audité.</p>
       <h2>Comparaisons</h2>
-      <p><b>An passé.</b> Colonne « année précédente » du fichier. Quand elle manque (HAWKS), le rapport prend le même mois — ou le même cumul — dans les fichiers
-      de l'an passé déjà versés au tableau de bord.</p>
+      <p><b>An passé.</b> Colonne « année précédente » du fichier. Quand elle manque (états financiers des constructeurs), le rapport prend le même mois — ou
+      le même cumul — dans les fichiers de l'an passé déjà versés au tableau de bord.</p>
       <p><b>Budget.</b> Colonne budget du fichier ; un budget à zéro est considéré comme non saisi. Un budget peut être ajouté dans budgets.csv ; le cumul budgété
       est alors la somme des mois.</p>
       <p><b>Périmètre comparable.</b> Un écart du groupe n'additionne que les concessions qui ont la base de comparaison. Les ratios du groupe sont recalculés
@@ -534,7 +535,8 @@ def p_methode(part):
       <p>EBT = profit brut + autres revenus − dépenses − éléments sous le BAIIA (amortissement, etc.). L'écart d'EBT est réparti entre ces postes ; la somme des barres
       du graphique égale exactement l'écart. Pour les véhicules, l'écart de profit brut est séparé en effet volume (écart d'unités × profit par unité de l'an passé)
       et effet profit par unité (écart de profit par unité × unités vendues).</p>
-      <p>Chez HAWKS, l'amortissement est compris dans les dépenses du relevé GM ; son poste « amortissement » est donc nul.</p>
+      <p>Dans l'état financier GM (HAWKS, STM), l'amortissement est compris dans les dépenses ; son poste « amortissement » est donc nul pour les mois
+      tirés de cet état.</p>
       <h2>Graphiques en anneau</h2>
       <p>Chaque part montre le poids d'un département ou d'une catégorie dans le total. Un montant négatif (crédit net) ne peut pas être dessiné : il figure dans
       le tableau sous l'anneau, et les pourcentages portent alors sur les montants positifs.</p>"""

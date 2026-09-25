@@ -26,10 +26,12 @@ from kpi_svg import waterfall, monthly_bars
 from rapport_kpi import KEY_ROWS, PB_ITEMS, DEP_ITEMS, issues_html
 
 FILE_NAMES = {"bmw": "BMW_Sherbrooke", "vw": "Volkswagen", "stm": "STM", "hyundai": "Hyundai", "hawks": "HAWKS"}
-FORMAT_SOURCE = {
-    "hawks": "Relevé financier standardisé de GM Canada. Ce format ne contient ni colonne budget ni colonne « année précédente » : "
-             "la comparaison avec l'an passé est reconstituée à partir des fichiers de l'an passé déjà versés au tableau de bord.",
+SOURCE_LABELS = {
+    "etat_gm": "état financier standardisé de GM Canada",
+    "etat_hyundai": "état financier standardisé de Hyundai Canada",
+    "gabarit": "gabarit financier standard du Groupe (Réalisé)",
 }
+
 OPS_ROWS = [
     (SEC, "Volume"),
     ("u_neuf", "Unités neuves", "unit", ""),
@@ -50,11 +52,35 @@ OPS_ROWS = [
 
 
 def format_source(s, P, d):
-    if d in FORMAT_SOURCE:
-        return FORMAT_SOURCE[d]
-    if s.has_native_budget(d, P, "ytd"):
-        return "Gabarit financier standard du Groupe, qui comprend les colonnes réel, budget et année précédente."
-    return "Gabarit financier standard du Groupe (colonnes réel et année précédente) ; le budget n'y est pas saisi."
+    """Source des chiffres de la période, mois par mois quand elle varie."""
+    y, m = split(P)
+    fmts = {}
+    for i in range(1, m + 1):
+        f = s.source_format(d, pkey(y, i))
+        if f:
+            fmts.setdefault(f, []).append(i)
+    main = s.source_format(d, P) or "gabarit"
+    if main == "gabarit":
+        txt = ("Gabarit financier standard du Groupe, qui comprend les colonnes réel, budget et année précédente."
+               if s.has_native_budget(d, P, "ytd") else
+               "Gabarit financier standard du Groupe (colonnes réel et année précédente) ; le budget n'y est pas saisi.")
+    else:
+        txt = (SOURCE_LABELS[main][0].upper() + SOURCE_LABELS[main][1:] + ". Ce format ne contient ni colonne budget "
+               "ni colonne « année précédente » : la comparaison avec l'an passé est reconstituée à partir des "
+               "fichiers de l'an passé déjà versés au tableau de bord.")
+    if len(fmts) > 1:
+        parts = []
+        for f, months in fmts.items():
+            runs = []
+            for i in months:
+                if runs and runs[-1][1] == i - 1:
+                    runs[-1][1] = i
+                else:
+                    runs.append([i, i])
+            lab = ", ".join(MOIS[a] if a == b else f"{MOIS[a]} à {MOIS[b]}" for a, b in runs)
+            parts.append(f"{lab} : {SOURCE_LABELS[f]}")
+        txt += f" Sources par mois en {y} — " + " ; ".join(parts) + "."
+    return txt
 
 
 def comps(s, P, d):

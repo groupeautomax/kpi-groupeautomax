@@ -133,6 +133,16 @@ class Store:
     def periods(self, dealer):
         return sorted(self.raw.get(dealer, {}).get("periods", {}).keys())
 
+    def source_format(self, dealer, period):
+        """Format du fichier source d'un mois : « gabarit » (Réalisé du Groupe),
+        « etat_gm » (état financier GM : HAWKS, STM) ou « etat_hyundai » (état
+        financier Hyundai Canada). Les anciens enregistrements n'ont pas le
+        champ : HAWKS = état GM, les autres = gabarit."""
+        p = self.raw.get(dealer, {}).get("periods", {}).get(period)
+        if not p:
+            return None
+        return p.get("source_format") or ("etat_gm" if dealer == "hawks" else "gabarit")
+
     def _native_section(self, dealer, period, mode):
         p = self.raw.get(dealer, {}).get("periods", {}).get(period)
         if not p:

@@ -323,9 +323,11 @@ def controle_donnees(s, period):
 
         # --- anomalies
         if not row["budget"]:
-            why = {"hawks": "le relevé GM de HAWKS ne contient aucune colonne budget",
-                   "hyundai": "les colonnes budget du fichier sont à zéro",
-                   "stm": "le fichier ne contient pas de budget"}.get(d, "aucun budget dans le fichier")
+            fmt = s.source_format(d, period)
+            why = {"etat_gm": "l'état financier GM ne contient aucune colonne budget",
+                   "etat_hyundai": "l'état financier Hyundai Canada ne contient aucune colonne budget"}.get(fmt) or \
+                {"hyundai": "les colonnes budget du fichier sont à zéro",
+                 "stm": "le fichier ne contient pas de budget"}.get(d, "aucun budget dans le fichier")
             anomalies.append((d, "manque", f"Budget {y} absent : {why}.",
                               f"Obtenir le budget mensuel {y} et le saisir dans budgets.csv (gabarit fourni)."))
         if not row["ap"]:

@@ -325,7 +325,8 @@ def controle_donnees(s, period):
         if not row["budget"]:
             fmt = s.source_format(d, period)
             why = {"etat_gm": "l'état financier GM ne contient aucune colonne budget",
-                   "etat_hyundai": "l'état financier Hyundai Canada ne contient aucune colonne budget"}.get(fmt) or \
+                   "etat_hyundai": "l'état financier Hyundai Canada ne contient aucune colonne budget",
+                   "etat_vw": "l'état financier Volkswagen Canada ne contient aucune colonne budget"}.get(fmt) or \
                 {"hyundai": "les colonnes budget du fichier sont à zéro",
                  "stm": "le fichier ne contient pas de budget"}.get(d, "aucun budget dans le fichier")
             anomalies.append((d, "manque", f"Budget {y} absent : {why}.",

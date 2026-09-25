@@ -26,10 +26,16 @@ Ce fichier sert de mémoire : décisions à respecter, limites connues, historiq
 
 - Le rapport lit `data/data.json`, construit par `src/extract.py` à partir de `sources/` (synchronisé depuis Drive par
   `src/drive_sync.py`). Chaque mois de data.json porte `source_format` : `gabarit` (Réalisé du Groupe), `etat_gm` (état
-  financier GM Canada : HAWKS, STM) ou `etat_hyundai` (état financier Hyundai Canada : Hyundai Longueuil).
+  financier GM Canada : HAWKS, STM), `etat_hyundai` (état financier Hyundai Canada : Hyundai Longueuil) ou `etat_vw`
+  (état financier Volkswagen Canada).
 - Règles de choix (demande du client, 25 septembre 2026) : les Réalisés qui se terminent par V0 ou V1 sont toujours ignorés ;
   on prend celui qui se termine par le nom de la concession (ex. « 2025-07_Réalisé_VW.xlsx ») ; l'état financier du
   constructeur l'emporte sur le Réalisé pour un même mois ; les fichiers de verrouillage « ~$ » sont ignorés.
+- Exception VW (décision du client, 25 septembre 2026) : le Réalisé reste la source par défaut (il contient le budget).
+  Si l'EBT du mois du Réalisé diffère de plus de 1 000 $ de l'état Volkswagen Canada, on prend un autre Réalisé du même
+  mois qui concorde avec l'état (il garde le budget), sinon l'état lui-même (plus de budget mensuel pour ce mois). Un
+  état incohérent (cumul − cumul du mois précédent ≠ mois, p. ex. l'état d'avril 2025 qui contient les chiffres de mai)
+  n'est jamais retenu. Mois touchés en 2026 : janvier, février, juin, juillet.
 - Un état constructeur n'a ni budget ni année précédente : l'an passé est reconstitué à partir des mois de l'an passé.
   La page « Base de présentation » de chaque concession indique la source mois par mois quand elle varie.
 
@@ -63,3 +69,6 @@ Ce fichier sert de mémoire : décisions à respecter, limites connues, historiq
 - Même jour : lecteur de l'état financier Hyundai Canada et prise en charge de l'état GM de STM dans `src/extract.py` ;
   correctifs de `src/drive_sync.py` (fichiers « ~$ » qui écrasaient les vrais classeurs, chemins en double, dossier des
   états financiers de STM). Conséquence : les mois de VW 2025 tirés jusque-là des brouillons V0/V1 sont corrigés.
+- Même jour : lecteur de l'état financier Volkswagen Canada (`etat_vw`) et règle VW ci-dessus (commit b5a1a07). Le
+  cumul d'août de VW ne change pas (833 482 $, identique dans le Réalisé et l'état) ; les mois de janvier, février, juin
+  et juillet 2026 prennent les chiffres de l'état.

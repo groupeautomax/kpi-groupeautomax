@@ -135,8 +135,9 @@ class Store:
 
     def source_format(self, dealer, period):
         """Format du fichier source d'un mois : « gabarit » (Réalisé du Groupe),
-        « etat_gm » (état financier GM : HAWKS, STM) ou « etat_hyundai » (état
-        financier Hyundai Canada). Les anciens enregistrements n'ont pas le
+        « etat_gm » (état financier GM : HAWKS, STM), « etat_hyundai » (état
+        financier Hyundai Canada) ou « etat_vw » (état financier Volkswagen
+        Canada, retenu quand son EBT diffère de celui du Réalisé). Les anciens enregistrements n'ont pas le
         champ : HAWKS = état GM, les autres = gabarit."""
         p = self.raw.get(dealer, {}).get("periods", {}).get(period)
         if not p:

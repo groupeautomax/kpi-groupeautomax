@@ -29,6 +29,7 @@ FILE_NAMES = {"bmw": "BMW_Sherbrooke", "vw": "Volkswagen", "stm": "STM", "hyunda
 SOURCE_LABELS = {
     "etat_gm": "état financier standardisé de GM Canada",
     "etat_hyundai": "état financier standardisé de Hyundai Canada",
+    "etat_vw": "état financier standardisé de Volkswagen Canada",
     "gabarit": "gabarit financier standard du Groupe (Réalisé)",
 }
 
@@ -77,7 +78,15 @@ def format_source(s, P, d):
                     runs[-1][1] = i
                 else:
                     runs.append([i, i])
-            lab = ", ".join(MOIS[a] if a == b else f"{MOIS[a]} à {MOIS[b]}" for a, b in runs)
+            items = []
+            for a, b in runs:
+                if a == b:
+                    items.append(MOIS[a])
+                elif b == a + 1:
+                    items += [MOIS[a], MOIS[b]]
+                else:
+                    items.append(f"{MOIS[a]} à {MOIS[b]}")
+            lab = items[0] if len(items) == 1 else ", ".join(items[:-1]) + " et " + items[-1]
             parts.append(f"{lab} : {SOURCE_LABELS[f]}")
         txt += f" Sources par mois en {y} — " + " ; ".join(parts) + "."
     return txt

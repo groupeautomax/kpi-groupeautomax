@@ -523,6 +523,8 @@ def p_methode(part):
       <h2>Sources</h2>
       <p>Toutes les valeurs viennent du tableau de bord KPI, qui lit les fichiers de chaque concession : état financier du constructeur quand il est
       fourni (GM Canada pour HAWKS et STM, Hyundai Canada pour Hyundai Longueuil), sinon le « Réalisé » (gabarit financier standard du Groupe).
+      Pour Volkswagen, le Réalisé est retenu (il contient le budget), sauf pour un mois où son EBT diffère de plus de 1 000 $ de l'état financier
+      de Volkswagen Canada : l'état, version finale, est alors retenu pour ce mois.
       Montants en k$ (milliers de dollars) sauf indication. Non audité.</p>
       <h2>Comparaisons</h2>
       <p><b>An passé.</b> Colonne « année précédente » du fichier. Quand elle manque (états financiers des constructeurs), le rapport prend le même mois — ou

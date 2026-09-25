@@ -1188,8 +1188,24 @@ def hy_sales_line_items(ws4, specs, start, end, cols):
     return items
 
 
+def hy_is_hyundai(wb):
+    """Vrai si l'état porte la marque Hyundai (en-tête de la Page 1 ou pied
+    de page « Hyundai Canada »)."""
+    for name in ("Page 1", "Page 2"):
+        ws = wb[name]
+        rows = list(range(1, 7)) + list(range(max(1, ws.max_row - 3), ws.max_row + 1))
+        for r in rows:
+            for c in range(1, ws.max_column + 1):
+                label = hy_label(ws.cell(row=r, column=c).value)
+                if label and "hyundai" in label:
+                    return True
+    return False
+
+
 def extract_hyundai_file(path):
     wb = openpyxl.load_workbook(path, data_only=True)
+    if not hy_is_hyundai(wb):
+        raise ValueError("état financier Keyloop sans la marque Hyundai (fichier ignoré)")
     ws2, ws3, ws4 = wb["Page 2"], wb["Page 3"], wb["Page 4"]
     year, month_num = hy_period(wb, path)
     rows2, rows3 = hy_rows(ws2, HY_P2_LABEL_COL), hy_rows(ws3, HY_P3_LABEL_COL)
@@ -1341,6 +1357,11 @@ def detect_format(path):
     if {"Page1", "Page2", "Page3", "Page4"} <= names:
         return "etat_gm"
     if {"Page 2", "Page 3", "Page 4"} <= names:
+        # Même logiciel (Keyloop) pour Volkswagen Canada : ses états ont en plus
+        # une feuille de données (« Données d'ÉF » / « FS Data »). Pas encore de
+        # lecteur VW : on refuse le fichier plutôt que de le lire comme Hyundai.
+        if names & {"Données d'ÉF", "FS Data"}:
+            raise ValueError("état financier Volkswagen Canada : pas encore de lecteur (fichier ignoré)")
         return "etat_hyundai"
     raise ValueError("format non reconnu (ni gabarit Réalisé, ni état GM, ni état Hyundai)")
 

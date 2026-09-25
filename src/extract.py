@@ -1057,9 +1057,33 @@ def hy_num(ws, row, col):
     return v
 
 
+def hy_page1_dates(wb):
+    """(début, fin) de « LA PÉRIODE DU: MMJJAA AU: MMJJAA » en Page 1, en
+    (année, mois, jour), ou (None, None)."""
+    ws = wb["Page 1"]
+    found = {}
+    for r in range(1, 8):
+        for c in range(1, ws.max_column + 1):
+            label = hy_label(ws.cell(row=r, column=c).value)
+            if label not in ("la periode du:", "au:"):
+                continue
+            for cc in range(c + 1, min(c + 6, ws.max_column + 1)):
+                v = ws.cell(row=r, column=cc).value
+                s = str(v).strip() if v is not None else ""
+                if re.fullmatch(r"\d{6}", s):
+                    mm, dd, yy = int(s[:2]), int(s[2:4]), int(s[4:])
+                    if 1 <= mm <= 12:
+                        found["du" if label.startswith("la") else "au"] = (2000 + yy, mm, dd)
+                    break
+    return found.get("du"), found.get("au")
+
+
 def hy_period(wb, path):
-    """(année, mois) : « MOIS DE 07 ... 2026 » en haut de la Page 4, sinon le
-    nom du fichier (…<MM><AAAA>.xlsm)."""
+    """(année, mois) de l'état : date « AU: » de la Page 1, sinon « MOIS DE »
+    en haut de la Page 4, sinon le nom du fichier (…052026, …05-2026)."""
+    _, au = hy_page1_dates(wb)
+    if au:
+        return au[0], au[1]
     ws = wb["Page 4"]
     for r in range(1, 8):
         cells = [ws.cell(row=r, column=c).value for c in range(1, ws.max_column + 1)]
@@ -1078,8 +1102,9 @@ def hy_period(wb, path):
                 year = n
         if month and year:
             return year, month
-    m = re.search(r'(\d{2})(\d{4})\D*$', os.path.splitext(os.path.basename(path))[0])
-    if m and 1 <= int(m.group(1)) <= 12:
+    stem = os.path.splitext(os.path.basename(path))[0]
+    m = re.search(r'(?<!\d)(0[1-9]|1[0-2])[-_ ]?(20\d\d)\D*$', stem)
+    if m:
         return int(m.group(2)), int(m.group(1))
     raise ValueError(f"Mois introuvable dans l'état Hyundai {path}")
 
@@ -1252,6 +1277,20 @@ def extract_hyundai_file(path):
         sections[mode] = {"source_title": month_name if mode == "month" else f"AAD {month_name}",
                           "kpis": kpis, "departments": departments}
 
+    # Avant 2025, l'exercice de Hyundai Longueuil commençait le 1er juillet :
+    # « l'année à date » de ces états n'est pas un cumul depuis janvier. On ne
+    # garde alors que le mois, pour ne pas mêler deux définitions du cumul.
+    # Repères : « LA PÉRIODE DU … AU … » de la Page 1 couvre soit le mois seul
+    # (2025 et après), soit tout l'exercice à date (ex. 070123 → 013124).
+    du, _ = hy_page1_dates(wb)
+    ytd_sales = (sections.get("ytd", {}).get("kpis", {}).get("ventes_nettes") or {}).get("real")
+    month_sales = (sections.get("month", {}).get("kpis", {}).get("ventes_nettes") or {}).get("real")
+    fiscal = bool(du) and (du[:2] < (year, 1) or du[1] not in (1, month_num))
+    same_as_month = month_num > 1 and isinstance(ytd_sales, (int, float)) and isinstance(month_sales, (int, float)) \
+        and abs(ytd_sales - month_sales) < 1
+    if fiscal or same_as_month:
+        sections.pop("ytd", None)
+
     return {
         "company": HY_COMPANY,
         "month_name": HAWKS_MONTHS[month_num],
@@ -1418,7 +1457,7 @@ def name_period(stem):
     m = re.search(r'(20\d\d)[-_ ](0[1-9]|1[0-3])(?!\d)', stem)
     if m:
         return f"{m.group(1)}-{min(int(m.group(2)), 12):02d}"
-    m = re.search(r'(?<!\d)(0[1-9]|1[0-2])(20\d\d)(?!\d)', stem)   # HYUNDAILONGUEUIL052026
+    m = re.search(r'(?<!\d)(0[1-9]|1[0-2])[-_ ]?(20\d\d)(?!\d)', stem)   # HYUNDAILONGUEUIL052026, FFS … 05-2026
     if m:
         return f"{m.group(2)}-{m.group(1)}"
     m = re.search(r'(?<!\d)(20\d\d)(0[1-9]|1[0-2])(?!\d)', stem)   # stm_202606

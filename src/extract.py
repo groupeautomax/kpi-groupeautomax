@@ -1319,6 +1319,230 @@ def extract_hyundai_file(path):
 
 
 # ---------------------------------------------------------------------------
+# Lecteur de l'état financier Volkswagen Canada (même logiciel Keyloop que
+# Hyundai, feuilles « Page 1 » à « Page 6 » + « FS Data » en anglais (2026) ou
+# « Données d'ÉF » en français (2025)).
+#
+# Les lignes sont repérées par leur numéro de ligne officiel (identique dans
+# les deux langues) : 1 ventes, 2 profit brut (« operating income »), 15
+# frais de vente, 27 frais d'emploi, 47 semi-fixes, 62 fixes, 63 total des
+# dépenses, 64 profit d'exploitation, 71 escompte sur commandes de stock,
+# 73 profit après incitatifs, 74 autres revenus, 75 autres déductions,
+# 80 rémunération des propriétaires, 81 profit net avant impôts, 82 impôts,
+# 83 profit net. Page 4 : 29 total véhicules neufs, 40 usagés détail,
+# 18 flotte VW.
+#
+# Correspondance avec le Réalisé de VW (vérifiée sur août 2026 et janvier
+# 2025) : EBT, unités neuves, usagées et flottes identiques ; profit brut
+# total = ligne 2 + escompte sur commandes de stock (ligne 71, rattaché aux
+# Pièces) ; autres revenus = incitatifs (lignes 65 à 72, hors 71) + ligne 74.
+# Les catégories de dépenses suivent celles de l'état (vente, emploi,
+# semi-fixes), qui diffèrent un peu de celles du Réalisé.
+#
+# Pour VW, le Réalisé reste prioritaire (il contient le budget) : l'état
+# sert aux mois sans Réalisé (FORMAT_RANK["etat_vw"] < gabarit) ET remplace
+# le Réalisé quand l'EBT du mois diffère de plus de VW_EBT_TOLERANCE $ :
+# l'état est alors la version finale (Réalisé produit avant des écritures
+# d'ajustement). Voir vw_statement_override(). Demandé par Maxime Allard
+# (25 septembre 2026).
+# ---------------------------------------------------------------------------
+
+VW_LINE_LABELS = ("line no.", "n° ligne", "no ligne", "line", "ligne")
+VW_MONTH_LABELS = ("current month", "mois en cours")
+VW_YTD_LABELS = ("year-to-date", "year - to - date", "cumul annuel")
+
+
+def vw_line_col(ws, max_row=8):
+    """Colonne des numéros de ligne (la plus à gauche)."""
+    best = None
+    for r in range(1, max_row + 1):
+        for c in range(1, ws.max_column + 1):
+            label = hy_label(ws.cell(row=r, column=c).value)
+            if label and any(label.startswith(x) for x in VW_LINE_LABELS):
+                best = c if best is None else min(best, c)
+    if best is None:
+        raise ValueError(f"Colonne des numéros de ligne introuvable dans « {ws.title} »")
+    return best
+
+
+def vw_blocks(ws, max_row=8):
+    """[(colonne mois, [colonnes cumul])] de gauche à droite, d'après la ligne
+    d'en-tête « CURRENT MONTH / YEAR-TO-DATE » (ou « MOIS EN COURS / CUMUL
+    ANNUEL »)."""
+    for r in range(1, max_row + 1):
+        labels = {c: hy_label(ws.cell(row=r, column=c).value) for c in range(1, ws.max_column + 1)}
+        months = sorted(c for c, v in labels.items() if v in VW_MONTH_LABELS)
+        ytds = sorted(c for c, v in labels.items() if v in VW_YTD_LABELS)
+        if len(months) >= 2 and ytds:
+            blocks = []
+            for i, m in enumerate(months):
+                nxt = months[i + 1] if i + 1 < len(months) else ws.max_column + 1
+                blocks.append((m, [y for y in ytds if m < y < nxt]))
+            return blocks
+    raise ValueError(f"En-têtes « mois / cumul » introuvables dans « {ws.title} »")
+
+
+def vw_rows(ws, line_col):
+    rows = {}
+    for r in range(1, ws.max_row + 1):
+        v = ws.cell(row=r, column=line_col).value
+        if isinstance(v, (int, float)) and not isinstance(v, bool) and float(v).is_integer():
+            rows.setdefault(int(v), r)
+    return rows
+
+
+def vw_value(ws, rows, line, cols):
+    """Premier montant numérique de la ligne dans les colonnes données."""
+    r = rows.get(line)
+    if r is None:
+        return None
+    for c in cols:
+        v = hy_num(ws, r, c)
+        if v is not None:
+            return v
+    return None
+
+
+def vw_period(wb):
+    """(début, fin) de « STATEMENT PERIOD / PÉRIODE » en Page 1 (dates)."""
+    import datetime as _dt
+    ws = wb["Page 1"]
+    for r in range(1, 8):
+        for c in range(1, ws.max_column + 1):
+            label = hy_label(ws.cell(row=r, column=c).value)
+            if label not in ("statement period", "periode"):
+                continue
+            dates = []
+            for rr in range(r + 1, r + 4):
+                for cc in (c, c + 1, c + 2):
+                    v = ws.cell(row=rr, column=cc).value
+                    if isinstance(v, _dt.datetime):
+                        dates.append(v)
+                        break
+            if len(dates) >= 2:
+                return dates[0], dates[1]
+    raise ValueError("Période introuvable dans la Page 1 de l'état VW")
+
+
+def vw_company(wb):
+    ws = wb["Page 1"]
+    for r in range(3, 8):
+        v = ws.cell(row=r, column=2).value
+        if isinstance(v, str) and "volkswagen" in strip_accents(v).lower():
+            return v.strip()
+    return "Volkswagen"
+
+
+def vw_department(ws, rows, month_col, ytd_cols, mode, pb_extra=True):
+    cols = [month_col] if mode == "month" else ytd_cols
+    g = lambda line: vw_value(ws, rows, line, cols) or 0
+    sod = g(71) if pb_extra else 0          # escompte sur commandes de stock
+    incentives = g(73) - g(64) - sod
+    data = {
+        "profit_brut": real_only_kv(g(2) + sod),
+        "total_variables": real_only_kv(g(15)),
+        "total_personnel": real_only_kv(g(27)),
+        "total_semifixes": real_only_kv(g(47)),
+        "total_depenses": real_only_kv(g(63)),
+        "autres_revenus": real_only_kv(incentives),
+        "profit_departemental": real_only_kv(g(73)),
+        "line_items": [],
+    }
+    return data, g
+
+
+def extract_vw_file(path):
+    wb = openpyxl.load_workbook(path, data_only=True)
+    start, end = vw_period(wb)
+    year, month_num = end.year, end.month
+    ws2, ws3, ws4 = wb["Page 2"], wb["Page 3"], wb["Page 4"]
+    lc2, lc3, lc4 = vw_line_col(ws2), vw_line_col(ws3), vw_line_col(ws4)
+    rows2, rows3, rows4 = vw_rows(ws2, lc2), vw_rows(ws3, lc3), vw_rows(ws4, lc4)
+    b2, b3 = vw_blocks(ws2), vw_blocks(ws3)
+    if len(b2) < 3 or len(b3) < 3:
+        raise ValueError(f"État VW {path} : blocs de colonnes incomplets")
+    for need in (1, 2, 15, 27, 47, 62, 63, 64, 73, 74, 75, 81):
+        if need not in rows2:
+            raise ValueError(f"État VW {path} : ligne {need} introuvable en Page 2")
+
+    # Page 4 : unités (1re colonne « UNITS / UNITÉS » = mois, 2e = cumul)
+    unit_cols = None
+    for r in range(1, 8):
+        cols = [c for c in range(1, ws4.max_column + 1)
+                if hy_label(ws4.cell(row=r, column=c).value) in ("units", "unites")]
+        if len(cols) >= 2:
+            unit_cols = (cols[0], cols[1])
+            break
+
+    sections = {}
+    for mode in ("month", "ytd"):
+        idx = 0 if mode == "month" else 1
+        u = (lambda line: real_only_kv(hy_num(ws4, rows4.get(line), unit_cols[idx]) or 0)
+             if unit_cols and rows4.get(line) else None)
+        departments = {}
+        (tm, ty), (nm, ny), (om, oy) = b2[0], b2[1], b2[2]
+        (sm, sy), (cm, cy), (pm, py) = b3[0], b3[1], b3[2]
+        d, _ = vw_department(ws2, rows2, nm, ny, mode, pb_extra=False)
+        d["units"], d["units_flottes"] = u(29), u(18)
+        departments["Véhicules neufs"] = d
+        d, _ = vw_department(ws2, rows2, om, oy, mode, pb_extra=False)
+        d["units"] = u(40)
+        departments["Véhicules usagés"] = d
+        departments["Service"], _ = vw_department(ws3, rows3, sm, sy, mode, pb_extra=False)
+        departments["Carrosserie"], _ = vw_department(ws3, rows3, cm, cy, mode, pb_extra=False)
+        departments["Pièces"], _ = vw_department(ws3, rows3, pm, py, mode, pb_extra=True)
+
+        cols = [tm] if mode == "month" else ty
+        t = lambda line: vw_value(ws2, rows2, line, cols) or 0
+        pb, td, op = t(2), t(63), t(64)
+        ar = (t(73) - op - t(71)) + t(74)
+        ebt = t(81)
+        amort = t(51) + t(53) + t(59)
+        checks = (
+            ("profit d'exploitation = profit brut - dépenses", op, pb - td),
+            ("dépenses = vente + emploi + semi-fixes + fixes", td, t(15) + t(27) + t(47) + t(62)),
+            ("profit avant impôts = après incitatifs + autres revenus - déductions - propriétaires",
+             ebt, t(73) + t(74) - t(75) - t(80)),
+        )
+        for label, a, b in checks:
+            if abs(a - b) > 5:
+                raise ValueError(f"État VW {path} ({mode}) : {label} ne balance pas ({a} vs {b})")
+        summary = {
+            "ventes_nettes": real_only_kv(t(1)),
+            "profit_brut": real_only_kv(pb + t(71)),
+            "total_depenses": real_only_kv(td + t(75) + t(80) - amort),
+            "total_autres_revenus": real_only_kv(ar),
+            "profit_net": real_only_kv(ebt),
+            "impot": real_only_kv(t(82)),
+            "profit_net_apres_impot": real_only_kv(t(83)),
+            "amortissement": real_only_kv(amort),
+            "baiia_operationnel": real_only_kv(ebt + amort),
+        }
+        kpis = {}
+        kpis.update(department_kpis_for_company_view(departments))
+        kpis.update(summary_kpis_for_company_view(summary))
+        kpis.update(expense_breakdown_kpis_for_company_view(departments))
+        kpis.update(unit_economics_kpis_for_company_view(kpis))
+        month_name = HAWKS_MONTHS[month_num]
+        sections[mode] = {"source_title": month_name if mode == "month" else f"AAD {month_name}",
+                          "kpis": kpis, "departments": departments}
+
+    # Cumul d'un exercice qui ne commence pas le 1er janvier : on ne garde que le mois.
+    if (start.year, start.month, start.day) != (year, 1, 1):
+        sections.pop("ytd", None)
+
+    return {
+        "company": vw_company(wb),
+        "month_name": HAWKS_MONTHS[month_num],
+        "month_num": month_num,
+        "year": year,
+        "period_key": f"{year}-{month_num:02d}",
+        "sections": sections,
+        "source_format": "etat_vw",
+    }
+
+
+# ---------------------------------------------------------------------------
 # Aiguillage par contenu (et non plus par extension) : l'état GM (HAWKS, STM)
 # et l'état Hyundai Canada sont tous deux des .xlsm.
 # ---------------------------------------------------------------------------
@@ -1330,7 +1554,9 @@ def extract_hyundai_file(path):
 # 25 septembre 2026), et c'était déjà l'effet de l'ancien ordre de
 # traitement (les .xlsm passaient après les .xlsx). Le Réalisé reste utilisé
 # pour tous les mois sans état financier.
-FORMAT_RANK = {"etat_gm": 1, "etat_hyundai": 1, "gabarit": 0}
+FORMAT_RANK = {"etat_gm": 1, "etat_hyundai": 1, "gabarit": 0, "etat_vw": -1}
+# Exception VW : son Réalisé (avec budget) reste prioritaire sur l'état
+# Volkswagen Canada, qui ne comble que les mois sans Réalisé.
 
 
 def sheet_names(path):
@@ -1358,22 +1584,23 @@ def detect_format(path):
         return "etat_gm"
     if {"Page 2", "Page 3", "Page 4"} <= names:
         # Même logiciel (Keyloop) pour Volkswagen Canada : ses états ont en plus
-        # une feuille de données (« Données d'ÉF » / « FS Data »). Pas encore de
-        # lecteur VW : on refuse le fichier plutôt que de le lire comme Hyundai.
+        # une feuille de données (« Données d'ÉF » / « FS Data »).
         if names & {"Données d'ÉF", "FS Data"}:
-            raise ValueError("état financier Volkswagen Canada : pas encore de lecteur (fichier ignoré)")
+            return "etat_vw"
         return "etat_hyundai"
-    raise ValueError("format non reconnu (ni gabarit Réalisé, ni état GM, ni état Hyundai)")
+    raise ValueError("format non reconnu (ni gabarit Réalisé, ni état GM, ni état Hyundai, ni état VW)")
 
 
 def extract_any_file(path):
     """Gabarit Réalisé (.xlsx, onglet Parametres), état financier GM (HAWKS,
-    STM) ou état financier Hyundai Canada (Hyundai Longueuil)."""
+    STM), Hyundai Canada (Hyundai Longueuil) ou Volkswagen Canada (VW)."""
     fmt = detect_format(path)
     if fmt == "etat_gm":
         out = extract_hawks_file(path)
     elif fmt == "etat_hyundai":
         out = extract_hyundai_file(path)
+    elif fmt == "etat_vw":
+        out = extract_vw_file(path)
     else:
         out = extract_file(path)
     out["source_format"] = fmt
@@ -1393,13 +1620,14 @@ def save_store(store, store_path):
     with open(store_path, 'w', encoding='utf-8') as f:
         json.dump(store, f, ensure_ascii=False, indent=2)
 
-def merge_into_store(store, extracted):
+def merge_into_store(store, extracted, force=False):
     dealer_key, display_name = canonicalize_dealer(extracted["company"])
     period = extracted["period_key"]
     d = store["dealers"].setdefault(dealer_key, {"display_name": display_name, "legal_name": extracted["company"], "periods": {}})
     fmt = extracted.get("source_format", "gabarit")
     existing = d["periods"].get(period)
-    if existing and FORMAT_RANK.get(existing_format(dealer_key, existing), 0) > FORMAT_RANK.get(fmt, 0):
+    if (not force and existing
+            and FORMAT_RANK.get(existing_format(dealer_key, existing), 0) > FORMAT_RANK.get(fmt, 0)):
         # Un mois déjà tiré d'un état financier n'est jamais remplacé par un
         # Réalisé (voir FORMAT_RANK).
         return store
@@ -1492,6 +1720,60 @@ def is_ignored_source(name):
     return base.startswith("~$") or bool(DRAFT_RE.search(stem_of(base)))
 
 
+VW_EBT_TOLERANCE = 1000.0
+
+
+def section_ebt(extracted, sec_key):
+    sec = extracted.get("sections", {}).get(sec_key) or {}
+    return ((sec.get("kpis") or {}).get("ebt") or {}).get("real")
+
+
+def vw_statement_override(ranked, prev_statement):
+    """Pour un mois où le Réalisé (gabarit) a été retenu et où un état VW
+    existe aussi : si l'EBT du mois diffère de plus de VW_EBT_TOLERANCE $,
+    renvoie (nom, extrait) du Réalisé qui concorde avec l'état s'il y en a
+    un, sinon l'état lui-même ; renvoie None si les deux concordent.
+
+    L'état n'est retenu que s'il est cohérent : son cumul moins le cumul de
+    l'état du mois précédent doit égaler son EBT du mois (écarte un fichier
+    mal nommé, p. ex. un état d'avril qui contient en fait les chiffres de
+    mai)."""
+    best = ranked[0][2]
+    if best.get("source_format") != "gabarit":
+        return None, None
+    statements = [t for t in ranked[1:] if t[2].get("source_format") == "etat_vw"]
+    if not statements:
+        return None, None
+    _, st_name, st = statements[0]
+    real_m, st_m = section_ebt(best, "month"), section_ebt(st, "month")
+    if real_m is None or st_m is None or abs(st_m - real_m) <= VW_EBT_TOLERANCE:
+        return None, None
+    st_y = section_ebt(st, "ytd")
+    if st_y is not None:
+        if st["month_num"] == 1:
+            prev_y = 0.0
+        else:
+            prev_y = section_ebt(prev_statement, "ytd") if prev_statement else None
+        if prev_y is not None and abs((st_y - prev_y) - st_m) > VW_EBT_TOLERANCE:
+            return None, (f"état {st_name} incohérent (cumul {st_y:,.0f} − cumul du mois "
+                          f"précédent {prev_y:,.0f} ≠ mois {st_m:,.0f}) : Réalisé conservé")
+    # Un autre Réalisé du même mois (p. ex. « … (1).xlsx », refait après les
+    # ajustements) qui concorde avec l'état est préféré : il garde le budget.
+    for _, other_name, other in ranked[1:]:
+        other_m = section_ebt(other, "month")
+        if (other.get("source_format") == "gabarit" and other_m is not None
+                and abs(other_m - st_m) <= VW_EBT_TOLERANCE):
+            return (other_name, other), (f"EBT du Réalisé {real_m:,.0f} $ ≠ état VW {st_m:,.0f} $ ; "
+                                         f"{other_name} concorde avec l'état : retenu (garde le budget)")
+    return (st_name, st), (f"EBT du Réalisé {real_m:,.0f} $ ≠ état VW {st_m:,.0f} $ : "
+                           f"état retenu")
+
+
+def prev_period_key(period_key):
+    y, m = int(period_key[:4]), int(period_key[5:7])
+    return f"{y - 1}-12" if m == 1 else f"{y}-{m - 1:02d}"
+
+
 def source_rank(name, extracted, order):
     stem = stem_of(name)
     np_ = name_period(stem)
@@ -1546,10 +1828,19 @@ if __name__ == "__main__":
             for sec_key, sec in other["sections"].items():
                 if sec_key.startswith("quarter_") and sec_key not in best["sections"]:
                     best["sections"][sec_key] = sec
+        force = False
+        prev_st = next((x for _, _, x in candidates.get((key[0], prev_period_key(key[1])), [])
+                        if x.get("source_format") == "etat_vw"), None)
+        override, why = vw_statement_override(ranked, prev_st)
+        if why:
+            print(f"VW {key[1]} : {why}")
+        if override:
+            best_name, best = override
+            force = True  # passe outre la protection FORMAT_RANK de merge_into_store
         if len(ranked) > 1:
             print(f"Retenu pour {key[0]} {key[1]} : {best_name} "
-                  f"(écartés : {', '.join(n for _, n, _ in ranked[1:])})")
-        merge_into_store(store, best)
+                  f"(écartés : {', '.join(n for _, n, _ in ranked if n != best_name)})")
+        merge_into_store(store, best, force=force)
 
     save_store(store, store_path)
     print("Saved store to", store_path)

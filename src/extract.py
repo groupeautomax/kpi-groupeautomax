@@ -33,7 +33,9 @@ def negate_kv(kv):
 # column/row/color order in the dashboard, regardless of upload order.
 CANONICAL_DEALERS = [
     ("bmw", "BMW Sherbrooke", lambda s: "bmw" in s),
-    ("stm", "STM (Ste-Marie Auto)", lambda s: "ste-marie" in s or "ste marie" in s or re.search(r'\bstm\b', s)),
+    # STM : « STE-MARIE AUTOMOBILES LTEE » dans l'état financier GM, « Ste-Marie
+    # Auto » dans le gabarit Réalisé -- on accepte aussi « Sainte-Marie ».
+    ("stm", "STM (Ste-Marie Auto)", lambda s: re.search(r'\b(ste|st|sainte)[- ]marie\b', s) or re.search(r'\bstm\b', s)),
     ("hawks", "HAWKS", lambda s: "hawk" in s),
     ("vw", "Volkswagen", lambda s: "volkswagen" in s or "volks" in s or re.search(r'\bvw\b', s)),
     ("hyundai", "Hyundai", lambda s: "hyundai" in s),
@@ -653,6 +655,15 @@ HAWKS_LINE_ITEM_SECTIONS = (
 )
 HAWKS_LINE_ITEM_TOTAL_ROWS = {10, 20, 43, 58, 64}
 
+def gm_brand_sheets(wb):
+    """Feuilles « Page5_<marque>_<MCI|VE> » présentes dans l'état GM : les 8 de
+    HAWKS_NEW_VEHICLE_BRAND_SHEETS, plus toute autre marque GM qu'un autre
+    concessionnaire (ex. STM) aurait dans son propre état."""
+    names = [n for n in HAWKS_NEW_VEHICLE_BRAND_SHEETS if n in wb.sheetnames]
+    names += [n for n in wb.sheetnames
+              if re.match(r'^Page5_[A-Z]+_(MCI|VE)$', n) and n not in names]
+    return names
+
 def real_only_kv(value):
     """A real-only kv (no budget/prior-year exists in HAWKS' source file)."""
     v = norm_num(value)
@@ -669,9 +680,7 @@ def hawks_find_row(ws, label_prefix, col=3, max_row=200):
 def hawks_new_vehicle_units(wb):
     """Sum "TOTAL VÉHICULES NEUFS" across the 8 per-brand sheets -> (month_kv, ytd_kv)."""
     month_total, ytd_total, any_found = 0, 0, False
-    for name in HAWKS_NEW_VEHICLE_BRAND_SHEETS:
-        if name not in wb.sheetnames:
-            continue
+    for name in gm_brand_sheets(wb):
         ws = wb[name]
         row = hawks_find_row(ws, "total vehicules neufs")
         if row is None:
@@ -717,9 +726,7 @@ def hawks_new_vehicle_line_items(wb, unit_col, profit_col):
     does."""
     car_units = car_profit = truck_units = truck_profit = 0
     any_found = False
-    for sheet_name in HAWKS_NEW_VEHICLE_BRAND_SHEETS:
-        if sheet_name not in wb.sheetnames:
-            continue
+    for sheet_name in gm_brand_sheets(wb):
         ws = wb[sheet_name]
         car_row = hawks_find_row(ws, "total voitures neuves")
         truck_row = hawks_find_row(ws, "total camions neufs")
@@ -939,12 +946,378 @@ def extract_hawks_file(path):
         },
     }
 
+# ---------------------------------------------------------------------------
+# Lecteur de l'état financier Hyundai Canada (format Keyloop / SDS).
+#
+# Hyundai Longueuil envoie aussi l'état financier standard de Hyundai Canada
+# (HYUNDAILONGUEUIL<MM><AAAA>.xlsm, feuilles « Page 1 » à « Page 6 ») :
+#  - Page 2 : sommaire des revenus et dépenses -- total des opérations
+#    (mois / année à date) et départements Véhicules neufs et d'occasion ;
+#  - Page 3 : mêmes lignes pour Pièces, Service, Débosselage et Location ;
+#  - Page 4 : analyse des ventes (unités, ventes et profit brut par modèle).
+# Comme l'état GM de HAWKS et de STM, il ne contient que le réel (pas de
+# budget ni d'année précédente). Les montants négatifs y sont imprimés entre
+# parenthèses, dans des cellules voisines : « ( » juste à gauche du montant.
+#
+# Correspondance avec le gabarit Réalisé, vérifiée au dollar près sur avril,
+# juin et juillet 2026 (mois pour lesquels les deux fichiers existent) :
+#  - dépenses variables  = frais de vente des véhicules - salaires des gérants
+#                          des ventes ;
+#  - dépenses personnel  = sous-total frais d'emploi + salaires des gérants ;
+#  - dépenses semi-fixes = frais directs - sous-total frais d'emploi ;
+#  - les frais indirects (loyer, taxes, etc.) restent dans le total des
+#    dépenses sans catégorie, comme les « fixes non ventilées » du Réalisé ;
+#  - le profit brut des lubrifiants et des « autres revenus » du service est
+#    rattaché aux Pièces, comme dans le Réalisé.
+# L'amortissement (améliorations, immeubles, équipement) est sorti des
+# dépenses et placé sous le BAIIA, comme dans le gabarit : BAIIA = profit net
+# + amortissement.
+# ---------------------------------------------------------------------------
+
+HY_COMPANY = "Hyundai Longueuil"
+
+# (colonne mois, colonne année à date) de chaque bloc
+HY_P2_COLS = {"total": (25, 38), "Véhicules neufs": (51, 60), "Véhicules usagés": (69, 78)}
+HY_P3_COLS = {"Pièces": (20, 29), "Service": (38, 47), "Carrosserie": (56, 65), "Location": (75, 84)}
+HY_P2_LABEL_COL, HY_P3_LABEL_COL, HY_P4_LABEL_COL = 2, 4, 34
+# Page 4 : unités / ventes / profit brut
+HY_P4_COLS = {"month": {"units": 2, "ventes": 7, "pb": 17}, "ytd": {"units": 53, "ventes": 58, "pb": 68}}
+
+HY_DEPT_ROWS = {
+    "ventes": "ventes totales",
+    "profit_brut": "profit brut total",
+    "sal_gerants": "salaires - gerants des vente",
+    "frais_vente": "total des frais de vente des",
+    "frais_emploi": "sous - total frais d'emploi",
+    "frais_directs": "total des frais directs",
+    "frais_indirects": "total des frais indirects",
+    "total_depenses": "total des depenses",
+    "profit_operation": "profit d'operation net",
+}
+HY_COMPANY_ROWS = {
+    "autres_revenus": "autres revenus",
+    "autres_deductions": "autres deductions",
+    "sal_proprio": "salaire - proprietaires",
+    "bonis_proprio": "bonis - proprietaires",
+    "profit_net": "profit net (ou perte nette)",
+    "impot": "impot sur le revenu",
+    "profit_net_apres_impot": "profit net (perte nette) apr",
+    "amort_ameliorations": "amortissements des ameliorat",
+    "amort_immeubles": "amortissement des immeubles",
+    "amort_equipement": "amortissement - equipement",
+}
+
+# Page 4 : lignes reprises dans le détail « Voir le détail des postes », sous
+# les mêmes noms de catégories que le gabarit Réalisé.
+HY_NEW_ITEMS = (
+    ("total hyundai detail - voitu", "Autos détail", False),
+    ("total hyundai detail - camio", "Camions détail", False),
+    ("total hyundai detail - ve", "Véhicules électriques", False),
+    ("modeles fin de serie", "Modèles fin de série", False),
+    ("total hyundai detail - neufs", "Total Neufs", True),
+    ("bureau commercial - neuf", "Total F&I", False),
+    ("flotte national", "Flottes", False),
+    ("echanges concessionaires", "Échanges concessionnaires", False),
+    ("total depart. veh. neufs", "Total Dépt. Neufs", True),
+)
+HY_USED_ITEMS = (
+    ("total ventes au detail veh", "Total Usagés", True),
+    ("ventes en gros vehicules d'o", "Ventes au Gros", False),
+    ("vehicules d'occasion - achat", "Achats de véhicules d'occasion", False),
+    ("bureau commercial - total de", "Total F&I", False),
+    ("total depart. veh. d'occasio", "Total Dépt. Usagés", True),
+)
+
+
+def hy_label(value):
+    if not isinstance(value, str):
+        return None
+    return re.sub(r"\s+", " ", strip_accents(value).lower()).strip()
+
+
+def hy_find(ws, col, prefix, start=1, end=None):
+    target = hy_label(prefix)
+    for r in range(start, (end or ws.max_row) + 1):
+        label = hy_label(ws.cell(row=r, column=col).value)
+        if label and label.startswith(target):
+            return r
+    return None
+
+
+def hy_num(ws, row, col):
+    """Montant de la cellule (row, col), négatif s'il est précédé de « ( »."""
+    if row is None:
+        return None
+    v = ws.cell(row=row, column=col).value
+    if not isinstance(v, (int, float)) or isinstance(v, bool):
+        return None
+    left = ws.cell(row=row, column=col - 1).value
+    if isinstance(left, str) and left.strip() == "(":
+        return -v
+    return v
+
+
+def hy_period(wb, path):
+    """(année, mois) : « MOIS DE 07 ... 2026 » en haut de la Page 4, sinon le
+    nom du fichier (…<MM><AAAA>.xlsm)."""
+    ws = wb["Page 4"]
+    for r in range(1, 8):
+        cells = [ws.cell(row=r, column=c).value for c in range(1, ws.max_column + 1)]
+        labels = [hy_label(v) for v in cells]
+        if "mois de" not in labels:
+            continue
+        month = year = None
+        for v in cells[labels.index("mois de") + 1:]:
+            s = str(v).strip() if v is not None else ""
+            if not s.isdigit():
+                continue
+            n = int(s)
+            if month is None and 1 <= n <= 12:
+                month = n
+            elif year is None and 2000 <= n <= 2100:
+                year = n
+        if month and year:
+            return year, month
+    m = re.search(r'(\d{2})(\d{4})\D*$', os.path.splitext(os.path.basename(path))[0])
+    if m and 1 <= int(m.group(1)) <= 12:
+        return int(m.group(2)), int(m.group(1))
+    raise ValueError(f"Mois introuvable dans l'état Hyundai {path}")
+
+
+def hy_rows(ws, label_col):
+    rows = {key: hy_find(ws, label_col, label) for key, label in HY_DEPT_ROWS.items()}
+    missing = [k for k in ("ventes", "profit_brut", "frais_vente", "frais_emploi", "frais_directs",
+                           "frais_indirects", "total_depenses", "profit_operation") if rows[k] is None]
+    if missing:
+        raise ValueError(f"Lignes introuvables dans « {ws.title} » : {', '.join(missing)}")
+    return rows
+
+
+def hy_expense_line_items(ws, label_col, rows, col):
+    """Chaque poste de dépense du département, classé comme dans le gabarit :
+    variables (frais de vente, sauf les salaires des gérants), personnel
+    (salaires des gérants + frais d'emploi), semi-fixes (autres frais directs)
+    et fixes (frais indirects, hors des trois catégories)."""
+    items = []
+    start = rows["sal_gerants"] or (rows["profit_brut"] + 1)
+    for r in range(start, rows["total_depenses"]):
+        label = ws.cell(row=r, column=label_col).value
+        money = hy_num(ws, r, col)
+        if not isinstance(label, str) or not label.strip() or money is None:
+            continue
+        if r == rows["frais_directs"]:
+            continue  # sous-total qui mêle personnel et semi-fixes
+        if r == rows["sal_gerants"]:
+            section = "personnel"
+        elif r <= rows["frais_vente"]:
+            section = "variables"
+        elif r <= rows["frais_emploi"]:
+            section = "personnel"
+        elif r < rows["frais_directs"]:
+            section = "semifixes"
+        else:
+            section = "fixes"
+        items.append({
+            "label": re.sub(r"\s+", " ", label).strip(),
+            "section": section,
+            "is_total": r in (rows["frais_vente"], rows["frais_emploi"], rows["frais_indirects"]),
+            "units": None,
+            "money": real_only_kv(money),
+            "pct": None,
+        })
+    return items
+
+
+def hy_department(ws, label_col, rows, col, pb_shift=0.0, units_kv=None, flottes_kv=None):
+    g = lambda key: hy_num(ws, rows.get(key), col) or 0
+    pb = g("profit_brut") + pb_shift
+    sal, fv, fe, fd = g("sal_gerants"), g("frais_vente"), g("frais_emploi"), g("frais_directs")
+    data = {
+        "profit_brut": real_only_kv(pb),
+        "total_variables": real_only_kv(fv - sal),
+        "total_personnel": real_only_kv(fe + sal),
+        "total_semifixes": real_only_kv(fd - fe),
+        "total_depenses": real_only_kv(g("total_depenses")),
+        "autres_revenus": real_only_kv(0),
+        "profit_departemental": real_only_kv(g("profit_operation") + pb_shift),
+        "line_items": hy_expense_line_items(ws, label_col, rows, col),
+    }
+    if units_kv is not None:
+        data["units"] = units_kv
+    if flottes_kv is not None:
+        data["units_flottes"] = flottes_kv
+    return data
+
+
+def hy_sales_line_items(ws4, specs, start, end, cols):
+    items = []
+    for prefix, label, is_total in specs:
+        r = hy_find(ws4, HY_P4_LABEL_COL, prefix, start, end)
+        if r is None:
+            continue
+        units, pb = hy_num(ws4, r, cols["units"]), hy_num(ws4, r, cols["pb"])
+        if units is None and pb is None:
+            continue
+        items.append({"label": label, "section": "ventes", "is_total": is_total,
+                      "units": real_only_kv(units or 0), "money": real_only_kv(pb or 0), "pct": None})
+    return items
+
+
+def extract_hyundai_file(path):
+    wb = openpyxl.load_workbook(path, data_only=True)
+    ws2, ws3, ws4 = wb["Page 2"], wb["Page 3"], wb["Page 4"]
+    year, month_num = hy_period(wb, path)
+    rows2, rows3 = hy_rows(ws2, HY_P2_LABEL_COL), hy_rows(ws3, HY_P3_LABEL_COL)
+    crow = {k: hy_find(ws2, HY_P2_LABEL_COL, lab, rows2["profit_operation"] if k in (
+        "autres_revenus", "autres_deductions", "sal_proprio", "bonis_proprio", "profit_net", "impot",
+        "profit_net_apres_impot") else 1) for k, lab in HY_COMPANY_ROWS.items()}
+    for k in ("autres_revenus", "profit_net"):
+        if crow[k] is None:
+            raise ValueError(f"Ligne « {HY_COMPANY_ROWS[k]} » introuvable dans la Page 2 de {path}")
+
+    # Repères de la Page 4
+    p4 = lambda prefix, start=1, end=None: hy_find(ws4, HY_P4_LABEL_COL, prefix, start, end)
+    r_vn_head, r_vn_tot = p4("vehicules neufs"), p4("total depart. veh. neufs")
+    r_vo_head, r_vo_tot = p4("vehicules d'occasion"), p4("total depart. veh. d'occasio")
+    r_vo_detail, r_fleet = p4("total ventes au detail veh"), p4("flotte national")
+    r_service = next((r for r in range(1, ws4.max_row + 1)
+                      if hy_label(ws4.cell(row=r, column=HY_P4_LABEL_COL).value) == "service"), None)
+    r_lub = p4("lubrifiants", r_service or 1)
+    r_serv_autres = p4("autres revenus", r_service or 1)
+    if None in (r_vn_tot, r_vo_detail, r_service):
+        raise ValueError(f"Page 4 de l'état Hyundai non reconnue : {path}")
+
+    sections = {}
+    for mode, idx in (("month", 0), ("ytd", 1)):
+        c4 = HY_P4_COLS[mode]
+        u = lambda r: real_only_kv(hy_num(ws4, r, c4["units"]) or 0) if r else None
+        # profit brut des lubrifiants et des autres revenus du service -> Pièces
+        shift = (hy_num(ws4, r_lub, c4["pb"]) or 0) + (hy_num(ws4, r_serv_autres, c4["pb"]) or 0)
+
+        departments = {}
+        for name in ("Véhicules neufs", "Véhicules usagés"):
+            col = HY_P2_COLS[name][idx]
+            if name == "Véhicules neufs":
+                d = hy_department(ws2, HY_P2_LABEL_COL, rows2, col, units_kv=u(r_vn_tot), flottes_kv=u(r_fleet))
+                d["line_items"] = hy_sales_line_items(ws4, HY_NEW_ITEMS, r_vn_head or 1, r_vn_tot, c4) + d["line_items"]
+            else:
+                d = hy_department(ws2, HY_P2_LABEL_COL, rows2, col, units_kv=u(r_vo_detail))
+                d["line_items"] = hy_sales_line_items(ws4, HY_USED_ITEMS, r_vo_head or 1, r_vo_tot, c4) + d["line_items"]
+            departments[name] = d
+        for name in ("Pièces", "Service", "Carrosserie", "Location"):
+            col = HY_P3_COLS[name][idx]
+            pb_shift = shift if name == "Pièces" else (-shift if name == "Service" else 0.0)
+            d = hy_department(ws3, HY_P3_LABEL_COL, rows3, col, pb_shift=pb_shift)
+            if name == "Location" and not any(
+                    (d[k]["real"] or 0) for k in ("profit_brut", "total_depenses", "profit_departemental")):
+                continue
+            departments[name] = d
+
+        tcol = HY_P2_COLS["total"][idx]
+        t = lambda key: hy_num(ws2, rows2[key], tcol) or 0
+        cv = lambda key: hy_num(ws2, crow[key], tcol) or 0
+        pb, td, po = t("profit_brut"), t("total_depenses"), t("profit_operation")
+        ar, ad, sp, bp = cv("autres_revenus"), cv("autres_deductions"), cv("sal_proprio"), cv("bonis_proprio")
+        pn = cv("profit_net")
+        amort = cv("amort_ameliorations") + cv("amort_immeubles") + cv("amort_equipement")
+        # Contrôles d'intégrité : si la mise en page change, on refuse le
+        # fichier plutôt que de publier des chiffres faux.
+        checks = (
+            ("profit d'opération = profit brut - dépenses", po, pb - td),
+            ("total des dépenses = frais de vente + directs + indirects", td,
+             t("frais_vente") + t("frais_directs") + t("frais_indirects")),
+            ("profit net = profit d'opération + autres revenus - déductions", pn, po + ar - ad - sp - bp),
+        )
+        for label, a, b in checks:
+            if abs(a - b) > 5:
+                raise ValueError(f"État Hyundai {path} ({mode}) : {label} ne balance pas ({a} vs {b})")
+
+        summary = {
+            "ventes_nettes": real_only_kv(t("ventes")),
+            "profit_brut": real_only_kv(pb),
+            "total_depenses": real_only_kv(td + ad + sp + bp - amort),
+            "total_autres_revenus": real_only_kv(ar),
+            "profit_net": real_only_kv(pn),
+            "impot": real_only_kv(cv("impot")),
+            "profit_net_apres_impot": real_only_kv(hy_num(ws2, crow["profit_net_apres_impot"], tcol)),
+            "amortissement": real_only_kv(amort),
+            "baiia_operationnel": real_only_kv(pn + amort),
+        }
+        kpis = {}
+        kpis.update(department_kpis_for_company_view(departments))
+        kpis.update(summary_kpis_for_company_view(summary))
+        kpis.update(expense_breakdown_kpis_for_company_view(departments))
+        kpis.update(unit_economics_kpis_for_company_view(kpis))
+        month_name = HAWKS_MONTHS[month_num]
+        sections[mode] = {"source_title": month_name if mode == "month" else f"AAD {month_name}",
+                          "kpis": kpis, "departments": departments}
+
+    return {
+        "company": HY_COMPANY,
+        "month_name": HAWKS_MONTHS[month_num],
+        "month_num": month_num,
+        "year": year,
+        "period_key": f"{year}-{month_num:02d}",
+        "sections": sections,
+        "source_format": "etat_hyundai",
+    }
+
+
+# ---------------------------------------------------------------------------
+# Aiguillage par contenu (et non plus par extension) : l'état GM (HAWKS, STM)
+# et l'état Hyundai Canada sont tous deux des .xlsm.
+# ---------------------------------------------------------------------------
+
+# Rang des formats quand deux fichiers donnent la même concession et le même
+# mois : l'état financier du constructeur (GM pour HAWKS et STM, Hyundai
+# Canada pour Hyundai Longueuil) l'emporte sur le gabarit Réalisé. C'est la
+# source que STM et Hyundai envoient désormais (demande de Maxime Allard,
+# 25 septembre 2026), et c'était déjà l'effet de l'ancien ordre de
+# traitement (les .xlsm passaient après les .xlsx). Le Réalisé reste utilisé
+# pour tous les mois sans état financier.
+FORMAT_RANK = {"etat_gm": 1, "etat_hyundai": 1, "gabarit": 0}
+
+
+def sheet_names(path):
+    """Noms des feuilles lus directement dans le .xlsx/.xlsm (rapide, sans
+    charger le classeur). Lève ValueError pour un fichier qui n'est pas un
+    classeur Excel (ex. fichier de verrouillage « ~$… » d'Office)."""
+    import zipfile
+    if not zipfile.is_zipfile(path):
+        raise ValueError("pas un classeur Excel (fichier vide ou fichier de verrouillage Office)")
+    with zipfile.ZipFile(path) as z:
+        xml = z.read("xl/workbook.xml").decode("utf-8", "replace")
+    return [html_unescape(n) for n in re.findall(r'<(?:\w+:)?sheet\b[^>]*\bname="([^"]*)"', xml)]
+
+
+def html_unescape(s):
+    import html
+    return html.unescape(s)
+
+
+def detect_format(path):
+    names = set(sheet_names(path))
+    if "Parametres" in names:
+        return "gabarit"
+    if {"Page1", "Page2", "Page3", "Page4"} <= names:
+        return "etat_gm"
+    if {"Page 2", "Page 3", "Page 4"} <= names:
+        return "etat_hyundai"
+    raise ValueError("format non reconnu (ni gabarit Réalisé, ni état GM, ni état Hyundai)")
+
+
 def extract_any_file(path):
-    """HAWKS sends GM's standardized .xlsm composite statement; every other
-    dealer sends the Quotus-based .xlsx template. Dispatch on extension."""
-    if path.lower().endswith(".xlsm"):
-        return extract_hawks_file(path)
-    return extract_file(path)
+    """Gabarit Réalisé (.xlsx, onglet Parametres), état financier GM (HAWKS,
+    STM) ou état financier Hyundai Canada (Hyundai Longueuil)."""
+    fmt = detect_format(path)
+    if fmt == "etat_gm":
+        out = extract_hawks_file(path)
+    elif fmt == "etat_hyundai":
+        out = extract_hyundai_file(path)
+    else:
+        out = extract_file(path)
+    out["source_format"] = fmt
+    return out
 
 def load_store(store_path):
     if os.path.exists(store_path):
@@ -964,15 +1337,108 @@ def merge_into_store(store, extracted):
     dealer_key, display_name = canonicalize_dealer(extracted["company"])
     period = extracted["period_key"]
     d = store["dealers"].setdefault(dealer_key, {"display_name": display_name, "legal_name": extracted["company"], "periods": {}})
+    fmt = extracted.get("source_format", "gabarit")
+    existing = d["periods"].get(period)
+    if existing and FORMAT_RANK.get(existing_format(dealer_key, existing), 0) > FORMAT_RANK.get(fmt, 0):
+        # Un mois déjà tiré d'un état financier n'est jamais remplacé par un
+        # Réalisé (voir FORMAT_RANK).
+        return store
+    if fmt == "gabarit" or dealer_key == "hawks" or not d.get("legal_name"):
+        d["legal_name"] = extracted["company"]
     d["display_name"] = display_name
-    d["legal_name"] = extracted["company"]
-    d["periods"][period] = {
+    record = {
         "month_name": extracted["month_name"],
         "month_num": extracted["month_num"],
         "year": extracted["year"],
-        "sections": extracted["sections"]
+        "sections": extracted["sections"],
+        "source_format": fmt,
     }
+    if extracted.get("source_file"):
+        record["source_file"] = extracted["source_file"]
+    d["periods"][period] = record
     return store
+
+
+def existing_format(dealer_key, record):
+    """Format d'un mois déjà présent dans data.json (les anciens
+    enregistrements n'ont pas le champ : HAWKS = état GM, les autres =
+    gabarit Réalisé)."""
+    return record.get("source_format") or ("etat_gm" if dealer_key == "hawks" else "gabarit")
+
+
+# ---------------------------------------------------------------------------
+# Choix du fichier quand plusieurs donnent la même concession et le même mois.
+#
+# Règles (demandées par Maxime Allard, 25 septembre 2026) :
+#  - les Réalisés qui se terminent par V0 ou V1 (brouillons) sont TOUJOURS
+#    ignorés ; on prend celui qui se termine par le nom de la concession
+#    (ex. « 2025-07_Réalisé_VW.xlsx ») ;
+#  - les fichiers de verrouillage d'Office (« ~$… ») sont ignorés ;
+#  - l'état financier du constructeur l'emporte sur le Réalisé (FORMAT_RANK) ;
+#  - un fichier dont le nom annonce le même mois que son contenu (onglet
+#    Parametres) l'emporte sur un fichier mal nommé ;
+#  - une version finale ou après régularisation (« Final », « après régul »,
+#    « 13 », « MOIS_13 ») l'emporte ; une variante (V2…, « (1) », copie,
+#    pré-réserve, anglais, GPA, cadres, brouillon…) passe après ;
+#  - à égalité, le dernier par ordre alphabétique (comportement d'origine).
+# ---------------------------------------------------------------------------
+
+DRAFT_RE = re.compile(r'[\s_-]v0?[01]$')
+VARIANT_RE = re.compile(r'[\s_-]v\d+$|\(\d+\)|(?<![a-z])(copy|copie|anglais|english|gpa|cadres|manuf|qg|draft|brouillon)(?![a-z])'
+                        r'|pre[\s_-]?reserve')
+FINAL_RE = re.compile(r'r_?e?gul|(?<![a-z])final(?![a-z])|mois[\s_-]?13|13[\s_-]?mois|20\d\d[-_ ]13(?!\d)')
+
+
+def load_source_names(paths):
+    """Nom d'origine (Drive) de chaque fichier de sources/, d'après
+    .drive_manifest.json ; à défaut, le nom du fichier lui-même."""
+    names = {}
+    for p in paths:
+        manifest = os.path.join(os.path.dirname(p) or ".", ".drive_manifest.json")
+        if os.path.exists(manifest) and manifest not in names:
+            try:
+                with open(manifest, encoding="utf-8") as f:
+                    for entry in json.load(f).values():
+                        lp = entry.get("local_path")
+                        if lp and not entry.get("name", "").startswith("~$"):
+                            names[os.path.basename(lp)] = entry.get("name")
+            except Exception:  # noqa: BLE001 - le manifeste est une aide, pas une obligation
+                pass
+            names[manifest] = True
+    return names
+
+
+def stem_of(name):
+    return strip_accents(os.path.splitext(os.path.basename(name))[0]).lower().strip()
+
+
+def name_period(stem):
+    """Mois annoncé par le nom du fichier : « 2025-07 », « 2025_12_31 »,
+    « 2025-13 » (= décembre après régularisation) ou « …052026 »."""
+    m = re.search(r'(20\d\d)[-_ ](0[1-9]|1[0-3])(?!\d)', stem)
+    if m:
+        return f"{m.group(1)}-{min(int(m.group(2)), 12):02d}"
+    m = re.search(r'(?<!\d)(0[1-9]|1[0-2])(20\d\d)(?!\d)', stem)   # HYUNDAILONGUEUIL052026
+    if m:
+        return f"{m.group(2)}-{m.group(1)}"
+    m = re.search(r'(?<!\d)(20\d\d)(0[1-9]|1[0-2])(?!\d)', stem)   # stm_202606
+    if m:
+        return f"{m.group(1)}-{m.group(2)}"
+    return None
+
+
+def is_ignored_source(name):
+    base = os.path.basename(name)
+    return base.startswith("~$") or bool(DRAFT_RE.search(stem_of(base)))
+
+
+def source_rank(name, extracted, order):
+    stem = stem_of(name)
+    np_ = name_period(stem)
+    name_score = 1 if np_ is None else (2 if np_ == extracted["period_key"] else 0)
+    quality = (1 if FINAL_RE.search(stem) else 0) - (1 if VARIANT_RE.search(stem) else 0)
+    return (FORMAT_RANK.get(extracted.get("source_format", "gabarit"), 0), name_score, quality, order)
+
 
 if __name__ == "__main__":
     # Relative to this script's own location (repo_root/src/extract.py ->
@@ -981,27 +1447,56 @@ if __name__ == "__main__":
     repo_root = Path(__file__).resolve().parent.parent
     store_path = str(repo_root / "data" / "data.json")
     store = load_store(store_path)
-    skipped = []
-    for path in sys.argv[1:]:
-        # sources/ est maintenant alimenté automatiquement par drive_sync.py,
-        # qui récupère TOUT ce qui se trouve dans les dossiers Drive de
-        # chaque concessionnaire -- pas seulement les rapports "Réalisé"
-        # mensuels que ce script sait lire. Des fichiers annexes (2 pagers,
-        # analyses de gross, bonis cadres, inventaires, rapports de ventes
-        # privées, etc.) s'y retrouvent donc aussi. On ignore ces fichiers
-        # avec un avertissement plutôt que de faire échouer toute la
-        # reconstruction du tableau de bord à cause d'un seul fichier
-        # inattendu.
+    skipped, ignored = [], []
+    paths = sorted(sys.argv[1:])
+    names = load_source_names(paths)
+    candidates = {}
+    for order, path in enumerate(paths):
+        name = names.get(os.path.basename(path)) or os.path.basename(path)
+        if is_ignored_source(name) or is_ignored_source(path):
+            ignored.append(name)
+            continue
+        # sources/ est alimenté automatiquement par drive_sync.py, qui
+        # récupère TOUT ce qui se trouve dans les dossiers Drive de chaque
+        # concessionnaire -- pas seulement les rapports mensuels que ce
+        # script sait lire. Des fichiers annexes (2 pagers, analyses de
+        # gross, bonis cadres, inventaires, etc.) s'y retrouvent donc aussi.
+        # On les ignore avec un avertissement plutôt que de faire échouer
+        # toute la reconstruction du tableau de bord.
         try:
             extracted = extract_any_file(path)
         except Exception as exc:  # noqa: BLE001 - on veut logguer et continuer
             skipped.append((path, str(exc)))
             print(f"IGNORÉ (format non reconnu): {path} -- {exc}", file=sys.stderr)
             continue
-        print(f"Extracted: {extracted['company']} - {extracted['period_key']} -- sections: {list(extracted['sections'].keys())}")
-        merge_into_store(store, extracted)
+        extracted["source_file"] = name
+        key = (canonicalize_dealer(extracted["company"])[0], extracted["period_key"])
+        candidates.setdefault(key, []).append((source_rank(name, extracted, order), name, extracted))
+        print(f"Extracted: {extracted['company']} - {extracted['period_key']} "
+              f"[{extracted['source_format']}] -- {name}")
+
+    for key in sorted(candidates):
+        ranked = sorted(candidates[key], key=lambda t: t[0], reverse=True)
+        _, best_name, best = ranked[0]
+        # Les sections trimestrielles (Résumé) d'un autre fichier du même
+        # format et du même mois sont conservées si le fichier retenu n'en a pas.
+        for _, _, other in ranked[1:]:
+            if other.get("source_format") != best.get("source_format"):
+                continue
+            for sec_key, sec in other["sections"].items():
+                if sec_key.startswith("quarter_") and sec_key not in best["sections"]:
+                    best["sections"][sec_key] = sec
+        if len(ranked) > 1:
+            print(f"Retenu pour {key[0]} {key[1]} : {best_name} "
+                  f"(écartés : {', '.join(n for _, n, _ in ranked[1:])})")
+        merge_into_store(store, best)
+
     save_store(store, store_path)
     print("Saved store to", store_path)
+    if ignored:
+        print(f"--- {len(ignored)} brouillon(s) V0/V1 ou fichier(s) de verrouillage ignoré(s) ---", file=sys.stderr)
+        for name in ignored:
+            print(f"  - {name}", file=sys.stderr)
     if skipped:
         print(f"--- {len(skipped)} fichier(s) ignoré(s) (format non reconnu) ---", file=sys.stderr)
         for path, reason in skipped:

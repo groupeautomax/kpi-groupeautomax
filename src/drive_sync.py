@@ -68,7 +68,10 @@ DEALER_SOURCES = [
     {
         "key": "stm",
         "label": "STM (Ste-Marie Auto)",
-        "roots": ["1SSfs-x-9Cmrtw075Qsbzgm7J-Uq0TyHu"],  # a) Réalisé (STM)
+        "roots": [
+            "1SSfs-x-9Cmrtw075Qsbzgm7J-Uq0TyHu",  # a) Réalisé (STM)
+            "1ui-xvQYYO-dAWFaBnfhh2J4Qs05n7K4z",  # États financiers GM (STM) : 2025/, 2026/
+        ],
     },
     {
         "key": "hawks",
@@ -86,11 +89,29 @@ DEALER_SOURCES = [
     {
         "key": "hyundai",
         "label": "Hyundai Longueuil",
+        # Réalisés et états financiers Hyundai Canada (HYUNDAILONGUEUIL<MM><AAAA>.xlsm)
         "roots": ["0AP3GdpOFlum2Uk9PVA"],  # Drive partagé "Hyundai Longueuil"
     },
 ]
 
 MAX_DEPTH = 5
+
+# Sous-dossiers de brouillons à ne jamais synchroniser (ex. « Version
+# incomplète » dans les états financiers de STM).
+SKIP_FOLDER_RE = re.compile(r"version incompl|brouillon", re.IGNORECASE)
+
+
+def is_lock_file(name):
+    """Fichiers de verrouillage d'Office (« ~$classeur.xlsx ») et de
+    LibreOffice (« .~lock… ») : quelques octets sans données. Leur nom
+    nettoyé est identique à celui du vrai classeur, ils l'écrasaient donc dans
+    sources/ (ex. Réalisés Hyundai d'avril, mai et juillet 2026)."""
+    return name.startswith("~$") or name.startswith(".~lock")
+
+
+def is_valid_workbook(path):
+    import zipfile
+    return os.path.exists(path) and zipfile.is_zipfile(path)
 
 
 def build_drive_service():
@@ -139,8 +160,10 @@ def walk(service, folder_id, depth=0):
     found = []
     for item in list_children(service, folder_id):
         if item["mimeType"] == FOLDER_MIME_TYPE:
+            if SKIP_FOLDER_RE.search(item["name"]):
+                continue
             found.extend(walk(service, item["id"], depth + 1))
-        elif item["mimeType"] in ACCEPTED_MIME_TYPES:
+        elif item["mimeType"] in ACCEPTED_MIME_TYPES and not is_lock_file(item["name"]):
             found.append(item)
     return found
 
@@ -180,6 +203,33 @@ def main():
     manifest = load_manifest()
     os.makedirs(SOURCES_DIR, exist_ok=True)
 
+    # Nettoyage : on oublie les fichiers de verrouillage déjà synchronisés et
+    # on supprime ceux qui n'avaient pas de vrai classeur au même chemin.
+    lock_ids = [fid for fid, e in manifest.items() if is_lock_file(e.get("name", ""))]
+    for fid in lock_ids:
+        entry = manifest.pop(fid)
+        lp = entry.get("local_path")
+        still_used = any(e.get("local_path") == lp for e in manifest.values())
+        if lp and not still_used and os.path.exists(lp):
+            os.remove(lp)
+            print(f"supprimé (fichier de verrouillage) : {lp}")
+
+    # Plusieurs fichiers Drive qui partageaient le même chemin local (ancien
+    # comportement) : le plus récent garde le chemin, les autres seront
+    # retéléchargés sous un nom unique.
+    by_path = {}
+    for fid, e in manifest.items():
+        if e.get("local_path"):
+            by_path.setdefault(e["local_path"], []).append(fid)
+    for lp, fids in by_path.items():
+        if len(fids) < 2:
+            continue
+        fids.sort(key=lambda fid: manifest[fid].get("modifiedTime") or "", reverse=True)
+        manifest[fids[0]]["modifiedTime"] = None  # contenu actuel incertain : on le retélécharge
+        for fid in fids[1:]:
+            manifest[fid]["local_path"] = None
+            manifest[fid]["modifiedTime"] = None
+
     downloaded = []
     unchanged = 0
     errors = []
@@ -197,13 +247,15 @@ def main():
                 ext = ACCEPTED_MIME_TYPES[f["mimeType"]]
                 entry = manifest.get(file_id)
 
+                # Un fichier local corrompu (ex. écrasé par un fichier de
+                # verrouillage) est retéléchargé même si Drive n'a pas changé.
                 if entry and entry.get("modifiedTime") == f["modifiedTime"] \
-                        and os.path.exists(entry.get("local_path", "")):
+                        and is_valid_workbook(entry.get("local_path", "")):
                     unchanged += 1
                     continue
 
-                if entry and entry.get("local_path") and os.path.exists(entry["local_path"]):
-                    local_path = entry["local_path"]
+                if entry and entry.get("local_path"):
+                    local_path = entry["local_path"]  # même fichier Drive : même chemin
                 else:
                     safe_name = sanitize_filename(f["name"])
                     local_path = os.path.join(
@@ -211,6 +263,12 @@ def main():
                     )
                     if not local_path.lower().endswith("." + ext):
                         local_path += "." + ext
+                    # Deux fichiers Drive différents ne partagent jamais le
+                    # même chemin local.
+                    taken = {e.get("local_path") for fid, e in manifest.items() if fid != file_id}
+                    if local_path in taken:
+                        root, extension = os.path.splitext(local_path)
+                        local_path = f"{root}__{file_id[:8]}{extension}"
 
                 try:
                     download_file(service, file_id, local_path)

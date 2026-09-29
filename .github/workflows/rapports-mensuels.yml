@@ -1,0 +1,62 @@
+name: Rapports mensuels par courriel
+
+# Le 20 de chaque mois : produit, pour chaque concession qui a les données du
+# mois précédent, son rapport mensuel et son rapport Opérations fixes, et les
+# envoie au script Apps Script de Maxime Allard, qui les expédie par courriel
+# au directeur de la concession (Maxime en copie) puis lui envoie un résumé.
+# Les adresses des directeurs sont dans le script Apps Script, pas ici.
+# Relance manuelle : seules les concessions pas encore envoyées partent
+# (essai = oui : tout part à Maxime seulement).
+on:
+  schedule:
+    - cron: "7 14 20 * *"   # le 20 à 14 h 07 UTC (10 h 07 à Montréal l'été, 9 h 07 l'hiver)
+  workflow_dispatch:
+    inputs:
+      mois:
+        description: "Mois AAAA-MM (vide = mois précédent)"
+        required: false
+        default: ""
+      essai:
+        description: "Essai : tout envoyer à Maxime seulement (oui / non)"
+        required: false
+        default: "non"
+      forcer:
+        description: "Renvoyer même si déjà envoyé (oui / non)"
+        required: false
+        default: "non"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: rapports-mensuels
+  cancel-in-progress: false
+
+jobs:
+  envoyer:
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: main
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: |
+          pip install playwright
+          python -m playwright install --with-deps chromium
+
+      - name: Produire et envoyer les rapports
+        env:
+          APPS_SCRIPT_URL: ${{ secrets.APPS_SCRIPT_URL }}
+          RAPPORTS_TOKEN: ${{ secrets.RAPPORTS_TOKEN }}
+          MOIS: ${{ github.event.inputs.mois }}
+          ESSAI: ${{ github.event.inputs.essai || 'non' }}
+          FORCER: ${{ github.event.inputs.forcer || 'non' }}
+        run: python reports/mensuel/envoi_rapports.py --data data/data.json

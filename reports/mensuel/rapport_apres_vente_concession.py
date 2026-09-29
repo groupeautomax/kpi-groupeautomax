@@ -173,8 +173,6 @@ def dealer_findings(F, d):
         if aa.get("productivite"):
             t += f" ({y-1} : {pct(aa['productivite'], 0)} et {pct(aa['efficacite'], 0)})"
         out.append(t + ".")
-    elif fr and not any(t.get("h") for t in fr["types"].values()):
-        out.append("<span class='muted'>Heures vendues absentes des fichiers de la concession : heures par BT et taux effectif non calculés.</span>")
     return out
 
 
@@ -421,14 +419,21 @@ def p_atelier(F, d):
                 if r.get("mo_bt") and rate:
                     rows += (f'<tr><td class="lab">{escape(TYPES[typ])}</td><td>{money(rate)}</td><td>{money(r["mo_bt"])}</td>'
                              f'<td>{num(div(r["mo_bt"], rate), 2)}</td></tr>')
-            est = f"""<div class="band-lab">Piste en attendant <span>taux horaires affichés de l'état GM (Page 4)</span></div>
+            est = f"""<div class="band-lab">Heures estimées au taux affiché <span>taux horaires affichés de l'état GM (Page 4)</span></div>
               <table class="t num fo" style="width:75%"><thead><tr><th class="lab">Type</th><th>Taux affiché</th><th>M-O par BT {y}</th><th>≈ heures au taux affiché</th></tr></thead>
               <tbody>{rows}</tbody></table>
               <div class="note">Estimation seulement : main-d'œuvre par BT ÷ taux affiché ; les escomptes et le temps offert la font baisser.</div>"""
-        msg = "Les fichiers de la concession ne donnent pas les heures vendues."
-        content = (f'<div class="callout"><div class="ch">Heures vendues</div>Ni le Réalisé ni l\'état financier ne donnent les heures vendues. '
-                   f'Pour suivre les heures par BT, la productivité et le taux effectif, il faut un rapport mensuel du système de gestion (DMS) : heures '
-                   f'vendues par type de BT (client, garantie, interne) et heures disponibles des techniciens.</div>{est}')
+        if not est:
+            return None
+        cr = F.tm(fr, "client")
+        msg = (f"Taux affiché client <b>{money(ta.get('client'))}</b> ; main-d'œuvre de <b>{money(cr.get('mo_bt'))}</b> par BT client, "
+               f"soit environ <b>{num(div(cr.get('mo_bt'), ta.get('client')), 2)} h</b> par BT au taux affiché.")
+        content = est
+        return f"""
+      <div class="eyebrow">Atelier</div>
+      <h1>Atelier : taux horaires affichés</h1>
+      {key(msg)}
+      {content}"""
     return f"""
       <div class="eyebrow">Atelier</div>
       <h1>Atelier : heures vendues et productivité</h1>
@@ -514,7 +519,7 @@ def p_methode(F, d):
       <ul class="retenir compact">
         <li><b>Fichier d'{MOIS[m]} {y}</b> : {escape(SOURCE_LABELS.get(src, '—'))}.</li>
         <li><b>An passé</b> : {"colonnes « année précédente » du Réalisé" if ap == "natif" else ("fichiers " + str(y-1) + " de la concession" if ap else "non disponible")}.</li>
-        <li><b>Heures vendues</b> : {("état " + ("Volkswagen Canada" if d == "vw" else "Hyundai Canada") + (" (repris dans le Réalisé)" if hs else "")) if has_h else "absentes des fichiers"}.</li>
+        {("<li><b>Heures vendues</b> : état " + ("Volkswagen Canada" if d == "vw" else "Hyundai Canada") + (" (repris dans le Réalisé)" if hs else "") + ".</li>") if has_h else ""}
         <li><b>À savoir</b> : {escape(lim)}</li>
       </ul>
       <h2>Définitions</h2>
@@ -541,7 +546,9 @@ def build_book(s, P, d):
     bk.add(p_position(F, d))
     bk.add(p_mensuel(F, d))
     bk.add(p_tendances(F, d))
-    bk.add(p_atelier(F, d))
+    pa = p_atelier(F, d)
+    if pa:
+        bk.add(pa)
     bk.add(p_pieces_carrosserie(F, d))
     bk.add(p_methode(F, d))
     return bk

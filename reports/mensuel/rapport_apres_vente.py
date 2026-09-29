@@ -351,10 +351,6 @@ def findings(F):
                  + (f" ; productivité {pct(at['productivite'], 0)}, efficacité {pct(at['efficacite'], 0)}" if at.get("productivite") else "")
                  + ".")
             out.append((5e4, t))
-    missing = [d for d in F.dealers if d not in hd]
-    if missing:
-        out.append((1, f"<span class='muted'>Heures vendues absentes des fichiers de {escape(', '.join(DEALERS[d] for d in missing))} : "
-                       f"heures par BT et taux effectif non calculés pour {'ces concessions' if len(missing) > 1 else 'cette concession'}.</span>"))
     return [t for _, t in sorted(out, key=lambda x: -x[0])]
 
 
@@ -596,7 +592,6 @@ def p_atelier(F):
                      + cell(cr.get("h_bt"), ca.get("h_bt"), "h") + cell(gr.get("h_bt"), ga.get("h_bt"), "h") + cell(ir.get("h_bt"), ia.get("h_bt"), "h")
                      + cell(cr.get("elr"), ca.get("elr"), "$") + cell(gr.get("elr"), ga.get("elr"), "$")
                      + "</tr>")
-    missing = [d for d in F.dealers if d not in hd]
     rates = ""
     for d in F.dealers:
         at = (F.flat(d, "ytd") or {}).get("atelier") or {}
@@ -607,7 +602,7 @@ def p_atelier(F):
             rates += (f"<tr><td class='lab'>{escape(DEALERS[d])}</td><td>{money(ta.get('client'))}</td><td>{money(ta.get('garantie'))}</td>"
                       f"<td>{money(ta.get('interne'))}</td><td>{money(cr.get('mo_bt'))}</td>"
                       f"<td>{num(div(cr.get('mo_bt'), ta.get('client')), 2) if ta.get('client') else '—'}</td></tr>")
-    rtable = (f"""<div class="band-lab">Taux horaires affichés (état GM) <span>sans heures vendues, une piste : M-O par BT client ÷ taux affiché ≈ heures facturées par BT au plein tarif</span></div>
+    rtable = (f"""<div class="band-lab">Taux horaires affichés (état GM) <span>M-O par BT client ÷ taux affiché ≈ heures facturées par BT au plein tarif</span></div>
       <table class="t num fo"><thead><tr><th class="lab">Concession</th><th>Client</th><th>Garantie</th><th>Interne</th><th>M-O / BT client {y}</th><th>≈ heures au taux affiché</th></tr></thead>
       <tbody>{rates}</tbody></table>""" if rates else "")
     msg = []
@@ -628,7 +623,6 @@ def p_atelier(F):
       <div class="note">Sources : état Volkswagen Canada (Page 6) et état Hyundai Canada (Page 6). Productivité = heures pointées sur les BT ÷ heures disponibles ;
       efficacité = heures vendues ÷ heures pointées (au-dessus de 100 % : les techniciens battent le temps facturé). Taux effectif = ventes de main-d'œuvre ÷ heures vendues.
       Sous chaque valeur : écart vs {y-1}.</div>
-      {"<div class='callout'><div class='ch'>Heures manquantes</div>" + escape(", ".join(DEALERS[d] for d in missing)) + " : ni le Réalisé ni l'état financier GM ne donnent les heures vendues. Pour les suivre, il faut un rapport mensuel du système de gestion (DMS) : heures vendues par type de BT (client, garantie, interne) et heures disponibles des techniciens.</div>" if missing else ""}
       {rtable}"""
 
 
@@ -773,7 +767,7 @@ def p_couverture(F):
         hs = ((F.av.native(d, F.P, "ytd") or {}).get("heures_source") == "etat")
         rows += (f"<tr><td class='lab'>{escape(DEALERS[d])}</td><td class='c'>{escape(labels.get(src, src or '—'))}</td>"
                  f"<td class='c'><span class='ok'>Oui</span></td>"
-                 f"<td class='c'>{'<span class=ok>Oui</span>' + (' (état ' + ('VW' if d == 'vw' else 'Hyundai') + ')' if hs else '') if has_h else '<span class=no>Non</span>'}</td>"
+                 f"<td class='c'>{'<span class=ok>Oui</span>' + (' (état ' + ('VW' if d == 'vw' else 'Hyundai') + ')' if hs else '') if has_h else '<span class=muted>—</span>'}</td>"
                  f"<td class='c'>{'<span class=ok>Colonnes du Réalisé</span>' if ap == 'natif' else ('<span class=rec>Fichiers ' + str(y-1) + '</span>' if ap else '<span class=no>Non</span>')}</td>"
                  f"<td class='c'>{'<span class=ok>Oui</span>' if bud else '<span class=muted>Non</span>'}</td></tr>")
     return f"""
@@ -852,9 +846,7 @@ def page_concession(s, P, d):
         at_line = (f'<div class="band-lab">Atelier <span>cumul {y}</span></div><p>{num(at["vendues"])} h vendues sur {num(at["disp"])} h disponibles '
                    f'(productivité {pct(at["productivite"], 0)}, efficacité {pct(at["efficacite"], 0)}'
                    + (f' ; {y-1} : {pct(aa["productivite"], 0)} et {pct(aa["efficacite"], 0)}' if aa.get("productivite") else "") + ").</p>")
-    no_h = "" if any(t.get("h") for t in fr["types"].values()) else (
-        '<div class="callout"><div class="ch">Heures manquantes</div>Les fichiers de cette concession ne donnent pas les heures vendues : '
-        "heures par BT et taux effectif non calculés. Il faut un rapport mensuel du système de gestion (heures vendues par type de BT).</div>")
+    no_h = ""
     return f"""
       <div class="eyebrow">Après-vente</div>
       <h1>Bons de travail : dollars et heures par BT</h1>

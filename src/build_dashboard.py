@@ -317,6 +317,7 @@ def build_html(store, generated_at_label):
     .mobile-nav .row { gap:5px; }
     .mobile-nav .pill { font-size:12px; padding:6px 10px; }
     .filters-toggle { display:flex; width:100%; align-items:center; justify-content:space-between; gap:8px; border:1px solid var(--border); background: var(--surface-1); color: var(--text-primary); border-radius:10px; padding:9px 12px; font-size:13px; cursor:pointer; margin-bottom:12px; text-align:left; }
+    .filters-toggle > span:first-child { min-width:0; flex:1 1 auto; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
     .filters-toggle .ft-sum { color: var(--text-secondary); font-size:12.5px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
     .filters-toggle .ft-chev { color: var(--muted); flex-shrink:0; }
     .controls { display:none; grid-template-columns: 1fr 1fr; gap:10px; padding:10px; margin-top:-4px; }
@@ -492,6 +493,7 @@ const state = {
   scope: 'summary', // summary | overview | departments | upload
   group: 'volume',
   dept: null, // selected department name when scope === 'departments'
+  foView: 'bt', // bt | atelier | pieces | tendances when scope === 'fixedops'
   view: 'chart', // chart | table
   showCombined: true // whether the "Groupe" total is shown in cards and tables
 };
@@ -544,6 +546,11 @@ const RATIO_KPIS = {
   ros: ['ebt', 'ventes_nettes'],
   gpa_neuf: ['pb_neuf', 'unites_neuf'],
   gpa_usage: ['pb_usage', 'unites_usage'],
+  // séparation véhicule / F&I (28 septembre 2026)
+  pbv_unite_neuf: ['pbv_neuf', 'unites_neuf'],
+  fi_unite_neuf: ['fi_neuf', 'unites_neuf'],
+  pbv_unite_usage: ['pbv_usage', 'unites_usage'],
+  fi_unite_usage: ['fi_usage', 'unites_usage'],
 };
 
 function isNum(v) { return typeof v === 'number' && isFinite(v); }
@@ -1211,12 +1218,16 @@ function subNavItems() {
     if (!state.dept || !deptNames.includes(state.dept)) state.dept = deptNames[0] || null;
     return deptNames.map(n => ({ label: n, active: state.dept === n, go: () => { state.dept = n; renderAll(); } }));
   }
+  if (state.scope === 'fixedops') {
+    return FO_VIEWS.map(([k, lab]) => ({ label: lab, active: (state.foView || 'bt') === k, go: () => { state.foView = k; renderAll(); } }));
+  }
   return [];
 }
 const NAV_SECTIONS = [
   { scope: 'summary', label: 'Sommaire', short: 'Sommaire' },
   { scope: 'overview', label: 'Indicateurs', short: 'Indicateurs' },
   { scope: 'departments', label: 'Départements', short: 'Départements' },
+  { scope: 'fixedops', label: 'Opérations fixes', short: 'Op. fixes' },
 ];
 function renderSidebar() {
   const nav = document.getElementById('sidebarNav');
@@ -1901,6 +1912,7 @@ function renderPageHead() {
   if (state.scope === 'summary') title = 'Sommaire';
   else if (state.scope === 'overview') title = GROUP_LABELS[state.group] || 'Indicateurs';
   else if (state.scope === 'departments') title = state.dept ? 'Département — ' + state.dept : 'Départements';
+  else if (state.scope === 'fixedops') title = 'Opérations fixes — ' + ((FO_VIEWS.find(v => v[0] === (state.foView || 'bt')) || [0, ''])[1]);
   else title = 'Déposer un fichier';
   if (state.scope === 'upload') { el.innerHTML = `<h2 class="page-title">${escapeHtml(title)}</h2>`; return; }
   const withData = dealersWithData().length;
@@ -1942,6 +1954,8 @@ function renderUploadView(container) {
 }
 
 
+__FO_JS__
+
 function renderContent() {
   hideTip();
   renderPageHead();
@@ -1953,6 +1967,7 @@ function renderContent() {
     return;
   }
   if (state.scope === 'summary') { renderSummaryView(container); return; }
+  if (state.scope === 'fixedops') { renderFixedOpsView(container); return; }
   if (state.scope === 'departments') {
     if (state.view === 'chart') renderDepartmentChartsView(container);
     else renderDepartmentTableView(container);
@@ -2050,6 +2065,10 @@ initLockScreen();
     html = html.replace("__GROUP_ORDER_JSON__", group_order_json)
     html = html.replace("__ROSTER_JSON__", roster_json)
     html = html.replace("__PERIODS_JSON__", periods_json)
+    # Onglet « Opérations fixes » : code JavaScript gardé dans son propre
+    # fichier (pas d'échappement Python à gérer).
+    fo_js_path = Path(__file__).resolve().parent / "fo_dashboard.js"
+    html = html.replace("__FO_JS__", fo_js_path.read_text(encoding="utf-8"))
     return html
 
 

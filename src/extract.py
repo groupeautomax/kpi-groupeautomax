@@ -1,4 +1,7 @@
 import openpyxl, json, re, sys, os, unicodedata
+
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import apres_vente  # opérations fixes : bons de travail, heures, pièces  # noqa: E402
 from pathlib import Path
 
 def strip_accents(s):
@@ -528,14 +531,87 @@ def unit_economics_kpis_for_company_view(kpis):
     profit brut ÷ unités."""
     out = {}
     specs = (
-        ("pb_neuf", "unites_neuf", "gpa_neuf", "Profit brut par unité (neuf)"),
-        ("pb_usage", "unites_usage", "gpa_usage", "Profit brut par unité (usagé)"),
+        ("pb_neuf", "unites_neuf", "gpa_neuf", "Profit brut du département par unité (neuf, avec F&I et gros)"),
+        ("pb_usage", "unites_usage", "gpa_usage", "Profit brut du département par unité (usagé, avec F&I et gros)"),
     )
     for pb_key, units_key, kpi_key, label in specs:
         ratio = ratio_kv(kpis.get(pb_key), kpis.get(units_key))
         if ratio:
             out[kpi_key] = dict(ratio, label=label, raw_label=label, group="profit")
     return out
+
+# ---------------------------------------------------------------------------
+# Séparation profit véhicule / F&I / gros (demande de Maxime Allard, 28 sept.
+# 2026 : le profit brut par unité usagée semblait très élevé parce qu'on
+# divisait tout le profit brut du département -- véhicule au détail + F&I +
+# gros, encan, export -- par les seules unités au détail).
+#  - profit véhicule = détail (neufs : avec ex-démos et flottes) ;
+#  - F&I = « Total F&I » du département (état GM : transfert F&A ramené dans
+#    le département, voir extract_hawks_file) ;
+#  - gros et autres = profit brut du département − véhicule − F&I (gros,
+#    encan, export, rachats de bail, rectifications) : un montant, jamais
+#    divisé par les unités au détail.
+# ---------------------------------------------------------------------------
+VEH_LINE_LABELS = {
+    "Véhicules neufs": ("total neufs", "ex-demos et courtoisies", "flottes"),
+    "Véhicules usagés": ("total usages",),
+}
+FI_LINE_LABEL = "total f&i"
+
+
+def kv_combine(a, b, sign=1):
+    """a + sign·b champ par champ (real, budget, prior_year) ; None si a manque."""
+    if not a:
+        return None
+    out = {}
+    for k in ("real", "budget", "prior_year"):
+        x = a.get(k)
+        y = (b or {}).get(k)
+        if isinstance(x, (int, float)):
+            out[k] = x + sign * (y if isinstance(y, (int, float)) else 0)
+        else:
+            out[k] = None
+    out["delta_budget"] = (out["real"] - out["budget"]) if isinstance(out["real"], (int, float)) and isinstance(out["budget"], (int, float)) else None
+    out["delta_prior_year"] = (out["real"] - out["prior_year"]) if isinstance(out["real"], (int, float)) and isinstance(out["prior_year"], (int, float)) else None
+    return out
+
+
+def vehicle_split(dept, dept_name):
+    """(véhicule, F&I, gros) d'un département de véhicules, ou None."""
+    if not dept or not dept.get("profit_brut"):
+        return None
+    items = {}
+    for li in dept.get("line_items") or []:
+        if li.get("section") == "ventes" and li.get("money"):
+            items.setdefault(sa(li["label"]), li["money"])
+    keys = [k for k in VEH_LINE_LABELS[dept_name] if k in items]
+    if not keys:
+        return None
+    veh = sum_kv([items[k] for k in keys])
+    fi = items.get(FI_LINE_LABEL) or real_only_kv(0)
+    fi = sum_kv([fi])
+    gros = kv_combine(kv_combine(dept["profit_brut"], veh, -1), fi, -1)
+    return veh, fi, gros
+
+
+def vehicle_split_kpis(departments, kpis):
+    out = {}
+    for dept_name, suf, lab in (("Véhicules neufs", "neuf", "neufs"), ("Véhicules usagés", "usage", "usagés")):
+        sp = vehicle_split(departments.get(dept_name), dept_name)
+        if not sp:
+            continue
+        veh, fi, gros = sp
+        out["pbv_" + suf] = dict(veh, label=f"Profit véhicule — {lab}", raw_label=dept_name, group="profit")
+        out["fi_" + suf] = dict(fi, label=f"F&I — {lab}", raw_label="Total F&I", group="profit")
+        out["gros_" + suf] = dict(gros, label=f"Gros, encan et autres — {lab}", raw_label=dept_name, group="profit")
+        units = kpis.get("unites_" + suf)
+        for k, v, l in (("pbv_unite_" + suf, veh, f"Profit véhicule par unité ({lab[:-1]})"),
+                        ("fi_unite_" + suf, fi, f"F&I par unité ({lab[:-1]})")):
+            r = ratio_kv(v, units)
+            if r:
+                out[k] = dict(r, label=l, raw_label=l, group="profit")
+    return out
+
 
 def extract_period(wb, sheet_candidates):
     ws = find_first_sheet(wb, sheet_candidates)
@@ -548,6 +624,7 @@ def extract_period(wb, sheet_candidates):
     kpis.update(summary_kpis_for_company_view(summary))
     kpis.update(expense_breakdown_kpis_for_company_view(departments))
     kpis.update(unit_economics_kpis_for_company_view(kpis))
+    kpis.update(vehicle_split_kpis(departments, kpis))
     return {"kpis": kpis, "departments": departments, "summary": summary}
 
 def extract_file(path):
@@ -919,6 +996,21 @@ def extract_hawks_file(path):
         departments_month["Véhicules usagés"]["line_items"] += hawks_used_vehicle_line_items(ws6, 6, 9)
         departments_ytd["Véhicules usagés"]["line_items"] += hawks_used_vehicle_line_items(ws6, 11, 14)
 
+    # F&I : l'état GM le sort des départements (ligne « TRANSFERT REVENU F & A
+    # ET PLAN DE PROTECTION », Page3, lue ici comme les autres revenus du
+    # département). On le ramène dans le profit brut des neufs et des usagés,
+    # comme au Réalisé ; le profit brut total et l'EBT ne changent pas.
+    for deps in (departments_month, departments_ytd):
+        for name in ("Véhicules neufs", "Véhicules usagés"):
+            dd = deps.get(name) or {}
+            fi = (dd.get("autres_revenus") or {}).get("real")
+            pbv = (dd.get("profit_brut") or {}).get("real")
+            if isinstance(fi, (int, float)) and isinstance(pbv, (int, float)):
+                dd["profit_brut"] = real_only_kv(pbv + fi)
+                dd["autres_revenus"] = real_only_kv(0)
+                dd["line_items"].append({"label": "Total F&I", "section": "ventes", "is_total": True,
+                                         "units": None, "money": real_only_kv(fi), "pct": None})
+
     ws2 = wb["Page2"]
     summary_month = hawks_summary_section(ws2, 7)   # G = MOIS
     summary_ytd = hawks_summary_section(ws2, 10)    # J = CUMUL ANNUEL
@@ -928,11 +1020,13 @@ def extract_hawks_file(path):
     kpis_month.update(summary_kpis_for_company_view(summary_month))
     kpis_month.update(expense_breakdown_kpis_for_company_view(departments_month))
     kpis_month.update(unit_economics_kpis_for_company_view(kpis_month))
+    kpis_month.update(vehicle_split_kpis(departments_month, kpis_month))
     kpis_ytd = {}
     kpis_ytd.update(department_kpis_for_company_view(departments_ytd))
     kpis_ytd.update(summary_kpis_for_company_view(summary_ytd))
     kpis_ytd.update(expense_breakdown_kpis_for_company_view(departments_ytd))
     kpis_ytd.update(unit_economics_kpis_for_company_view(kpis_ytd))
+    kpis_ytd.update(vehicle_split_kpis(departments_ytd, kpis_ytd))
 
     return {
         "company": company.strip() if isinstance(company, str) else company,
@@ -1289,6 +1383,7 @@ def extract_hyundai_file(path):
         kpis.update(summary_kpis_for_company_view(summary))
         kpis.update(expense_breakdown_kpis_for_company_view(departments))
         kpis.update(unit_economics_kpis_for_company_view(kpis))
+        kpis.update(vehicle_split_kpis(departments, kpis))
         month_name = HAWKS_MONTHS[month_num]
         sections[mode] = {"source_title": month_name if mode == "month" else f"AAD {month_name}",
                           "kpis": kpis, "departments": departments}
@@ -1451,6 +1546,71 @@ def vw_department(ws, rows, month_col, ytd_cols, mode, pb_extra=True):
     return data, g
 
 
+VW_P4_PATTERNS = {
+    "neuf_veh": r"^total vw \(",
+    "neuf_fi": r"^(sub-?total|sous[ -]?total)[ -]*(f&i new|f&a neuf|- f&a neuf)",
+    "neuf_total": r"^total (new vehicles|vehicules neufs)",
+    "flottes": r"(fleet|ventes? aux parcs|parcs? / corporati|corporatif)",
+    "usage_veh": r"^(subtotal used retail|sous[ -]?total veh\.? (d.occasion|d.occ\.?|usages) detail)",
+    "usage_fi": r"^(sub-?total|sous[ -]?total)[ -]*(f&i used|f&a usages|f&a d.occasion)",
+    "usage_gros": r"^(wholesale|ventes? en gros)",
+    "usage_total": r"^total (used vehicles|veh\.? d.occasion|vehicules usages|vehicules d.occasion)",
+}
+
+
+def vw_p4_vehicles(ws4):
+    """Page 4 de l'état VW, repérée par les libellés (les numéros de ligne
+    changent entre les versions 2021, 2023-2025 et 2026) :
+    {mode: {clé: (unités, profit brut)}} pour véhicule, F&I, gros et totaux."""
+    hdr = None
+    for r in range(1, 9):
+        labs = {c: hy_label(ws4.cell(row=r, column=c).value) for c in range(1, ws4.max_column + 1)}
+        uc = sorted(c for c, v in labs.items() if v in ("units", "unites"))
+        gc = sorted(c for c, v in labs.items() if v in ("gross profit", "profit brut"))
+        if len(uc) >= 2 and len(gc) >= 2:
+            hdr = {"month": (uc[0], gc[0]), "ytd": (uc[1], gc[1])}
+            break
+    if not hdr:
+        return None
+    rows = {}
+    for r in range(1, min(ws4.max_row, 120) + 1):
+        lab = None
+        for c in range(2, 8):
+            v = ws4.cell(row=r, column=c).value
+            if isinstance(v, str) and len(v.strip()) > 3:
+                lab = hy_label(v).replace("’", "'").replace("f & a", "f&a").replace("f & i", "f&i")
+                lab = re.sub(r"\s+", " ", lab)
+                break
+        if not lab:
+            continue
+        for key, pat in VW_P4_PATTERNS.items():
+            if key not in rows and re.search(pat, lab):
+                if key == "flottes" and ("demo" in lab or "employ" in lab):
+                    continue
+                rows[key] = r
+    out = {}
+    for mode, (uc, gc) in hdr.items():
+        out[mode] = {k: (hy_num(ws4, r, uc), hy_num(ws4, r, gc)) for k, r in rows.items()}
+    return out
+
+
+def vw_vehicle_line_items(p4, kind):
+    """Lignes « Total Neufs / Total Usagés / Total F&I / Ventes au Gros » (même
+    vocabulaire que le Réalisé) pour la séparation véhicule / F&I / gros."""
+    items = []
+    spec = ((f"{kind}_veh", "Total Neufs" if kind == "neuf" else "Total Usagés", True),
+            (f"{kind}_fi", "Total F&I", True), ("usage_gros", "Ventes au Gros", False))
+    for key, label, tot in spec:
+        if key == "usage_gros" and kind != "usage":
+            continue
+        if key in p4:
+            u, pb = p4[key]
+            items.append({"label": label, "section": "ventes", "is_total": tot,
+                          "units": real_only_kv(u) if u is not None and key != f"{kind}_fi" else None,
+                          "money": real_only_kv(pb or 0), "pct": None})
+    return items
+
+
 def extract_vw_file(path):
     wb = openpyxl.load_workbook(path, data_only=True)
     start, end = vw_period(wb)
@@ -1474,19 +1634,26 @@ def extract_vw_file(path):
             unit_cols = (cols[0], cols[1])
             break
 
+    p4v = vw_p4_vehicles(ws4)
     sections = {}
     for mode in ("month", "ytd"):
         idx = 0 if mode == "month" else 1
         u = (lambda line: real_only_kv(hy_num(ws4, rows4.get(line), unit_cols[idx]) or 0)
              if unit_cols and rows4.get(line) else None)
+        pv = (p4v or {}).get(mode) or {}
+        pu = lambda key: real_only_kv(pv[key][0] or 0) if key in pv else None
         departments = {}
         (tm, ty), (nm, ny), (om, oy) = b2[0], b2[1], b2[2]
         (sm, sy), (cm, cy), (pm, py) = b3[0], b3[1], b3[2]
         d, _ = vw_department(ws2, rows2, nm, ny, mode, pb_extra=False)
-        d["units"], d["units_flottes"] = u(29), u(18)
+        # unités lues par libellé (les numéros de ligne changent d'une version à l'autre)
+        d["units"] = pu("neuf_total") or u(29)
+        d["units_flottes"] = pu("flottes") or u(18)
+        d["line_items"] = vw_vehicle_line_items(pv, "neuf")
         departments["Véhicules neufs"] = d
         d, _ = vw_department(ws2, rows2, om, oy, mode, pb_extra=False)
-        d["units"] = u(40)
+        d["units"] = pu("usage_veh") or u(40)
+        d["line_items"] = vw_vehicle_line_items(pv, "usage")
         departments["Véhicules usagés"] = d
         departments["Service"], _ = vw_department(ws3, rows3, sm, sy, mode, pb_extra=False)
         departments["Carrosserie"], _ = vw_department(ws3, rows3, cm, cy, mode, pb_extra=False)
@@ -1523,6 +1690,7 @@ def extract_vw_file(path):
         kpis.update(summary_kpis_for_company_view(summary))
         kpis.update(expense_breakdown_kpis_for_company_view(departments))
         kpis.update(unit_economics_kpis_for_company_view(kpis))
+        kpis.update(vehicle_split_kpis(departments, kpis))
         month_name = HAWKS_MONTHS[month_num]
         sections[mode] = {"source_title": month_name if mode == "month" else f"AAD {month_name}",
                           "kpis": kpis, "departments": departments}
@@ -1604,6 +1772,14 @@ def extract_any_file(path):
     else:
         out = extract_file(path)
     out["source_format"] = fmt
+    # Opérations fixes : BT par type, heures, pièces (voir apres_vente.py).
+    # Une erreur de lecture n'empêche jamais l'extraction principale.
+    try:
+        present = [k for k in ("month", "ytd") if k in out.get("sections", {})]
+        for sec_key, av in apres_vente.read(path, fmt, sections=present).items():
+            out["sections"][sec_key]["apres_vente"] = av
+    except Exception as exc:  # noqa: BLE001
+        print(f"Après-vente non lu pour {path} : {exc}", file=sys.stderr)
     return out
 
 def load_store(store_path):
@@ -1696,6 +1872,34 @@ def load_source_names(paths):
     return names
 
 
+def load_source_meta(paths):
+    """{nom local: date de modification Drive} d'après .drive_manifest.json."""
+    meta = {}
+    seen = set()
+    for p in paths:
+        manifest = os.path.join(os.path.dirname(p) or ".", ".drive_manifest.json")
+        if manifest in seen or not os.path.exists(manifest):
+            continue
+        seen.add(manifest)
+        try:
+            with open(manifest, encoding="utf-8") as f:
+                for entry in json.load(f).values():
+                    lp = entry.get("local_path")
+                    if lp:
+                        meta[os.path.basename(lp)] = entry.get("modifiedTime") or ""
+        except Exception:  # noqa: BLE001
+            pass
+    return meta
+
+
+def is_empty_extract(extracted):
+    """Classeur vide : ventes nettes, profit brut et EBT du mois tous à 0
+    (ou absents)."""
+    k = ((extracted.get("sections") or {}).get("month") or {}).get("kpis") or {}
+    vals = [((k.get(x) or {}).get("real")) for x in ("ventes_nettes", "pb_total", "ebt")]
+    return all(not v for v in vals)
+
+
 def stem_of(name):
     return strip_accents(os.path.splitext(os.path.basename(name))[0]).lower().strip()
 
@@ -1782,15 +1986,18 @@ def source_rank(name, extracted, order):
     return (FORMAT_RANK.get(extracted.get("source_format", "gabarit"), 0), name_score, quality, order)
 
 
-if __name__ == "__main__":
+def main(paths, store_path=None, extract_fn=None):
+    """Extrait tous les fichiers donnés et met à jour data/data.json.
+    extract_fn permet de fournir une extraction déjà faite (cache de test)."""
+    extract_fn = extract_fn or extract_any_file
     # Relative to this script's own location (repo_root/src/extract.py ->
     # repo_root/data/data.json) so this runs identically whether invoked
     # locally or from a GitHub Actions checkout at a different path.
     repo_root = Path(__file__).resolve().parent.parent
-    store_path = str(repo_root / "data" / "data.json")
+    store_path = store_path or str(repo_root / "data" / "data.json")
     store = load_store(store_path)
     skipped, ignored = [], []
-    paths = sorted(sys.argv[1:])
+    paths = sorted(paths)
     names = load_source_names(paths)
     candidates = {}
     for order, path in enumerate(paths):
@@ -1806,19 +2013,39 @@ if __name__ == "__main__":
         # On les ignore avec un avertissement plutôt que de faire échouer
         # toute la reconstruction du tableau de bord.
         try:
-            extracted = extract_any_file(path)
+            extracted = extract_fn(path)
         except Exception as exc:  # noqa: BLE001 - on veut logguer et continuer
             skipped.append((path, str(exc)))
             print(f"IGNORÉ (format non reconnu): {path} -- {exc}", file=sys.stderr)
             continue
         extracted["source_file"] = name
+        extracted["_path"] = path
         key = (canonicalize_dealer(extracted["company"])[0], extracted["period_key"])
         candidates.setdefault(key, []).append((source_rank(name, extracted, order), name, extracted))
         print(f"Extracted: {extracted['company']} - {extracted['period_key']} "
               f"[{extracted['source_format']}] -- {name}")
 
+    meta = load_source_meta(paths)
     for key in sorted(candidates):
-        ranked = sorted(candidates[key], key=lambda t: t[0], reverse=True)
+        # Deux copies d'un même fichier (même nom dans Drive) : seule la plus
+        # récemment modifiée est classée ; les plus anciennes ne servent qu'à
+        # la règle VW (Réalisé qui concorde avec l'état).
+        by_name = {}
+        for t in candidates[key]:
+            by_name.setdefault(t[1], []).append(t)
+        primary, older = [], []
+        for name_, lst in by_name.items():
+            lst.sort(key=lambda t: meta.get(os.path.basename(t[2].get("_path", "")), ""), reverse=True)
+            primary.append(lst[0])
+            older.extend(lst[1:])
+        # Un classeur vide passe après un classeur rempli ; seul, il n'est
+        # jamais retenu.
+        ranked = sorted(primary, key=lambda t: (not is_empty_extract(t[2]), t[0]), reverse=True)
+        if is_empty_extract(ranked[0][2]):
+            print(f"Ignoré pour {key[0]} {key[1]} : classeur(s) vide(s) "
+                  f"({', '.join(n for _, n, _ in ranked)})")
+            continue
+        ranked = ranked + sorted(older, key=lambda t: t[0], reverse=True)
         _, best_name, best = ranked[0]
         # Les sections trimestrielles (Résumé) d'un autre fichier du même
         # format et du même mois sont conservées si le fichier retenu n'en a pas.
@@ -1837,11 +2064,24 @@ if __name__ == "__main__":
         if override:
             best_name, best = override
             force = True  # passe outre la protection FORMAT_RANK de merge_into_store
+        # Heures vendues : absentes du Réalisé ; reprises de l'état VW ou
+        # Hyundai du même mois quand les nombres de BT concordent.
+        if best.get("source_format") == "gabarit":
+            state = next((x for _, _, x in ranked if x.get("source_format") in ("etat_vw", "etat_hyundai")), None)
+            if state:
+                for sk in ("month", "ytd"):
+                    tgt = (best["sections"].get(sk) or {}).get("apres_vente")
+                    src = (state["sections"].get(sk) or {}).get("apres_vente")
+                    if tgt and src and not apres_vente.merge_state_hours(tgt, src):
+                        print(f"Heures non reprises pour {key[0]} {key[1]} ({sk}) : nombres de BT différents")
         if len(ranked) > 1:
             print(f"Retenu pour {key[0]} {key[1]} : {best_name} "
                   f"(écartés : {', '.join(n for _, n, _ in ranked if n != best_name)})")
         merge_into_store(store, best, force=force)
 
+    # Statistiques d'atelier recopiées d'un autre mois (état mal daté) : retirées.
+    for dk, pk, sk in apres_vente.drop_duplicate_stats(store, lambda n: name_period(stem_of(n))):
+        print(f"Après-vente {dk} {pk} ({sk}) : BT et heures identiques à un autre mois, retirés (montants gardés)")
     save_store(store, store_path)
     print("Saved store to", store_path)
     if ignored:
@@ -1852,3 +2092,7 @@ if __name__ == "__main__":
         print(f"--- {len(skipped)} fichier(s) ignoré(s) (format non reconnu) ---", file=sys.stderr)
         for path, reason in skipped:
             print(f"  - {path}: {reason}", file=sys.stderr)
+
+
+if __name__ == "__main__":
+    main(sys.argv[1:])

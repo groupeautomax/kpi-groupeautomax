@@ -2,7 +2,9 @@
 // Lit sections.<mois|cumul>.apres_vente (src/apres_vente.py) : BT par type,
 // main-d'œuvre, pièces, heures, atelier. Ratios du Groupe recalculés à partir
 // des sommes ; heures : seulement les concessions qui en ont.
-const FO_TYPES = [['client', 'Client (détail)'], ['garantie', 'Garantie'], ['interne', 'Interne'], ['esthetique', 'Esthétique']];
+const FO_TYPES = [['client', 'Client (détail)'], ['garantie', 'Garantie'], ['entretien', 'Entretien BMW'], ['interne', 'Interne'], ['esthetique', 'Esthétique']];
+// Types qui portent des pièces ; « entretien » : BMW seulement (état BMW Canada, pages 8 et 9).
+const FO_PC_TYPES = ['client', 'garantie', 'entretien', 'interne'];
 const FO_DETAIL = { mobile: 'dont service mobile', inspection: 'dont inspection des véhicules neufs' };
 // STM : le compte 460D (service mobile) n’est utilisé qu’à partir de l’état d’août 2026 (cumul retraité).
 const FO_MEAS = [['bt', 'bt'], ['mo_ventes', 'mo_v'], ['mo_pb', 'mo_pb'], ['pc_ventes', 'pc_v'], ['pc_pb', 'pc_pb'], ['heures', 'h']];
@@ -19,7 +21,7 @@ const FO_METRICS = [
   { key: 'pc_v', label: 'Ventes de pièces sur ces BT', fmt: 'money' },
 ];
 const FO_VIEWS = [['bt', 'Bons de travail'], ['atelier', 'Atelier et heures'], ['pieces', 'Pièces'], ['tendances', 'Tendances']];
-const FO_PC_CHANNELS = [['client', 'BT client'], ['garantie', 'BT garantie'], ['interne', 'BT interne'], ['carrosserie', 'Carrosserie'],
+const FO_PC_CHANNELS = [['client', 'BT client'], ['garantie', 'BT garantie'], ['entretien', 'BT entretien BMW'], ['interne', 'BT interne'], ['carrosserie', 'Carrosserie'],
   ['comptoir', 'Comptoir (détail)'], ['accessoires', 'Accessoires'], ['gros', 'Gros'], ['pneus', 'Pneus'], ['huile', 'Huiles et graisse'], ['divers', 'Divers']];
 
 function foField(kv, f) { return (kv && typeof kv === 'object' && isNum(kv[f])) ? kv[f] : null; }
@@ -254,7 +256,7 @@ function renderFoBtView(container) {
   const colsAll = foColumns(f => foAllTypes(f).bt);
   const allRows = FO_METRICS.map(m => ({ label: m.label, fmt: m.fmt, strong: m.strong, htyp: ['h_bt', 'elr'].includes(m.key) ? 'all' : null, get: f => foTypeMetrics(foAllTypes(f))[m.key] }));
   container.appendChild(foCard('Tous les bons de travail (mécanique)',
-    'Client + garantie + interne + esthétique · ' + escapeHtml(periodLabel(state.refPeriod)) + ' · ' + escapeHtml(periodModeLabel()),
+    'Client + garantie + entretien BMW + interne + esthétique · ' + escapeHtml(periodLabel(state.refPeriod)) + ' · ' + escapeHtml(periodModeLabel()),
     foTable('Indicateur', allRows, colsAll), foFootBasis() + (foNoHoursNote() ? '<br>' + foNoHoursNote() : '')));
   FO_TYPES.forEach(([typ, lab]) => {
     const cols = foColumns(f => (f.types[typ] || {}).bt);
@@ -269,7 +271,9 @@ function renderFoBtView(container) {
     });
     const typeNote = typ === 'client' ? 'Client : BT payés par le client (atelier, service rapide, contrats et entretien prépayé ; service mobile de STM inclus).'
       : typ === 'interne' ? 'Interne : travaux facturés aux autres départements (reconditionnement des usagés, préparation des neufs ; inspection des véhicules neufs incluse à l’état GM).'
-      : typ === 'garantie' ? 'Garantie : travaux remboursés par le constructeur.' : 'Esthétique : BT d’esthétique du Réalisé (BMW, VW).';
+      : typ === 'garantie' ? 'Garantie : travaux remboursés par le constructeur (BMW : garantie seulement, l’entretien payé par BMW est à part).'
+      : typ === 'entretien' ? 'Entretien BMW : entretien payé par BMW (BMW Service Inclus), état BMW Canada pages 8 et 9.'
+      : 'Esthétique : BT d’esthétique (VW : Réalisé ; BMW : programme SPA de l’état BMW Canada).';
     container.appendChild(foCard(lab, escapeHtml(typeNote), foTable('Indicateur', rows, cols), ''));
   });
 }
@@ -288,21 +292,24 @@ function renderFoAtelierView(container) {
     { label: 'Heures vendues par technicien', htyp: 'atelier', fmt: 'volume', get: A('h_tech') },
     { sec: 'Heures vendues et taux effectif par type' },
   ];
-  FO_TYPES.slice(0, 3).forEach(([typ, lab]) => {
+  FO_TYPES.filter(([t]) => FO_PC_TYPES.includes(t)).forEach(([typ, lab]) => {
     rows.push({ label: 'Heures vendues — ' + lab.toLowerCase(), fmt: 'volume', htyp: typ, get: f => (f.types[typ] || {}).h || null });
     rows.push({ label: 'Heures par BT — ' + lab.toLowerCase(), fmt: 'dec2', sub: true, htyp: typ, get: f => foTypeMetrics(f.types[typ]).h_bt });
     rows.push({ label: 'Taux effectif — ' + lab.toLowerCase(), fmt: 'money', sub: true, htyp: typ, get: f => foTypeMetrics(f.types[typ]).elr });
   });
+  rows.push({ sec: 'Déclaré au constructeur (état BMW Canada, page 10)' });
+  rows.push({ label: 'Taux de main-d’œuvre en vigueur ($ l’heure, taux effectif déclaré)', fmt: 'dec2', get: f => (f.atelier || {}).taux_effectif_declare || null });
+  rows.push({ label: 'Taux affiché client', fmt: 'money', sub: true, get: f => ((f.atelier || {}).taux_affiche || {}).client || null });
   container.appendChild(foCard('Atelier et heures vendues', escapeHtml(periodLabel(state.refPeriod)) + ' · ' + escapeHtml(periodModeLabel()),
     foTable('Indicateur', rows, cols),
-    'Sources : état Volkswagen Canada (Page 6) et état Hyundai Canada (Page 6). ' + (foNoHoursNote() || '') +
+    'Sources : état Volkswagen Canada (Page 6), état Hyundai Canada (Page 6) ; taux effectif déclaré et taux affichés : état BMW Canada (page 10) et états GM (Page 4). ' + (foNoHoursNote() || '') +
     ' Taux effectif = ventes de main-d’œuvre ÷ heures vendues.'));
 }
 function renderFoPiecesView(container) {
   const cols = foColumns(f => (f.pieces.total || {}).v);
   const rows = [{ sec: 'Ventes par canal' }];
-  const chanV = ch => f => (['client', 'garantie', 'interne'].includes(ch) ? (f.types[ch] || {}).pc_v : (f.pieces[ch] || {}).v) || null;
-  const chanPb = ch => f => (['client', 'garantie', 'interne'].includes(ch) ? (f.types[ch] || {}).pc_pb : (f.pieces[ch] || {}).pb);
+  const chanV = ch => f => (FO_PC_TYPES.includes(ch) ? (f.types[ch] || {}).pc_v : (f.pieces[ch] || {}).v) || null;
+  const chanPb = ch => f => (FO_PC_TYPES.includes(ch) ? (f.types[ch] || {}).pc_pb : (f.pieces[ch] || {}).pb);
   const present = FO_PC_CHANNELS.filter(([ch]) => cols.some(c => c.real && chanV(ch)(c.real)));
   present.forEach(([ch, lab]) => rows.push({ label: lab, fmt: 'money', get: chanV(ch) }));
   rows.push({ label: 'Total du département Pièces', fmt: 'money', strong: true, get: f => (f.pieces.total || {}).v || null });
@@ -310,10 +317,10 @@ function renderFoPiecesView(container) {
   present.forEach(([ch, lab]) => rows.push({ label: lab, fmt: 'percent', get: f => foDiv(chanPb(ch)(f), chanV(ch)(f)) }));
   rows.push({ label: 'Total du département Pièces', fmt: 'percent', strong: true, get: f => foDiv((f.pieces.total || {}).pb, (f.pieces.total || {}).v) });
   rows.push({ sec: 'Pièces par dollar de main-d’œuvre' });
-  FO_TYPES.slice(0, 3).forEach(([typ, lab]) => rows.push({ label: lab, fmt: 'dec2', get: f => foTypeMetrics(f.types[typ]).pc_mo }));
+  FO_TYPES.filter(([t]) => FO_PC_TYPES.includes(t)).forEach(([typ, lab]) => rows.push({ label: lab, fmt: 'dec2', get: f => foTypeMetrics(f.types[typ]).pc_mo }));
   container.appendChild(foCard('Pièces', escapeHtml(periodLabel(state.refPeriod)) + ' · ' + escapeHtml(periodModeLabel()),
     foTable('Indicateur', rows, cols),
-    'Pièces sur BT client / garantie / interne : ventes de pièces facturées sur ces bons de travail. ' +
+    'Pièces sur BT client / garantie / entretien BMW / interne : ventes de pièces facturées sur ces bons de travail. ' +
     'Ajustements (escomptes, allocations d’achat, rectifications d’inventaire) : dans le total seulement. ' + foFootBasis()));
 }
 function foMultiLine(seriesList, fmt, height) {

@@ -63,7 +63,13 @@ DEALER_SOURCES = [
     {
         "key": "bmw",
         "label": "BMW Sherbrooke",
-        "roots": ["1CVp1bMr8TP_XTCxKPLVTlSVq2VAYjbZh"],  # a) Réalisé (BMW)
+        "roots": [
+            "1CVp1bMr8TP_XTCxKPLVTlSVq2VAYjbZh",  # a) Réalisé (BMW)
+            # b) États financiers : états BMW Canada « AAAA-MM MANUF BMW Sher.xlsm »
+            # (2024/, 2025/, 2026/) -- source des opérations fixes de BMW
+            # (types de BT des pages 8 à 10, demande du 29 septembre 2026).
+            "1bp1QFO-TlD5I-hb48B86RoM4375WwIQ-",
+        ],
     },
     {
         "key": "stm",

@@ -1722,9 +1722,12 @@ def extract_vw_file(path):
 # 25 septembre 2026), et c'était déjà l'effet de l'ancien ordre de
 # traitement (les .xlsm passaient après les .xlsx). Le Réalisé reste utilisé
 # pour tous les mois sans état financier.
-FORMAT_RANK = {"etat_gm": 1, "etat_hyundai": 1, "gabarit": 0, "etat_vw": -1}
+FORMAT_RANK = {"etat_gm": 1, "etat_hyundai": 1, "gabarit": 0, "etat_vw": -1, "etat_bmw": -2}
 # Exception VW : son Réalisé (avec budget) reste prioritaire sur l'état
 # Volkswagen Canada, qui ne comble que les mois sans Réalisé.
+# État BMW Canada (« MANUF ») : jamais la source principale du mois ; il ne
+# sert qu'aux opérations fixes de BMW (types de BT des pages 8 à 10), repris
+# dans le Réalisé retenu (voir main).
 
 
 def sheet_names(path):
@@ -1748,6 +1751,10 @@ def detect_format(path):
     names = set(sheet_names(path))
     if "Parametres" in names:
         return "gabarit"
+    if {"FS Data", "Page 1", "Page2", "Page 8", "Page 10"} <= names:
+        # État financier BMW Canada (BMW Sherbrooke) : « Page 1 », « Page2 »,
+        # « Page3 », « Page 4 »… et une feuille « FS Data ».
+        return "etat_bmw"
     if {"Page1", "Page2", "Page3", "Page4"} <= names:
         return "etat_gm"
     if {"Page 2", "Page 3", "Page 4"} <= names:
@@ -1756,20 +1763,57 @@ def detect_format(path):
         if names & {"Données d'ÉF", "FS Data"}:
             return "etat_vw"
         return "etat_hyundai"
-    raise ValueError("format non reconnu (ni gabarit Réalisé, ni état GM, ni état Hyundai, ni état VW)")
+    raise ValueError("format non reconnu (ni gabarit Réalisé, ni état GM, ni état Hyundai, ni état VW, ni état BMW)")
+
+
+def extract_bmw_file(path):
+    """État BMW Canada : seulement l'identité (concession, mois) ; les
+    chiffres des opérations fixes sont lus par apres_vente.read_bmw."""
+    import openpyxl
+    wb = openpyxl.load_workbook(path, data_only=True, read_only=True)
+    ws = wb["Page 1"]
+    rows = [r for r in ws.iter_rows(min_row=1, max_row=3, values_only=True)]
+    wb.close()
+    company, dest = None, None
+    for r in rows:
+        for i, v in enumerate(r):
+            t = sa(v) if isinstance(v, str) else ""
+            if t.startswith("nom du concessionnaire"):
+                company = next((x for x in r[i + 1:] if isinstance(x, str) and x.strip()), None)
+            if t.startswith("dest"):
+                dest = next((x for x in r[i + 1:] if hasattr(x, "year")), None)
+    # Anciens états (2024) : libellés en anglais ; valeurs aux mêmes endroits.
+    if not dest:
+        dest = next((v for v in reversed(rows[0] if rows else ()) if hasattr(v, "year")), None)
+    if not company:
+        company = next((v for r in rows for v in r if isinstance(v, str) and "bmw" in sa(v)
+                        and "canada" not in sa(v)), None)
+    if not company or not dest:
+        raise ValueError("état BMW : nom de la concession ou mois introuvable (Page 1)")
+    return {
+        "company": company.strip(),
+        "period_key": f"{dest.year}-{dest.month:02d}",
+        "month_name": HAWKS_MONTHS[dest.month],
+        "month_num": dest.month,
+        "year": dest.year,
+        "sections": {"month": {}, "ytd": {}},
+    }
 
 
 def extract_any_file(path):
     """Gabarit Réalisé (.xlsx, onglet Parametres), état financier GM (HAWKS,
-    STM), Hyundai Canada (Hyundai Longueuil) ou Volkswagen Canada (VW)."""
+    STM), Hyundai Canada (Hyundai Longueuil), Volkswagen Canada (VW) ou
+    BMW Canada (BMW Sherbrooke, opérations fixes seulement)."""
     fmt = detect_format(path)
-    if fmt == "etat_gm":
+    if fmt == "etat_bmw":
+        out = extract_bmw_file(path)
+    elif fmt == "etat_gm":
         out = extract_hawks_file(path)
     elif fmt == "etat_hyundai":
         out = extract_hyundai_file(path)
     elif fmt == "etat_vw":
         out = extract_vw_file(path)
-    else:
+    elif fmt != "etat_bmw":
         out = extract_file(path)
     out["source_format"] = fmt
     # Opérations fixes : BT par type, heures, pièces (voir apres_vente.py).
@@ -1973,6 +2017,40 @@ def vw_statement_override(ranked, prev_statement):
                            f"état retenu")
 
 
+def merge_manufacturer_fixed_ops(store, key, best, manufs):
+    """Remplace les types de BT du Réalisé retenu (best) par ceux de l'état
+    BMW Canada du même mois. Cumul inutilisable (état de décembre 2025) :
+    cumul du mois précédent (déjà fusionné) + mois."""
+    gm = (best["sections"].get("month") or {}).get("apres_vente")
+    name, st, matched = apres_vente.pick_manufacturer(gm, manufs)
+    if not st:
+        return
+    sm = (st["sections"].get("month") or {}).get("apres_vente")
+    sy = (st["sections"].get("ytd") or {}).get("apres_vente")
+    if not matched:
+        print(f"Opérations fixes {key[0]} {key[1]} : M-O client de l'état {name} ≠ Réalisé (> 2 %), état retenu quand même")
+    if sm and best["sections"].get("month") is not None:
+        best["sections"]["month"]["apres_vente"] = apres_vente.merge_manufacturer(gm, sm)
+    if best["sections"].get("ytd") is None:
+        return
+    gy = best["sections"]["ytd"].get("apres_vente")
+    if not apres_vente.manufacturer_ytd_ok(sm, sy, best.get("month_num") or st.get("month_num")):
+        prev = ((((store.get("dealers") or {}).get(key[0]) or {}).get("periods") or {})
+                .get(prev_period_key(key[1])) or {})
+        pav = ((prev.get("sections") or {}).get("ytd") or {}).get("apres_vente")
+        if (st.get("month_num") != 1 and pav and pav.get("source_types") == "etat_bmw"
+                and int(key[1][:4]) == int(prev_period_key(key[1])[:4])):
+            sy = dict(sy or {}, types=apres_vente.add_types(pav.get("types"), (sm or {}).get("types")))
+            print(f"Opérations fixes {key[0]} {key[1]} : cumul de l'état {name} inutilisable, "
+                  f"reconstitué (cumul {prev_period_key(key[1])} + mois)")
+        else:
+            print(f"Opérations fixes {key[0]} {key[1]} : cumul de l'état {name} inutilisable, cumul du Réalisé gardé")
+            sy = None
+    if sy:
+        best["sections"]["ytd"]["apres_vente"] = apres_vente.merge_manufacturer(gy, sy)
+    print(f"Opérations fixes {key[0]} {key[1]} : types de BT de l'état BMW Canada ({name})")
+
+
 def prev_period_key(period_key):
     y, m = int(period_key[:4]), int(period_key[5:7])
     return f"{y - 1}-12" if m == 1 else f"{y}-{m - 1:02d}"
@@ -2074,6 +2152,12 @@ def main(paths, store_path=None, extract_fn=None):
                     src = (state["sections"].get(sk) or {}).get("apres_vente")
                     if tgt and src and not apres_vente.merge_state_hours(tgt, src):
                         print(f"Heures non reprises pour {key[0]} {key[1]} ({sk}) : nombres de BT différents")
+        # Opérations fixes de BMW : types de BT de l'état BMW Canada (pages 8
+        # à 10) à la place de ceux du Réalisé (demande du 29 septembre 2026).
+        if best.get("source_format") == "gabarit":
+            manufs = [(n, x) for _, n, x in ranked if x.get("source_format") == "etat_bmw"]
+            if manufs:
+                merge_manufacturer_fixed_ops(store, key, best, manufs)
         if len(ranked) > 1:
             print(f"Retenu pour {key[0]} {key[1]} : {best_name} "
                   f"(écartés : {', '.join(n for _, n, _ in ranked if n != best_name)})")

@@ -20,6 +20,14 @@ Sources et ce qu'elles contiennent :
     Page 6 (temps disponible, heures poinçonnées, temps facturé par type).
   - État Volkswagen Canada : Page 5 (B.R., ventes, profit brut par ligne),
     Page 6 (heures vendues par type, heures disponibles et productives).
+  - État BMW Canada (BMW Sherbrooke, « MANUF ») : feuille « FS Data » (codes
+    page-ligne-colonne) — Page 8 (retours inscrits = BT, ventes et profit brut
+    par type : client, entretien BMW, garantie, interne, programme SPA),
+    Page 9 (pièces sur ces BT), Page 10 (taux affichés, taux de main-d'œuvre
+    en vigueur = taux effectif déclaré, techniciens, jours de service). Pas
+    d'heures vendues. Sert de source des types de BT de BMW (demande de Maxime
+    Allard, 29 septembre 2026) : le Réalisé mêle l'entretien à la garantie et
+    compte les BT d'esthétique interne dans l'interne.
 
 Chaque montant est un dict {"real": x} (plus "budget" et "prior_year" pour le
 Réalisé), comme le reste de data.json. Montants = ventes (M-O, pièces) ou
@@ -31,7 +39,7 @@ import unicodedata
 
 import openpyxl
 
-TYPES = ("client", "garantie", "interne", "esthetique")
+TYPES = ("client", "garantie", "entretien", "interne", "esthetique")
 MEASURES = ("bt", "mo_ventes", "mo_pb", "pc_ventes", "pc_pb", "heures")
 
 
@@ -760,6 +768,163 @@ def read_vw(path):
     return {k: _clean(v) for k, v in out.items()}
 
 
+
+# ---------------------------------------------------------------------------
+# État BMW Canada (BMW Sherbrooke) -- feuille « FS Data » : colonne A = code
+# page-ligne-colonne (800612 = page 8, ligne 6, colonne 12), colonne B = montant.
+# Page 8 : colonnes 12/14/16 = mois (retours inscrits, ventes, bénéfice brut),
+# 22/24/26 = cumul. Page 9 : pièces, mêmes colonnes. Page 10 : ×100 pour les
+# taux et les effectifs.
+# ---------------------------------------------------------------------------
+
+BMW_COLS = {"month": (12, 14, 16), "ytd": (22, 24, 26)}
+# type : lignes de la page 8 (main-d'œuvre) et de la page 9 (pièces)
+BMW_TYPES = {
+    "client": ((6,), (6,)),
+    "entretien": ((11, 30), (11, 30)),     # entretien BMW (BMW Service Inclus) + service tout compris
+    "garantie": ((23,), (23,)),
+    "interne": ((29,), (29,)),
+    "esthetique": ((31,), ()),             # programme SPA BMW (459A)
+}
+
+
+def bmw_fs(path):
+    wb = openpyxl.load_workbook(path, data_only=True, read_only=True)
+    fs = {}
+    for row in wb["FS Data"].iter_rows(min_row=2, values_only=True):
+        a = row[0] if row else None
+        b = row[1] if len(row) > 1 else None
+        if isinstance(a, (int, float)) and not isinstance(a, bool) and _num(b) is not None:
+            fs[int(a)] = float(b)
+    wb.close()
+    return fs
+
+
+def _bmw_code(page, line, col):
+    return page * 100000 + line * 100 + col
+
+
+def bmw_sections(fs):
+    g = lambda page, line, col: fs.get(_bmw_code(page, line, col))
+    out = {}
+    for sk, (cn, cv, cb) in BMW_COLS.items():
+        sec = _empty_section()
+        for typ, (mo_lines, pc_lines) in BMW_TYPES.items():
+            t = _t(sec, typ)
+            for ln in mo_lines:
+                _put(t, "bt", _kv(g(8, ln, cn)))
+                _put(t, "mo_ventes", _kv(g(8, ln, cv)))
+                _put(t, "mo_pb", _kv(g(8, ln, cb)))
+            for ln in pc_lines:
+                _put(t, "pc_ventes", _kv(g(9, ln, cv)))
+                _put(t, "pc_pb", _kv(g(9, ln, cb)))
+        sec["service"]["sous_traitance"] = {"ventes": _kv(g(8, 17, cv)), "pb": _kv(g(8, 17, cb)), "bt": _kv(g(8, 17, cn))}
+        adj = g(8, 37, cb)
+        if adj:
+            sec["service"]["ajustement_mo"] = {"pb": _kv(-adj)}
+        sec["service"]["total"] = {"ventes": _kv(g(8, 40, cv)), "pb": _kv(g(8, 40, cb)), "bt": _kv(g(8, 40, cn))}
+        out[sk] = _clean(sec)
+    # Page 10 (fin de mois) : mêmes valeurs pour le mois et le cumul
+    at = {}
+    rates = {"client": g(10, 20, 4), "garantie": g(10, 21, 4), "interne": g(10, 22, 4), "esthetique": g(10, 24, 4)}
+    rates = {k: v / 100 for k, v in rates.items() if v}
+    if rates:
+        at["taux_affiche"] = rates
+    elr = g(10, 52, 24)
+    if elr:
+        at["taux_effectif_declare"] = elr / 100
+    techs = {"mecanique": g(10, 33, 14), "apprentis": g(10, 34, 14)}
+    techs = {k: v / 100 for k, v in techs.items() if v}
+    if techs:
+        at["techniciens_declares"] = techs
+    if g(10, 25, 14):
+        at["jours_service_mois"] = g(10, 25, 14)
+    for sk in out:
+        out[sk]["atelier"].update(at)
+    return out
+
+
+def read_bmw(path):
+    return bmw_sections(bmw_fs(path))
+
+
+def _real(kv):
+    return (kv or {}).get("real") if isinstance(kv, dict) else None
+
+
+def manufacturer_ytd_ok(month, ytd, month_num):
+    """Le cumul d'un état BMW est inutilisable s'il ne dépasse pas le mois
+    (état de décembre 2025 : colonnes « cumul » = décembre seulement)."""
+    if not ytd or not month:
+        return False
+    if month_num == 1:
+        return True
+    bm = sum(_real(t.get("bt")) or 0 for t in (month.get("types") or {}).values())
+    by = sum(_real(t.get("bt")) or 0 for t in (ytd.get("types") or {}).values())
+    return by > bm
+
+
+def add_types(a, b):
+    """Somme de deux blocs « types » (réel seulement) : cumul reconstitué =
+    cumul du mois précédent + mois."""
+    out = {}
+    for typ in set(a or {}) | set(b or {}):
+        ta, tb = (a or {}).get(typ) or {}, (b or {}).get(typ) or {}
+        t = {}
+        for m in set(ta) | set(tb):
+            x, y = _real(ta.get(m)), _real(tb.get(m))
+            if x is not None or y is not None:
+                t[m] = {"real": (x or 0) + (y or 0)}
+        out[typ] = t
+    return out
+
+
+# Budget du Réalisé gardé seulement là où la définition est la même que dans
+# l'état (client : 460A/B/D ; esthétique : programme SPA 459A). Garantie et
+# interne du Réalisé comprennent l'entretien et l'esthétique interne.
+MANUF_KEEP_BUDGET = ("client", "esthetique")
+
+
+def merge_manufacturer(target, manuf, source="etat_bmw"):
+    """Types de BT (BT, M-O, pièces) de l'état du constructeur à la place de
+    ceux du Réalisé ; le reste du Réalisé (sous-traitance, pièces par canal,
+    carrosserie) est gardé. Colonnes « an passé » retirées des types : l'an
+    passé vient alors de l'état du même mois de l'an passé (même
+    définition)."""
+    import copy
+    out = copy.deepcopy(target) if target else _empty_section()
+    old = out.get("types") or {}
+    new = {}
+    for typ, meas in (manuf.get("types") or {}).items():
+        t = {m: {"real": _real(kv)} for m, kv in meas.items() if _real(kv) is not None}
+        if typ in MANUF_KEEP_BUDGET:
+            for m, kv in (old.get(typ) or {}).items():
+                b = (kv or {}).get("budget") if isinstance(kv, dict) else None
+                if b is not None and m in t:
+                    t[m]["budget"] = b
+        new[typ] = t
+    out["types"] = new
+    out["detail"] = {}
+    out.setdefault("atelier", {}).update(manuf.get("atelier") or {})
+    out["source_types"] = source
+    return out
+
+
+def pick_manufacturer(gabarit_month, candidates, tol=0.02):
+    """Parmi les états BMW du mois (doublons, version après régularisation),
+    celui dont la M-O client du mois concorde avec le Réalisé ; sinon le
+    premier. candidates : [(nom, extrait)] dans l'ordre de préférence."""
+    ref = _real(((gabarit_month or {}).get("types") or {}).get("client", {}).get("mo_ventes"))
+    best = None
+    for name, ex in candidates:
+        av = ((ex.get("sections") or {}).get("month") or {}).get("apres_vente") or {}
+        v = _real((av.get("types") or {}).get("client", {}).get("mo_ventes"))
+        if ref and v is not None and abs(v - ref) <= tol * abs(ref):
+            return name, ex, True
+        if best is None:
+            best = (name, ex)
+    return (best[0], best[1], False) if best else (None, None, False)
+
 # ---------------------------------------------------------------------------
 
 def read(path, fmt, sections=("month", "ytd")):
@@ -770,6 +935,8 @@ def read(path, fmt, sections=("month", "ytd")):
         out = read_hyundai(path, month_only="ytd" not in sections)
     elif fmt == "etat_vw":
         out = read_vw(path)
+    elif fmt == "etat_bmw":
+        out = read_bmw(path)
     else:
         out = read_gabarit(path)
     return {k: v for k, v in out.items() if k in sections}

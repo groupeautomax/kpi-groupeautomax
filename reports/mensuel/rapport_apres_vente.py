@@ -894,6 +894,10 @@ def build_book(s, P):
     bk.add(p_mix(F))
     bk.add(p_atelier(F))
     bk.add(p_pieces(F))
+    import rapport_composite as rcomp   # après-vente face aux composites des constructeurs
+    pg = rcomp.page_fo_groupe(s, P)
+    if pg:
+        bk.add(pg)
     bk.add(p_tendances(F))
     bk.add(p_detail_mensuel(F))
     bk.add(p_couverture(F))

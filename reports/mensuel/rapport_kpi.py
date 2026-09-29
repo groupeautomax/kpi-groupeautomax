@@ -601,9 +601,13 @@ def build_book(s, P, marks):
     toc = [("L'essentiel du mois", marks.get("essentiel", "")), ("Alertes", marks.get("alertes", "")),
            ("Résultats du groupe", marks.get("resultats", "")), ("Analyse des écarts", marks.get("pont", "")),
            ("Composition du profit brut et des dépenses", marks.get("compo", "")), ("Résultats par concession", marks.get("concessions", "")),
-           ("Indicateurs de gestion", marks.get("ind", "")), ("Après-vente : bons de travail", marks.get("apres", "")),
+           ("Indicateurs de gestion", marks.get("ind", "")),
+           ("Comparaison aux composites des constructeurs", marks.get("composites", "")),
+           ("Après-vente : bons de travail", marks.get("apres", "")),
            ("Tendances", marks.get("tend", "")),
            ("Qualité des données", marks.get("qualite", "")), ("Méthode", marks.get("methode", ""))]
+    if marks:   # 2e passe : sections absentes ce mois-ci retirées du sommaire
+        toc = [t for t in toc if t[1] != ""]
     bk.add_cover(p_cover(s, P, toc))
     bk.mark("essentiel"); bk.add(p_essentiel(s, P, marks))
     parts = chunks(al, 16)
@@ -615,6 +619,10 @@ def build_book(s, P, marks):
     bk.mark("compo"); bk.add(p_compo(s, P, "pb")); bk.add(p_compo(s, P, "dep"))
     bk.mark("concessions"); bk.add(p_concessions(s, P)); bk.add(p_heat(s, P))
     bk.mark("ind"); bk.add(p_ind(s, P, False)); bk.add(p_ind(s, P, True))
+    import rapport_composite as rcomp   # nos concessions face aux composites des constructeurs
+    comp_page = rcomp.page_groupe(s, P)
+    if comp_page:
+        bk.mark("composites"); bk.add(comp_page)
     fo_pages = apres_vente_pages(s, P)
     if fo_pages:
         bk.mark("apres")

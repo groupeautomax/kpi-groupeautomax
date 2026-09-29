@@ -79,6 +79,44 @@ Ce fichier sert de mémoire : décisions à respecter, limites connues, historiq
   seulement → cumul refait (cumul de novembre + décembre). Pas d'heures vendues dans l'état : page Atelier = taux affichés,
   taux effectif déclaré et heures estimées (M-O ÷ taux effectif).
 
+## Composites des constructeurs — règles (29 septembre 2026)
+
+- Demande du client : « il faut que les comparaisons [au composite] soient ajoutées au rapport » ; composites reçus :
+  Hyundai (eComposite « ÉF ‐ Sommaire », « P&P » et « Analyse des revenus ») et Volkswagen (« Dealer Report Card ») ;
+  BMW et GM à venir. Le client dépose les PDF dans les dossiers Drive des concessions, avec le Réalisé et les états.
+- Lecture : `src/composites.py` (PDF → JSON). Les PDF ne vont JAMAIS dans le dépôt : seuls les chiffres, dans
+  `sources/composites/<concession>_<AAAA-MM>_<type>.json` (types `hyundai_ef`, `hyundai_pp`, `hyundai_ar`,
+  `vw_report_card`). `drive_sync.py` télécharge les PDF des Drive des concessions dont le nom contient « composite »,
+  « report card », « scorecard », « dealer report » ou « ÉF ‐ Sommaire » (pas « sommaire » seul : sommaires de relevés
+  et de TPS-TVQ), les lit dans un fichier temporaire et écrit le JSON. PDF non reconnu : noté dans le manifeste avec
+  `parser_version` ; relu seulement s'il change sur Drive ou si `PARSER_VERSION` de `src/composites.py` augmente
+  (l'augmenter à chaque amélioration de la lecture). À la main : `python src/composites.py fichier.pdf …`.
+- Libellés : `norm()` ramène « œ » à « oe » (« Main‐d'œuvre » du composite = « MAIN-D'OEUVRE » de l'état).
+- `extract.py` (`load_composites`) → `data.json["composites"][concession][mois][type]`. Hyundai : le composite ne donne
+  que les moyennes du groupe (ex. « Est A (850+) », 16 concessions) ; les chiffres de Hyundai Longueuil aux mêmes
+  définitions sont calculés à partir de l'état Hyundai Canada du mois (`composites.hyundai_statement_lines`, clé
+  `concession`). Définitions vérifiées sur les moyennes d'août 2026 : profit net avant bonis = profit net avant impôt +
+  salaire et bonis des propriétaires ; absorption = PB pièces + service + carrosserie ÷ (frais total − frais de vente des
+  véhicules) ; publicité = publicité véhicules + publicité pièces-service ; PVND / PVOD = bureau commercial ÷ unités
+  détail. Lubrifiants laissés au service (comme l'état), contrairement au reste du rapport.
+- Postes P&P : table `PP_LINES` (composite ↔ état, même ordre de lignes). Postes comparés en % du profit brut ; « effet »
+  = écart de ratio × PB de la concession. Page des dépenses : postes comparés au total de la concession (frais fixes
+  répartis entre départements à la façon de chaque concession : Hyundai Longueuil met le loyer en parts égales) ; frais
+  d'emploi en sous-total (Hyundai Longueuil inscrit les charges sociales dans les avantages sociaux).
+- Pages (`reports/mensuel/rapport_composite.py`) : rapport de Hyundai (sommaire vs groupe + dépenses en % du PB), de VW
+  (bulletin : classement, indicateurs et points ; ventes, F&I et CEM), rapports Opérations fixes de Hyundai et de VW
+  (service et pièces), rapport du Groupe (« Nos concessions face à leur réseau », avec l'état des composites reçus) et
+  rapport Opérations fixes du Groupe (« Après-vente face aux composites »). Encadrés « Bravo / À améliorer » (2 + 2).
+  Analyse des revenus (`hyundai_ar`, postes `AR_LINES`) : page « Main-d'œuvre et pièces par type de travail » du
+  rapport Opérations fixes de Hyundai (BT client / garantie / interne : nombre, $ par BT, marge ; pièces par type) ;
+  Hyundai Longueuil : page 4 de l'état (colonnes unités / ventes / PB). Pièces « par BT » = ventes de pièces du type ÷
+  BT de main-d'œuvre du même type. Écart de PB = PB réel − PB au ratio du groupe (PB par BT, sinon marge). Escompte /
+  boni pour ventes en gros : hors marge des ventes en gros (comme le composite), compris dans le total pièces.
+  Aucun composite pour le mois : aucune page, et l'entrée est retirée du sommaire du Groupe.
+- Vérification d'août 2026 : 1 724 valeurs du composite Hyundai et 256 du bulletin VW relues par un 2e lecteur
+  (pdftotext), 486 valeurs de Hyundai Longueuil relues cellule par cellule dans l'état : 0 écart. Analyse des revenus :
+  674 lignes (4 colonnes chacune) relues par pdftotext, 0 écart.
+
 ## Profit véhicule, F&I et gros — règles (28 septembre 2026, refait le 29)
 
 - Chaque département véhicules (neufs, usagés) est séparé en trois : **profit véhicule détail** (lignes véhicules de
@@ -148,3 +186,6 @@ Ce fichier sert de mémoire : décisions à respecter, limites connues, historiq
   BMW Canada branché comme source des types de BT de BMW (voir « Opérations fixes — règles »). Effet sur le cumul
   d'août 2026 de BMW : garantie 885 BT (au lieu de 1 689, entretien à part : 804 BT), interne 1 138 BT à 458 $ par BT
   (au lieu de 1 437 BT à 365 $) ; client et SPA inchangés.
+- Soir : composites des constructeurs ajoutés aux rapports (voir « Composites des constructeurs — règles ») :
+  Hyundai (eComposite, groupe Est A (850+)) et VW (Dealer Report Card) d'août 2026 ; BMW et GM à venir. Ajout de
+  l'« Analyse des revenus » Hyundai (déposée sur Drive) : page par type de travail au rapport Opérations fixes.

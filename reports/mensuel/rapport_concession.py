@@ -434,6 +434,9 @@ def build_book(s, P, d):
     fo_page = rav.page_concession(s, P, d)
     if fo_page:
         bk.add(fo_page)
+    import rapport_composite as rcomp   # comparaison au composite du constructeur (Hyundai, VW ; BMW et GM à venir)
+    for pg in rcomp.pages_concession(s, P, d):
+        bk.add(pg)
     bk.add(p_compo(s, P, d, "pb"))
     bk.add(p_compo(s, P, d, "dep"))
     bk.add(p_pont(s, P, d, "month"))

@@ -194,3 +194,9 @@ table.fo td { padding-top: 3.5px; padding-bottom: 3.5px; }
 table.fo.small td { padding-top: 2.5px; padding-bottom: 2.5px; }
 .retenir.compact li { margin-bottom: 5px; font-size: 9pt; line-height: 1.45; }
 table.t.tight td { padding-top: 3px; padding-bottom: 3px; }
+/* Comparaison au composite : encadrés « Bravo / À améliorer » compacts */
+.two.bravo { gap: 14px; margin-top: 6px; }
+.bravo .callout { font-size: 8.4pt; line-height: 1.4; padding: 7px 11px; margin: 4px 0; }
+.bravo .callout li { margin-bottom: 2px; }
+.callout.compact { font-size: 8.4pt; line-height: 1.4; padding: 7px 11px; margin: 6px 0; }
+.callout.compact li { margin-bottom: 2px; }

@@ -86,7 +86,10 @@ def _num(x):
 class Store:
     def __init__(self, data_path, budget_csv=None):
         with open(data_path, encoding="utf-8") as f:
-            self.raw = json.load(f)["dealers"]
+            data = json.load(f)
+        self.raw = data["dealers"]
+        # Composites des constructeurs (src/composites.py) : {concession: {mois: {type: …}}}
+        self.composites = data.get("composites") or {}
         self.notes = []          # (concession, période, texte) des valeurs reconstituées
         self._note_keys = set()
         self.budget_csv = {}     # (dealer, period, key) -> valeur (dépenses positives)

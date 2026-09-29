@@ -558,6 +558,9 @@ def build_book(s, P, d):
     bk.add(p_departements(F, d))
     bk.add(p_bt(F, d))
     bk.add(p_position(F, d))
+    import rapport_composite as rcomp   # comparaison au composite du constructeur
+    for pg in rcomp.pages_fo_concession(s, P, d):
+        bk.add(pg)
     bk.add(p_mensuel(F, d))
     bk.add(p_tendances(F, d))
     pa = p_atelier(F, d)

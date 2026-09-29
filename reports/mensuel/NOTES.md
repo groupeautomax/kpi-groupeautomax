@@ -82,6 +82,19 @@ Ce fichier sert de mémoire : décisions à respecter, limites connues, historiq
   unités détail). Le pont du Groupe additionne ceux des concessions (pas d'effet de mix).
 - Ces clés ne vont pas dans le gabarit budgets.csv (pas de budget par composante).
 
+## Envoi aux directeurs le 20 du mois (demande du client, 29 septembre 2026)
+
+- Workflow GitHub « Rapports mensuels par courriel » (`.github/workflows/rapports-mensuels.yml`), le 20 à 14 h 07 UTC :
+  `envoi_rapports.py` vise le mois précédent et, pour chaque concession dont le fichier du mois est dans data.json,
+  produit `Rapport_<Concession>_AAAA-MM.pdf` et `Rapport_Operations_fixes_<Concession>_AAAA-MM.pdf`, puis les envoie au
+  script Apps Script « Envoi rapports KPI » de Maxime (web app, compte mallard@groupeautomax.com), qui les expédie au
+  directeur de la concession, Maxime en copie, puis envoie à Maxime un résumé (envoyés, en attente, avertissements).
+- Chaque directeur reçoit seulement les rapports de sa concession ; le rapport du Groupe reste pour Maxime.
+- Concession sans données du mois : pas d'envoi, signalée dans le résumé. Relance manuelle (Actions → Run workflow) :
+  seules les concessions pas encore envoyées partent ; `essai = oui` : tout part à Maxime seulement ; `forcer = oui` : renvoi.
+- Secrets GitHub : `APPS_SCRIPT_URL`, `RAPPORTS_TOKEN`. Les adresses des directeurs sont dans le script Apps Script,
+  jamais dans ce dépôt (public) ; le journal des Actions n'affiche que les codes de concession et les statuts.
+
 ## Limites connues
 
 - Le rapport détecte et affiche lui-même (page « Qualité et couverture des données ») les budgets absents, les mois

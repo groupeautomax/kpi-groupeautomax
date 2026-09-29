@@ -191,6 +191,12 @@
     "modifiedTime": "2026-01-15T00:16:09.000Z",
     "name": "Bonis cadres VW 2025-12.xlsx"
   },
+  "13xaUf7bFUUMDT3Tlb-SBvxmp81a2Ah68": {
+    "dealer": "bmw",
+    "local_path": "sources/bmw_2025-04_MANUF_BMW_Sher.xlsm.xlsx",
+    "modifiedTime": "2025-07-16T21:17:02.617Z",
+    "name": "2025-04_MANUF_BMW_Sher.xlsm"
+  },
   "143j4Z4YYh0FEV52HCQpeEkxdw0Q4mWYp": {
     "dealer": "bmw",
     "local_path": "sources/bmw_2024-09_R_alis_BMW_Sher.xlsx",
@@ -221,11 +227,23 @@
     "modifiedTime": "2026-06-17T01:01:45.065Z",
     "name": "2026-03 Réalisé STM.xlsx"
   },
+  "14No2bx_fpW3mHZ8PaGM6iRx-McxSZn0D": {
+    "dealer": "bmw",
+    "local_path": "sources/bmw_2024-01_MANUF_BMW_Sher.xlsm.xlsx",
+    "modifiedTime": "2024-02-12T17:25:55.319Z",
+    "name": "2024-01_MANUF_BMW_Sher.xlsm"
+  },
   "14fIek2F4BWueLiq-jQSxZYBYtgv9tLiy": {
     "dealer": "vw",
     "local_path": "sources/vw_2024-12_R_alis_VW.xlsx",
     "modifiedTime": "2025-01-17T22:21:00.464Z",
     "name": "2024-12_Réalisé_VW.xlsx"
+  },
+  "14jP-JYpZ2OWW-VKaPwyS6sidR2P5ZAI8": {
+    "dealer": "bmw",
+    "local_path": "sources/bmw_2026-08_MANUF_BMW_Sher.xlsm",
+    "modifiedTime": "2026-09-14T17:56:12.737Z",
+    "name": "2026-08 MANUF BMW Sher.xlsm"
   },
   "14p-Z8lzfWEqfVMGrlWxKPUxUbRsqzT_n": {
     "dealer": "vw",
@@ -322,6 +340,12 @@
     "local_path": "sources/vw_VW_r_alis_Q2-2021.xlsx",
     "modifiedTime": "2022-07-13T15:00:26.509Z",
     "name": "VW réalisé Q2-2021.xlsx"
+  },
+  "17LuktPR7gOsjzeeGPUv4no_N28veTAgu": {
+    "dealer": "bmw",
+    "local_path": "sources/bmw_2025-12_MANUF_BMW_Sher.xlsm",
+    "modifiedTime": "2026-01-15T17:47:00.052Z",
+    "name": "2025-12_MANUF_BMW_Sher.xlsm"
   },
   "17cpnQwnIG64ZHn6Wj25K2w2ShIEFd4TU": {
     "dealer": "vw",
@@ -478,6 +502,12 @@
     "local_path": "sources/vw_Actual_side_by_side_February_2025.xlsx",
     "modifiedTime": "2025-03-26T15:25:53.000Z",
     "name": "Actual side by side February 2025.xlsx"
+  },
+  "1AGye6IzGqyRXjJeZx00vw1s0zkDEQnkm": {
+    "dealer": "bmw",
+    "local_path": "sources/bmw_2024-03_MANUF_BMW_Sher.xlsm.xlsx",
+    "modifiedTime": "2024-04-11T16:26:49.342Z",
+    "name": "2024-03_MANUF_BMW_Sher.xlsm"
   },
   "1ATn6q_CxBQyOBn2TsRK6d1rAZrncqj_6": {
     "dealer": "vw",
@@ -713,6 +743,12 @@
     "modifiedTime": "2024-07-12T18:38:58.103Z",
     "name": "2024-06_Réalisé_VW.xlsx"
   },
+  "1F0E6mJUTf04ER-aCJBAqHl_yApZLlAxt": {
+    "dealer": "bmw",
+    "local_path": "sources/bmw_2025-13_MANUF_BMW_Sher.xlsm",
+    "modifiedTime": "2026-01-30T17:41:23.497Z",
+    "name": "2025-13_MANUF_BMW_Sher.xlsm"
+  },
   "1FD7M1hreEBF1TE_oA55NDYCr5wlpYYQ8": {
     "dealer": "vw",
     "local_path": "sources/vw_2025-12_MANUF_VW.xlsm",
@@ -815,6 +851,18 @@
     "modifiedTime": "2022-06-29T14:20:39.729Z",
     "name": "2022-12_Réalisé_VW.xlsx"
   },
+  "1Hw2O0_jOnbMRwFb9n_88fj7uWlmOf7hc": {
+    "dealer": "bmw",
+    "local_path": "sources/bmw_2024-12_MANUF_BMW_Sher.xlsm.xlsx",
+    "modifiedTime": "2025-12-17T03:49:48.073Z",
+    "name": "2024-12_MANUF_BMW_Sher.xlsm"
+  },
+  "1IFkNuRwrqnPT4q63TlMJ9Iqio3EVQu1_": {
+    "dealer": "bmw",
+    "local_path": "sources/bmw_2024-12_MANUF_BMW_Sher_APRES_REGUL.xlsm",
+    "modifiedTime": "2026-04-13T20:14:35.200Z",
+    "name": "2024-12_MANUF_BMW_Sher APRES REGUL.xlsm"
+  },
   "1IPFmPrpQXJsWJVae1Kg6CFyrX8T_0R7h": {
     "dealer": "bmw",
     "local_path": "sources/bmw_2024-07_R_alis_BMW_Sher.xlsx",
@@ -887,6 +935,12 @@
     "modifiedTime": "2026-08-14T13:52:52.741Z",
     "name": "VWBROSSARD072026.xlsm"
   },
+  "1J_RETye9VGeCKEfEgiQRM5tSJOvD5WZT": {
+    "dealer": "bmw",
+    "local_path": "sources/bmw_2024-02_MANUF_BMW_Sher.xlsm.xlsx",
+    "modifiedTime": "2024-03-11T18:58:25.785Z",
+    "name": "2024-02_MANUF_BMW_Sher.xlsm"
+  },
   "1JjMOz-YqtKLse2bZIJPINfZaunQV1nrB": {
     "dealer": "stm",
     "local_path": "sources/stm_2025-10_R_alis_STM.xlsx",
@@ -940,6 +994,12 @@
     "local_path": "sources/hyundai_FFS_Hyundai_F_10-2026.xlsm",
     "modifiedTime": "2026-09-28T15:32:24.395Z",
     "name": "FFS Hyundai F 10-2026.xlsm"
+  },
+  "1L8am8SlplqGbxVaD3jaUwiIx5gQxIji9": {
+    "dealer": "bmw",
+    "local_path": "sources/bmw_2025-07_MANUF_BMW_Sher.xlsm",
+    "modifiedTime": "2025-08-12T17:30:03.939Z",
+    "name": "2025-07_MANUF_BMW_Sher.xlsm"
   },
   "1LOwhMyDvus7Z3Z-UySiE6GmFfXgtoAMf": {
     "dealer": "stm",
@@ -1025,6 +1085,12 @@
     "modifiedTime": "2025-03-13T15:17:39.441Z",
     "name": "2025-02_Réalisé_VW.xlsx"
   },
+  "1NWJ07ZoFC_II0FxPOtehIyXEMsI6PDbZ": {
+    "dealer": "bmw",
+    "local_path": "sources/bmw_2025-11_MANUF_BMW_Sher.xlsm",
+    "modifiedTime": "2025-12-12T13:33:47.863Z",
+    "name": "2025-11_MANUF_BMW_Sher.xlsm"
+  },
   "1NlfUjqpb-Y7hJGzx5JMn3FUVAXTSMyK7": {
     "dealer": "vw",
     "local_path": "sources/vw_VW_r_alis_P08_2021.xlsx",
@@ -1078,6 +1144,12 @@
     "local_path": "sources/stm_2025_07_31_EF_STM.xlsm",
     "modifiedTime": "2025-11-20T22:16:46.797Z",
     "name": "2025_07_31_EF_STM.xlsm"
+  },
+  "1OwNMzOlMmZIk92cRZZ6IQkNJw9zQQ3Qs": {
+    "dealer": "bmw",
+    "local_path": "sources/bmw_2024-04_MANUF_BMW_Sher.xlsm.xlsx",
+    "modifiedTime": "2024-05-10T14:49:57.876Z",
+    "name": "2024-04_MANUF_BMW_Sher.xlsm"
   },
   "1PCSU_27Eq56TrCIJp9udOIbbU-Q_AQsR": {
     "dealer": "hyundai",
@@ -1210,6 +1282,12 @@
     "local_path": "sources/vw_2023-06_MANUF_VOLKS.xlsm",
     "modifiedTime": "2023-07-13T13:52:59.855Z",
     "name": "2023-06_MANUF_VOLKS.xlsm"
+  },
+  "1S5AMZmMT0pzFfcwSggVjN8OL7gV3EgCw": {
+    "dealer": "bmw",
+    "local_path": "sources/bmw_2024-10_MANUF_BMW_Sher.xlsm.xlsx",
+    "modifiedTime": "2024-11-11T21:03:58.398Z",
+    "name": "2024-10_MANUF_BMW_Sher.xlsm"
   },
   "1S5uJ10tNgIfr_BaIQB_gIO13V99S15g3": {
     "dealer": "hyundai",
@@ -1355,6 +1433,12 @@
     "modifiedTime": "2026-03-26T17:18:05.000Z",
     "name": "FFS Hyundai F 04-2024.xlsm"
   },
+  "1UZ5uHUDofRiYrA098b8Xc3aeDOvvG7dO": {
+    "dealer": "bmw",
+    "local_path": "sources/bmw_2026-05_MANUF_BMW_Sher.xlsm",
+    "modifiedTime": "2026-06-12T15:47:38.534Z",
+    "name": "2026-05 MANUF BMW Sher.xlsm"
+  },
   "1Uwje6d99MhW5aBy2lGo_R34fT2pgKkCC": {
     "dealer": "vw",
     "local_path": "sources/vw_2023-02_R_alis_VW.xlsx",
@@ -1414,6 +1498,18 @@
     "local_path": "sources/vw_2023-08_MANUF_VOLKS.xlsm",
     "modifiedTime": "2023-09-13T18:56:18.709Z",
     "name": "2023-08_MANUF_VOLKS.xlsm"
+  },
+  "1X9VxSa0KNnyDn-Cl95srdMJBP5F05SHe": {
+    "dealer": "bmw",
+    "local_path": "sources/bmw_2026-02_MANUF_BMW_Sher.xlsm",
+    "modifiedTime": "2026-03-12T01:45:52.362Z",
+    "name": "2026-02 MANUF BMW Sher.xlsm"
+  },
+  "1XBOZEDIZdhipLJr8uWHvGz9ztnZTG1Ph": {
+    "dealer": "bmw",
+    "local_path": "sources/bmw_2024-09_MANUF_BMW_Sher.xlsm.xlsx",
+    "modifiedTime": "2024-10-11T02:52:04.215Z",
+    "name": "2024-09_MANUF_BMW_Sher.xlsm"
   },
   "1XH7p2a61HLETtwUMh0e3w1p6frIbfaFA": {
     "dealer": "vw",
@@ -1475,11 +1571,23 @@
     "modifiedTime": "2026-08-19T22:16:45.081Z",
     "name": "2026_07_31_EF_HAWKS.xlsm"
   },
+  "1YLAUYVI2zoRriEWR0CRHrmDG-HTUx1G2": {
+    "dealer": "bmw",
+    "local_path": "sources/bmw_2026-07_MANUF_BMW_Sher.xlsm",
+    "modifiedTime": "2026-08-13T18:02:23.676Z",
+    "name": "2026-07 MANUF BMW Sher.xlsm"
+  },
   "1YLqzv7NpMnYSWwVuxGKbNT5pF0BhH-57": {
     "dealer": "vw",
     "local_path": "sources/vw_VW_r_alis_P06_2021new.xlsx",
     "modifiedTime": "2021-07-13T20:56:43.000Z",
     "name": "VW réalisé P06 2021new.xlsx"
+  },
+  "1YVHaEg56AOIYdowHZGcX-WGA6vAs7PN-": {
+    "dealer": "bmw",
+    "local_path": "sources/bmw_2024-11_MANUF_BMW_Sher.xlsm.xlsx",
+    "modifiedTime": "2024-12-12T13:36:41.095Z",
+    "name": "2024-11_MANUF_BMW_Sher.xlsm"
   },
   "1YZnyoh7iRA15boZg-7O1IjZJk1SJxGoL": {
     "dealer": "bmw",
@@ -1493,6 +1601,12 @@
     "modifiedTime": "2023-08-15T20:20:16.164Z",
     "name": "VW réalisé T2 2023.xlsx"
   },
+  "1YjOYHnTcdIGirI6qhaMmhXlTX3wWj7xN": {
+    "dealer": "bmw",
+    "local_path": "sources/bmw_2026-04_MANUF_BMW_Sher.xlsm",
+    "modifiedTime": "2026-05-13T14:24:31.898Z",
+    "name": "2026-04 MANUF BMW Sher.xlsm"
+  },
   "1Ypb5Sd8YBpIrPFm40m8_FjeOBKCUrvEC": {
     "dealer": "hawks",
     "local_path": "sources/hawks_2026_04_30_EF_HAWKS.xlsm",
@@ -1505,6 +1619,12 @@
     "modifiedTime": "2026-08-14T13:52:52.741Z",
     "name": "VWBROSSARD072026.xlsm"
   },
+  "1Z-HnnI2N8KxQzkLEbDPiHm5dCrYVnm1I": {
+    "dealer": "bmw",
+    "local_path": "sources/bmw_2025-06_MANUF_BMW_Sher.xlsm.xlsx",
+    "modifiedTime": "2025-07-10T18:37:26.517Z",
+    "name": "2025-06_MANUF_BMW_Sher.xlsm"
+  },
   "1ZAKp490Y-thMFdTmxTYStLSk6kCeUuYK": {
     "dealer": "vw",
     "local_path": "sources/vw_2026-04_R_alis_VW_V0.xlsx",
@@ -1516,6 +1636,18 @@
     "local_path": "sources/vw_2025-09_MANUF_VW.xlsm",
     "modifiedTime": "2025-10-20T19:22:30.786Z",
     "name": "2025-09_MANUF_VW.xlsm"
+  },
+  "1Zd89R_2l5T-ES2ZSr9v7qKI-KgHCEGE2": {
+    "dealer": "bmw",
+    "local_path": "sources/bmw_2024-06_MANUF_BMW_Sher.xlsm.xlsx",
+    "modifiedTime": "2024-07-12T13:59:59.617Z",
+    "name": "2024-06_MANUF_BMW_Sher.xlsm"
+  },
+  "1ZpB7RqXa7E7pJkgf0PGVAu3Bo94V2YbY": {
+    "dealer": "bmw",
+    "local_path": "sources/bmw_2024-07_MANUF_BMW_Sher.xlsm.xlsx",
+    "modifiedTime": "2024-08-13T19:13:29.728Z",
+    "name": "2024-07_MANUF_BMW_Sher.xlsm"
   },
   "1ZwpdrBNDY0BrJdpoBhsRTCqNOvKjAb4_": {
     "dealer": "bmw",
@@ -1577,11 +1709,29 @@
     "modifiedTime": "2025-04-23T12:04:48.842Z",
     "name": "2025-03_Réalisé_BMW Sher.xlsx"
   },
+  "1_rVi9Sp0IP0ePpb3cL5HzHxv3eLbmbyz": {
+    "dealer": "bmw",
+    "local_path": "sources/bmw_2026-03_MANUF_BMW_Sher.xlsm",
+    "modifiedTime": "2026-04-10T20:44:04.687Z",
+    "name": "2026-03 MANUF BMW Sher.xlsm"
+  },
   "1_x3VZuYycikP8R0NMxEddbiUDYKLY2oW": {
     "dealer": "vw",
     "local_path": "sources/vw_Etat_financier_PA-VW_10_2022.xlsm",
     "modifiedTime": "2022-11-11T14:49:11.019Z",
     "name": "Etat financier PA-VW 10 2022.xlsm"
+  },
+  "1_xGhFfyn4pb5twjSNZ6KOioD4_vVPOjb": {
+    "dealer": "bmw",
+    "local_path": "sources/bmw_2025-05_MANUF_BMW_Sher.xlsm.xlsx",
+    "modifiedTime": "2025-06-11T12:54:29.071Z",
+    "name": "2025-05_MANUF_BMW_Sher.xlsm"
+  },
+  "1a34ESEIN_YLdOdeZU5zwZjLPxCQqYMJ2": {
+    "dealer": "bmw",
+    "local_path": "sources/bmw_2025-01_MANUF_BMW_Sher.xlsm.xlsx",
+    "modifiedTime": "2025-02-11T21:13:15.190Z",
+    "name": "2025-01_MANUF_BMW_Sher.xlsm"
   },
   "1a8dVExeQ7xbHArhf1zJFwuq3oQZL7n17": {
     "dealer": "bmw",
@@ -1721,6 +1871,12 @@
     "modifiedTime": "2024-06-13T19:09:26.904Z",
     "name": "2024-05_MANUF_VW.xlsm"
   },
+  "1caRzPVGy6wBrhw7oIEp8OmbE4bgbCBlf": {
+    "dealer": "bmw",
+    "local_path": "sources/bmw_2025-10_MANUF_BMW_Sher.xlsm",
+    "modifiedTime": "2025-11-13T14:39:42.202Z",
+    "name": "2025-10_MANUF_BMW_Sher.xlsm"
+  },
   "1cgzz_LckC1cn1nTR4V53J2d6hOoY8bmd": {
     "dealer": "hyundai",
     "local_path": "sources/hyundai_FFS_Hyundai_F_10-2024.xlsm",
@@ -1811,6 +1967,12 @@
     "modifiedTime": "2025-03-12T11:12:44.000Z",
     "name": "2025-02_Réalisé_VW V0.xlsx"
   },
+  "1ecBzD2FrvMVNQkVJuYdPtzqsMSB1FVEc": {
+    "dealer": "bmw",
+    "local_path": "sources/bmw_2025-08_MANUF_BMW_Sher.xlsm",
+    "modifiedTime": "2025-09-10T16:59:17.747Z",
+    "name": "2025-08_MANUF_BMW_Sher.xlsm"
+  },
   "1eg3IPKFbOA1gpBQ4O5FbWXAc7rNze4pw": {
     "dealer": "vw",
     "local_path": "sources/vw_Etat_financier_VW_01_2021.xlsm",
@@ -1822,6 +1984,12 @@
     "local_path": "sources/vw_Q3-2025_Realise_VW__1egpk79f.xlsx",
     "modifiedTime": "2025-10-10T18:32:22.265Z",
     "name": "Q3-2025_Realise VW.xlsx"
+  },
+  "1eq45BEQvXzRzl_Ve2gPI0hBJTiESVy8N": {
+    "dealer": "bmw",
+    "local_path": "sources/bmw_2025-09_MANUF_BMW_Sher.xlsm",
+    "modifiedTime": "2025-10-10T16:01:16.910Z",
+    "name": "2025-09_MANUF_BMW_Sher.xlsm"
   },
   "1f6Mw46A4IzLC2O66bGEK-fAPR7-F2kd3": {
     "dealer": "vw",
@@ -1864,6 +2032,12 @@
     "local_path": "sources/vw_2025-10_R_alis_VW.xlsx",
     "modifiedTime": "2025-11-27T11:48:03.000Z",
     "name": "2025-10_Réalisé_VW.xlsx"
+  },
+  "1ftYNgKYMp6hv3ySYETW8wxJlpb9eFHp8": {
+    "dealer": "bmw",
+    "local_path": "sources/bmw_2025-03_MANUF_BMW_Sher.xlsm.xlsx",
+    "modifiedTime": "2025-04-09T20:00:09.540Z",
+    "name": "2025-03_MANUF_BMW_Sher.xlsm"
   },
   "1g-F9pfd2pQ2J3-bJ_g2JZ23QR5yYrJwK": {
     "dealer": "vw",
@@ -1930,6 +2104,12 @@
     "local_path": "sources/hyundai_FFS_Hyundai_F_12-2024.xlsm",
     "modifiedTime": "2026-03-04T17:15:18.000Z",
     "name": "FFS Hyundai F 12-2024.xlsm"
+  },
+  "1hKuN_D3ek6sSf3tSnfa80ihhMl4JvZaB": {
+    "dealer": "bmw",
+    "local_path": "sources/bmw_2024-05_MANUF_BMW_Sher.xlsm.xlsx",
+    "modifiedTime": "2024-06-12T19:58:55.741Z",
+    "name": "2024-05_MANUF_BMW_Sher.xlsm"
   },
   "1hVGTAO3p5WEGQsBbpQcCV4vazNmPudPo": {
     "dealer": "hyundai",
@@ -2129,6 +2309,12 @@
     "modifiedTime": "2026-01-20T23:34:25.000Z",
     "name": "2025-12_Réalisé_VW V1.xlsx"
   },
+  "1m_oq1akpmvoIjU-8HO8fu2eVgKC_V7WO": {
+    "dealer": "bmw",
+    "local_path": "sources/bmw_2024-08_MANUF_BMW_Sher.xlsm.xlsx",
+    "modifiedTime": "2024-09-12T17:09:23.204Z",
+    "name": "2024-08_MANUF_BMW_Sher.xlsm"
+  },
   "1mmHP_ZE725toojeHSDjhOJ4DqLZQnNWK": {
     "dealer": "hyundai",
     "local_path": "sources/hyundai_FFS_Hyundai_F_11-2025.xlsm",
@@ -2164,6 +2350,12 @@
     "local_path": "sources/vw_VW_r_alis_T3_2023.xlsx",
     "modifiedTime": "2023-10-13T15:27:13.308Z",
     "name": "VW réalisé T3 2023.xlsx"
+  },
+  "1n-_fis9k5NRshWJVqfcoQp_J196Xq8E0": {
+    "dealer": "bmw",
+    "local_path": "sources/bmw_2025-02_MANUF_BMW_Sher.xlsm.xlsx",
+    "modifiedTime": "2025-03-11T17:04:28.257Z",
+    "name": "2025-02_MANUF_BMW_Sher.xlsm"
   },
   "1n58qq8bVELG1ngibs-FGJ_fKWAcSl0Yr": {
     "dealer": "stm",
@@ -2242,6 +2434,12 @@
     "local_path": "sources/hawks_2026_02_28_EF_HAWKS.xlsm",
     "modifiedTime": "2026-03-22T17:45:47.505Z",
     "name": "2026_02_28_EF_HAWKS.xlsm"
+  },
+  "1nw028BqrHNsUS9QIcUKiqfW8wVUbifvJ": {
+    "dealer": "bmw",
+    "local_path": "sources/bmw_2025-11_MANUF_BMW_Sher_V2.xlsm",
+    "modifiedTime": "2026-04-13T20:10:53.030Z",
+    "name": "2025-11_MANUF_BMW_Sher V2.xlsm"
   },
   "1nz0vsgtViMMEPXT1SrxKVkZt_P9b1hI4": {
     "dealer": "stm",
@@ -2549,6 +2747,12 @@
     "modifiedTime": "2026-09-16T15:14:49.269Z",
     "name": "2026_08_31_EF_HAWKS"
   },
+  "1tbWD_FN28dI47K9iuVVGr_A3o5nvLzY6": {
+    "dealer": "bmw",
+    "local_path": "sources/bmw_2026-06_MANUF_BMW_Sher.xlsm",
+    "modifiedTime": "2026-07-14T17:20:34.778Z",
+    "name": "2026-06 MANUF BMW Sher.xlsm"
+  },
   "1teBv9MxazSghqLF4v4NsNz3K4nBJ8ZJZ": {
     "dealer": "vw",
     "local_path": "sources/vw_2024-08_MANUF_VW.xlsm",
@@ -2656,6 +2860,12 @@
     "local_path": "sources/vw_2023-08_R_alis_VW.xlsx",
     "modifiedTime": "2023-09-13T13:46:28.670Z",
     "name": "2023-08_Réalisé_VW.xlsx"
+  },
+  "1vQAaxveQ8c6mdSszgcmLjWMz0qDF3Cft": {
+    "dealer": "bmw",
+    "local_path": "sources/bmw_2026-01_MANUF_BMW_Sher.xlsm",
+    "modifiedTime": "2026-02-13T18:58:06.724Z",
+    "name": "2026-01 MANUF BMW Sher.xlsm"
   },
   "1vdtREkmGJEjuP9N8UQIwtKGMicx8tRUd": {
     "dealer": "stm",

@@ -49,6 +49,20 @@ ACCEPTED_MIME_TYPES = {
 
 FOLDER_MIME_TYPE = "application/vnd.google-apps.folder"
 
+# Composites des constructeurs (PDF) : eComposite Hyundai (« ÉF ‐ Sommaire »,
+# « P&P »), bulletin VW (« Dealer Report Card »)… Seuls les PDF dont le nom
+# ressemble à un composite sont téléchargés ; ils sont lus par
+# src/composites.py et SEULS LES CHIFFRES sont écrits dans
+# sources/composites/*.json : le PDF n'est jamais gardé (dépôt public).
+# Demande de Maxime Allard (29 septembre 2026).
+PDF_MIME_TYPE = "application/pdf"
+# Noms reconnus : « eComposite ‐ … » et « É.F. ‐ Sommaire … » (Hyundai),
+# « Dealer report card … » (VW). Pas « sommaire » seul : les sommaires de
+# relevés (STM, BMW) et de TPS-TVQ ne sont pas des composites.
+COMPOSITE_NAME_RE = re.compile(r"composite|report ?card|scorecard|dealer ?report|(?<![a-z])[ée][\W_]{0,2}f(?![a-z])[\W_]{0,4}sommaire",
+                               re.IGNORECASE)
+COMPOSITES_DIR = os.path.join(SOURCES_DIR, "composites")
+
 # Un dossier Drive racine par concessionnaire. Chaque racine est parcourue
 # récursivement (sous-dossiers compris, ex: BMW/STM organisent leurs
 # "Réalisé" par année) jusqu'à MAX_DEPTH niveaux, pour éviter de partir dans
@@ -171,7 +185,43 @@ def walk(service, folder_id, depth=0):
             found.extend(walk(service, item["id"], depth + 1))
         elif item["mimeType"] in ACCEPTED_MIME_TYPES and not is_lock_file(item["name"]):
             found.append(item)
+        elif item["mimeType"] == PDF_MIME_TYPE and COMPOSITE_NAME_RE.search(item["name"]):
+            found.append(item)
     return found
+
+
+def composites_version():
+    sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+    import composites
+    return composites.PARSER_VERSION
+
+
+def sync_composite(service, dealer, f, manifest):
+    """PDF de composite : téléchargé dans un fichier temporaire, lu, puis
+    effacé ; les chiffres vont dans sources/composites/<concession>_<mois>_<type>.json.
+    Renvoie le chemin du JSON écrit, ou None."""
+    import tempfile
+    sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+    import composites
+    version = composites.PARSER_VERSION
+    fd, tmp = tempfile.mkstemp(suffix=".pdf")
+    os.close(fd)
+    try:
+        download_file(service, f["id"], tmp)
+        data = composites.read_any(tmp, dealer=dealer["key"])
+        out = composites.write_json(data, COMPOSITES_DIR)
+        manifest[f["id"]] = {"dealer": dealer["key"], "name": f["name"], "modifiedTime": f["modifiedTime"],
+                             "local_path": None, "composite_json": out, "parser_version": version}
+        print(f"[{dealer['label']}] composite lu : {f['name']} -> {out}")
+        return out
+    except Exception as exc:  # noqa: BLE001 - PDF qui n'est pas un composite reconnu
+        manifest[f["id"]] = {"dealer": dealer["key"], "name": f["name"], "modifiedTime": f["modifiedTime"],
+                             "local_path": None, "composite_error": str(exc)[:200], "parser_version": version}
+        print(f"[{dealer['label']}] PDF ignoré (pas un composite reconnu) : {f['name']} -- {exc}")
+        return None
+    finally:
+        if os.path.exists(tmp):
+            os.remove(tmp)
 
 
 def sanitize_filename(name):
@@ -250,8 +300,20 @@ def main():
 
             for f in files:
                 file_id = f["id"]
-                ext = ACCEPTED_MIME_TYPES[f["mimeType"]]
                 entry = manifest.get(file_id)
+                if f["mimeType"] == PDF_MIME_TYPE:
+                    # relu si le PDF a changé, si le JSON manque, ou si la lecture
+                    # a été améliorée depuis (PARSER_VERSION de src/composites.py)
+                    if entry and entry.get("modifiedTime") == f["modifiedTime"] \
+                            and entry.get("parser_version") == composites_version() and (
+                            entry.get("composite_error") or os.path.exists(entry.get("composite_json") or "")):
+                        unchanged += 1
+                        continue
+                    out = sync_composite(service, dealer, f, manifest)
+                    if out:
+                        downloaded.append(out)
+                    continue
+                ext = ACCEPTED_MIME_TYPES[f["mimeType"]]
 
                 # Un fichier local corrompu (ex. écrasé par un fichier de
                 # verrouillage) est retéléchargé même si Drive n'a pas changé.

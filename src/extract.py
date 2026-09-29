@@ -2,6 +2,7 @@ import openpyxl, json, re, sys, os, unicodedata
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import apres_vente  # opérations fixes : bons de travail, heures, pièces  # noqa: E402
+import composites  # composites des constructeurs (sources/composites/*.json)  # noqa: E402
 from pathlib import Path
 
 def strip_accents(s):
@@ -2064,6 +2065,34 @@ def source_rank(name, extracted, order):
     return (FORMAT_RANK.get(extracted.get("source_format", "gabarit"), 0), name_score, quality, order)
 
 
+def load_composites(store, candidates, comp_dir):
+    """Composites des constructeurs (chiffres lus dans les PDF par
+    src/composites.py, jamais le PDF lui-même) → store["composites"]
+    [concession][mois][type]. Hyundai : le composite ne donne que les moyennes
+    du groupe ; les chiffres de Hyundai Longueuil aux mêmes définitions sont
+    calculés à partir de l'état Hyundai Canada du mois (clé « concession »).
+    Demande du 29 septembre 2026."""
+    comps = composites.load_dir(str(comp_dir))
+    for pk, entry in comps.get("hyundai", {}).items():
+        if not ({"hyundai_ef", "hyundai_pp"} & set(entry)):
+            continue
+        states = [x for _, _, x in candidates.get(("hyundai", pk), []) if x.get("source_format") == "etat_hyundai"]
+        for st in states:
+            try:
+                entry["concession"] = composites.rounded(composites.hyundai_statement_lines(st["_path"]))
+                entry["concession_source"] = st.get("source_file")
+                break
+            except Exception as exc:  # noqa: BLE001
+                print(f"Composite Hyundai {pk} : état {st.get('source_file')} illisible ({exc})", file=sys.stderr)
+        if "concession" not in entry:
+            print(f"Composite Hyundai {pk} : aucun état Hyundai Canada du même mois (comparaison impossible)")
+    if comps or "composites" in store:
+        store["composites"] = comps
+    for dk, periods in sorted(comps.items()):
+        for pk, entry in sorted(periods.items()):
+            print(f"Composite {dk} {pk} : {', '.join(sorted(k for k in entry if k != 'concession_source'))}")
+
+
 def main(paths, store_path=None, extract_fn=None):
     """Extrait tous les fichiers donnés et met à jour data/data.json.
     extract_fn permet de fournir une extraction déjà faite (cache de test)."""
@@ -2163,6 +2192,7 @@ def main(paths, store_path=None, extract_fn=None):
                   f"(écartés : {', '.join(n for _, n, _ in ranked if n != best_name)})")
         merge_into_store(store, best, force=force)
 
+    load_composites(store, candidates, repo_root / "sources" / "composites")
     # Statistiques d'atelier recopiées d'un autre mois (état mal daté) : retirées.
     for dk, pk, sk in apres_vente.drop_duplicate_stats(store, lambda n: name_period(stem_of(n))):
         print(f"Après-vente {dk} {pk} ({sk}) : BT et heures identiques à un autre mois, retirés (montants gardés)")

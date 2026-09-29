@@ -40,9 +40,10 @@ METRIC_COLS = [  # (clé, en-tête, format)
 ]
 TYPE_NOTES = {
     "client": "BT payés par le client : atelier, service rapide, contrats de service et entretien prépayé. À STM, le service mobile est inclus.",
-    "garantie": "Travaux remboursés par le constructeur (main-d'œuvre et pièces de garantie).",
+    "garantie": "Travaux remboursés par le constructeur (main-d'œuvre et pièces de garantie). BMW : garantie seulement ; l'entretien payé par BMW est à part.",
+    "entretien": "BMW : entretien payé par BMW (BMW Service Inclus), pages 8 et 9 de l'état BMW Canada.",
     "interne": "Travaux facturés aux autres départements : reconditionnement des usagés, préparation des neufs. À l'état GM, l'inspection des véhicules neufs est incluse.",
-    "esthetique": "BT d'esthétique inscrits au Réalisé (BMW, VW).",
+    "esthetique": "BT d'esthétique : Réalisé VW ; BMW : programme SPA de l'état BMW Canada.",
 }
 
 
@@ -538,7 +539,7 @@ def p_mix(F):
             v = (fr["types"].get(typ) or {}).get("mo_v") or 0
             tds += f'<td class="{"sep" if typ == "client" else ""}"><div>{pct(div(v, mo_r), 0)}</div><div class="dsub">&nbsp;</div></td>'
         body += f'<tr class="{"strong" if d == GROUP else ""}"><td class="lab">{escape(dl(d))}</td><td><div>{num(tot_r)}</div><div class="dsub">&nbsp;</div></td>{tds}</tr>'
-    heads = "".join(f"<th>{escape(TYPES[t])}</th>" for t in TYPES) + "".join(
+    heads = "".join(f"<th>{escape(TYPES[t].split(' ')[0])}</th>" for t in TYPES) + "".join(
         f'<th class="{"sep" if t == "client" else ""}">{escape(TYPES[t].split(" ")[0])}</th>' for t in MAIN_TYPES)
     # carrosserie
     cbody = ""
@@ -599,12 +600,14 @@ def p_atelier(F):
         fr = F.flat(d, "ytd")
         cr = F.tm(fr, "client")
         if ta.get("client"):
+            elr = at.get("taux_effectif_declare")
             rates += (f"<tr><td class='lab'>{escape(DEALERS[d])}</td><td>{money(ta.get('client'))}</td><td>{money(ta.get('garantie'))}</td>"
-                      f"<td>{money(ta.get('interne'))}</td><td>{money(cr.get('mo_bt'))}</td>"
+                      f"<td>{money(ta.get('interne'))}</td><td>{(num(elr, 2) + ' $') if elr else '—'}</td><td>{money(cr.get('mo_bt'))}</td>"
                       f"<td>{num(div(cr.get('mo_bt'), ta.get('client')), 2) if ta.get('client') else '—'}</td></tr>")
-    rtable = (f"""<div class="band-lab">Taux horaires affichés (état GM) <span>M-O par BT client ÷ taux affiché ≈ heures facturées par BT au plein tarif</span></div>
-      <table class="t num fo"><thead><tr><th class="lab">Concession</th><th>Client</th><th>Garantie</th><th>Interne</th><th>M-O / BT client {y}</th><th>≈ heures au taux affiché</th></tr></thead>
-      <tbody>{rates}</tbody></table>""" if rates else "")
+    rtable = (f"""<div class="band-lab">Taux horaires affichés (états du constructeur) <span>M-O par BT client ÷ taux affiché ≈ heures facturées par BT au plein tarif</span></div>
+      <table class="t num fo small"><thead><tr><th class="lab">Concession</th><th>Client</th><th>Garantie</th><th>Interne</th><th>Taux effectif déclaré</th><th>M-O / BT client {y}</th><th>≈ heures au taux affiché</th></tr></thead>
+      <tbody>{rates}</tbody></table>
+      <div class="note">Taux effectif déclaré : « taux de main-d'œuvre en vigueur » de l'état BMW Canada (page 10). Taux affichés : état GM (Page 4), état BMW Canada (page 10).</div>""" if rates else "")
     msg = []
     for d in hd:
         r = atelier_metrics(F.flat(d, "ytd"))
@@ -626,7 +629,7 @@ def p_atelier(F):
       {rtable}"""
 
 
-PC_SHORT = {"client": "BT client", "garantie": "BT garantie", "interne": "BT interne", "carrosserie": "Carros.",
+PC_SHORT = {"client": "BT client", "garantie": "BT garantie", "entretien": "BT entretien", "interne": "BT interne", "carrosserie": "Carros.",
             "comptoir": "Comptoir", "accessoires": "Access.", "gros": "Gros", "pneus": "Pneus", "huile": "Huiles", "divers": "Divers"}
 
 
@@ -636,8 +639,8 @@ def p_pieces(F):
     data = {}
     for d in F.dealers:
         fr, fa = F.flat(d, "ytd"), F.flat(d, "ytd", "ap")
-        cr = {c: (v, pb) for c, v, pb in fo.pieces_channels(fr)}
-        ca = {c: (v, pb) for c, v, pb in fo.pieces_channels(fa)}
+        cr = _merge_entretien({c: (v, pb) for c, v, pb in fo.pieces_channels(fr)})
+        ca = _merge_entretien({c: (v, pb) for c, v, pb in fo.pieces_channels(fa)})
         data[d] = (fr, fa, cr, ca)
         used |= {c for c, (v, _) in cr.items() if v}
     chans = [c for c in fo.PC_CHANNELS if c in used]
@@ -680,7 +683,16 @@ def p_pieces(F):
       <table class="t num fo small"><thead><tr><th class="lab">Concession</th>{heads}<th class="sep">Total</th></tr></thead><tbody>{mrows}</tbody></table>
       <div class="band-lab">Dollars de pièces par dollar de main-d'œuvre <span>cumul {y} · écart vs {y-1}</span></div>
       <table class="t num fo small" style="width:62%"><thead><tr><th class="lab">Concession</th>{rheads}</tr></thead><tbody>{rrows}</tbody></table>
-      <div class="note">Pièces facturées sur les BT client / garantie / interne. Total : y compris les ajustements (escomptes, allocations d'achat, rectifications d'inventaire).</div>"""
+      <div class="note">Pièces facturées sur les BT client / garantie / interne (BMW : garantie avec l'entretien payé par BMW). Total : y compris les ajustements (escomptes, allocations d'achat, rectifications d'inventaire).</div>"""
+
+
+def _merge_entretien(ch):
+    """Vue Groupe des pièces : l'entretien payé par BMW va avec la garantie."""
+    if "entretien" in ch:
+        v, pb = ch.pop("entretien")
+        gv, gpb = ch.get("garantie") or (None, None)
+        ch["garantie"] = ((gv or 0) + (v or 0), (gpb or 0) + (pb or 0))
+    return ch
 
 
 def month_labels(P, n):
@@ -756,7 +768,7 @@ def p_detail_mensuel(F, typ="client"):
 
 def p_couverture(F):
     y, m = F.y, F.m
-    labels = {"gabarit": "Réalisé", "etat_gm": "État GM", "etat_hyundai": "État Hyundai", "etat_vw": "État VW"}
+    labels = {"gabarit": "Réalisé", "etat_gm": "État GM", "etat_hyundai": "État Hyundai", "etat_vw": "État VW", "etat_bmw": "État BMW"}
     rows = ""
     for d in F.dealers:
         fr = F.flat(d, "ytd")
@@ -777,10 +789,12 @@ def p_couverture(F):
       <tbody>{rows}</tbody></table>
       <h2>D'où viennent les chiffres</h2>
       <ul class="retenir compact">
-        <li><b>Réalisé</b> : blocs Service (« M/O Client / Garantie / Interne / Esthétique », colonne # = BT), Pièces et Carrosserie ; colonnes réel, budget, an passé.</li>
-        <li><b>État GM</b> (HAWKS, STM) : Page 6, B.R., ventes et profit brut par compte (460A client, 460D mobile, 462 garantie, 463 interne, 464 inspection).</li>
-        <li><b>État Hyundai Canada</b> : Page 4 (B.R., ventes, profit brut par compte) et Page 6 (heures disponibles, poinçonnées, facturées par type).</li>
-        <li><b>État Volkswagen Canada</b> : Pages 5 et 6. Quand le Réalisé VW est retenu, ses heures viennent de l'état du même mois si les BT concordent (± 3 %).</li>
+        <li><b>Réalisé</b> : blocs Service, Pièces et Carrosserie (colonne # = BT) ; colonnes réel, budget, an passé.</li>
+        <li><b>État GM</b> (HAWKS, STM) : Page 6, B.R., ventes et profit brut par compte (460A, 460D mobile, 462, 463, 464 inspection).</li>
+        <li><b>État Hyundai Canada</b> : Page 4 (B.R., ventes, profit brut) et Page 6 (heures disponibles, poinçonnées, facturées).</li>
+        <li><b>État Volkswagen Canada</b> : Pages 5 et 6 ; heures reprises dans le Réalisé VW si les BT concordent (± 3 %).</li>
+        <li><b>État BMW Canada</b> : pages 8 à 10 (BT, ventes, profit brut et pièces par type ; taux affichés et effectif) à la place des types du Réalisé :
+        entretien payé par BMW à part de la garantie, esthétique interne hors de l'interne, budget garantie et interne retiré.</li>
       </ul>
       <h2>Définitions</h2>
       <dl class="defs">

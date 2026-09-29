@@ -67,6 +67,17 @@ Ce fichier sert de mémoire : décisions à respecter, limites connues, historiq
   viennent de l'état VW du même mois si les nombres de BT concordent (écart ≤ 3 %). BMW, STM et HAWKS : pas d'heures dans
   leurs fichiers (à demander : rapport DMS mensuel des heures vendues par type).
 - Heures à 0 avec de la main-d'œuvre = donnée absente (jamais zéro). Techniciens de l'état GM non utilisés (STM incohérent).
+- BMW (demande du client, 29 septembre 2026) : types de BT pris dans l'état BMW Canada (« AAAA-MM MANUF BMW Sher.xlsm »,
+  dossier « b) États financiers » de BMW, synchronisé par `drive_sync.py`), feuille « FS Data » (code = page × 100 000 +
+  ligne × 100 + colonne) : page 8 (retours inscrits = BT, ventes, bénéfice brut ; mois col. 12/14/16, cumul 22/24/26),
+  page 9 (pièces), page 10 (taux affichés, « taux de main-d'œuvre en vigueur » = taux effectif déclaré, techniciens,
+  jours de service). Types : client (460A/B/D), **entretien BMW** (461D/E/G, BMW Service Inclus + 478A), garantie
+  (461A/B/H), interne (462A/B/D), esthétique = programme SPA (459A). Format `etat_bmw` (rang −2 : jamais la source du
+  mois) ; repris dans le Réalisé retenu par `merge_manufacturer_fixed_ops` (état dont la M-O client concorde à ± 2 %).
+  Le reste du Réalisé (sous-traitance, pièces par canal, P&L) est gardé. Budget du Réalisé gardé pour client et
+  esthétique seulement ; « an passé » = état BMW de l'an passé. État de décembre 2025 : colonnes « cumul » = décembre
+  seulement → cumul refait (cumul de novembre + décembre). Pas d'heures vendues dans l'état : page Atelier = taux affichés,
+  taux effectif déclaré et heures estimées (M-O ÷ taux effectif).
 
 ## Profit véhicule, F&I et gros — règles (28 septembre 2026, refait le 29)
 
@@ -133,3 +144,7 @@ Ce fichier sert de mémoire : décisions à respecter, limites connues, historiq
   à la version du 28 (cumul août 2026 : profit véhicule usagé Groupe 1 609 $/u, F&I usagé 1 318 $/u, véhicule neuf
   1 604 $/u, F&I neuf 590 $/u, F&I total 2,87 M$, gros 2,90 M$). EBT inchangé (août 578 670 $, cumul 6 436 502 $).
 - Tableau de bord : résumé des filtres tronqué sur téléphone (débordait de 64 px).
+- Soir : mention « heures vendues absentes » retirée des rapports et du tableau de bord (décision du client) ; état
+  BMW Canada branché comme source des types de BT de BMW (voir « Opérations fixes — règles »). Effet sur le cumul
+  d'août 2026 de BMW : garantie 885 BT (au lieu de 1 689, entretien à part : 804 BT), interne 1 138 BT à 458 $ par BT
+  (au lieu de 1 437 BT à 365 $) ; client et SPA inchangés.

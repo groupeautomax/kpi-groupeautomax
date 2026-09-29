@@ -6,7 +6,7 @@ Chaque période de data.json porte, dans sections.<mois|cumul>.apres_vente, le
 détail lu par src/apres_vente.py (BT par type, main-d'œuvre, pièces, heures,
 atelier). Ce module en tire, par concession et pour le Groupe :
 
-  - par type de BT (client, garantie, interne, esthétique) : nombre de BT,
+  - par type de BT (client, garantie, entretien BMW, interne, esthétique) : nombre de BT,
     main-d'œuvre par BT, pièces par BT, total par BT, profit brut par BT,
     heures vendues par BT, taux effectif (M-O ÷ heures), marges ;
   - atelier : heures disponibles, pointées, vendues, productivité, efficacité ;
@@ -24,15 +24,25 @@ from kpi_data import DEALERS, prior_year, split, pkey
 TYPES = OrderedDict([
     ("client", "Client (détail)"),
     ("garantie", "Garantie"),
+    ("entretien", "Entretien BMW"),
     ("interne", "Interne"),
     ("esthetique", "Esthétique"),
 ])
 MAIN_TYPES = ("client", "garantie", "interne")
+# Types qui portent des pièces ; « entretien » : BMW seulement (état BMW Canada,
+# pages 8 et 9 : entretien payé par BMW, BMW Service Inclus).
+PC_TYPES = ("client", "garantie", "entretien", "interne")
+
+
+def types_for(f, types=PC_TYPES):
+    """Types principaux + entretien quand la concession en a (BMW)."""
+    return [t for t in types if t in MAIN_TYPES or (((f or {}).get("types") or {}).get(t) or {}).get("bt")]
+
 DETAIL_LABELS = {"mobile": "dont service mobile", "inspection": "dont inspection des neufs"}
 MEAS = (("bt", "bt"), ("mo_ventes", "mo_v"), ("mo_pb", "mo_pb"), ("pc_ventes", "pc_v"),
         ("pc_pb", "pc_pb"), ("heures", "h"))
 PC_CHANNELS = OrderedDict([
-    ("client", "BT client"), ("garantie", "BT garantie"), ("interne", "BT interne"),
+    ("client", "BT client"), ("garantie", "BT garantie"), ("entretien", "BT entretien BMW"), ("interne", "BT interne"),
     ("carrosserie", "Carrosserie"), ("comptoir", "Comptoir (détail)"), ("accessoires", "Accessoires"),
     ("gros", "Gros"), ("pneus", "Pneus"), ("huile", "Huiles et graisse"), ("divers", "Divers"),
 ])
@@ -166,6 +176,9 @@ def atelier_metrics(f):
         "productivite": div(pt, disp), "efficacite": div(vend, pt), "rendement": div(vend, disp),
         "techs": techs, "h_tech": div(vend, techs) if techs and techs >= 2 else None,
         "taux_affiche": a.get("taux_affiche") or {},
+        # état BMW Canada, page 10 : « taux de main-d'œuvre en vigueur »
+        "taux_effectif_declare": a.get("taux_effectif_declare"),
+        "techs_declares": a.get("techniciens_declares") or {},
     }
 
 
@@ -181,12 +194,12 @@ def pieces_channels(f):
     if not f:
         return []
     out = []
-    for typ in MAIN_TYPES:
+    for typ in PC_TYPES:
         t = f["types"].get(typ) or {}
         if t.get("pc_v") or t.get("pc_pb"):
             out.append((typ, t.get("pc_v"), t.get("pc_pb")))
     for ch in PC_CHANNELS:
-        if ch in MAIN_TYPES:
+        if ch in PC_TYPES:
             continue
         m = f["pieces"].get(ch) or {}
         if m.get("v") or m.get("pb"):

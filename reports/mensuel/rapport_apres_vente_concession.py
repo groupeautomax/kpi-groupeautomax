@@ -26,7 +26,7 @@ from kpi_data import Store, DEALERS, DEALER_SHORT, MOIS, pkey, split, prior_year
 from kpi_analyse import money, kmoney, num, pct, pts, var_pct, de, NBSP
 from kpi_svg import _text, nice_ticks, INK, MUTED, GRID, AXIS, PREV, CUR
 import kpi_apres_vente as fo
-from kpi_apres_vente import TYPES, MAIN_TYPES, type_metrics, atelier_metrics, div
+from kpi_apres_vente import TYPES, MAIN_TYPES, type_metrics, atelier_metrics, div, types_for
 from rapport_apres_vente import (FO, GROUP, METRIC_COLS, TYPE_NOTES, DEALER_COLOR, PC_SHORT, fv, fd, cell,
                                  type_rows_table, lines_chart, month_labels, dl)
 
@@ -258,7 +258,7 @@ def p_bt(F, d):
     if t:
         msg += f", {t} vs {y-1}"
     msg += "."
-    notes = " ".join(escape(TYPE_NOTES[t_]) for t_ in MAIN_TYPES)
+    notes = " ".join(escape(TYPE_NOTES[t_]) for t_ in types_for(fr))
     return f"""
       <div class="eyebrow">Bons de travail</div>
       <h1>Bons de travail par type : dollars et heures par BT</h1>
@@ -310,7 +310,7 @@ def p_mensuel(F, d):
     has_h = any(t.get("h") for t in (F.flat(d, "ytd") or {"types": {}})["types"].values())
     specs = [("bt", "BT", "n"), ("mo_bt", "M-O / BT", "$"), ("tot_bt", "Total / BT", "$")] + ([("h_bt", "Heures / BT", "h")] if has_h else [])
     body = ""
-    for typ in MAIN_TYPES:
+    for typ in types_for(F.flat(d, "ytd")):
         if not F.tm(F.flat(d, "ytd"), typ).get("bt"):
             continue
         body += f'<tr class="sec"><td colspan="{len(months) + 2}">{escape(TYPES[typ])}</td></tr>'
@@ -419,7 +419,7 @@ def p_atelier(F, d):
                 if r.get("mo_bt") and rate:
                     rows += (f'<tr><td class="lab">{escape(TYPES[typ])}</td><td>{money(rate)}</td><td>{money(r["mo_bt"])}</td>'
                              f'<td>{num(div(r["mo_bt"], rate), 2)}</td></tr>')
-            est = f"""<div class="band-lab">Heures estimées au taux affiché <span>taux horaires affichés de l'état GM (Page 4)</span></div>
+            est = f"""<div class="band-lab">Heures estimées au taux affiché <span>taux horaires affichés de l'état {"BMW Canada (page 10)" if d == "bmw" else "GM (Page 4)"}</span></div>
               <table class="t num fo" style="width:75%"><thead><tr><th class="lab">Type</th><th>Taux affiché</th><th>M-O par BT {y}</th><th>≈ heures au taux affiché</th></tr></thead>
               <tbody>{rows}</tbody></table>
               <div class="note">Estimation seulement : main-d'œuvre par BT ÷ taux affiché ; les escomptes et le temps offert la font baisser.</div>"""
@@ -428,6 +428,18 @@ def p_atelier(F, d):
         cr = F.tm(fr, "client")
         msg = (f"Taux affiché client <b>{money(ta.get('client'))}</b> ; main-d'œuvre de <b>{money(cr.get('mo_bt'))}</b> par BT client, "
                f"soit environ <b>{num(div(cr.get('mo_bt'), ta.get('client')), 2)} h</b> par BT au taux affiché.")
+        elr = at.get("taux_effectif_declare")
+        if elr:
+            mo_all = sum((t.get("mo_v") or 0) for k_, t in fr["types"].items())
+            bt_all = sum((t.get("bt") or 0) for k_, t in fr["types"].items())
+            h_est = div(mo_all, elr)
+            msg += (f"<br>Taux de main-d'œuvre en vigueur déclaré à BMW Canada : <b>{num(elr, 2)} $</b> l'heure ; à ce taux, la main-d'œuvre "
+                    f"de {kmoney(mo_all)} depuis janvier représente environ <b>{num(h_est)} h</b> vendues, soit {num(div(h_est, bt_all), 2)} h par BT.")
+            tech = at.get("techs_declares") or {}
+            est += (f'<div class="note">Taux de main-d\'œuvre en vigueur : état BMW Canada, page 10 (fin {de(m)} {y}). Heures estimées = main-d\'œuvre de tous '
+                    f'les types ÷ ce taux (l\'état ne donne pas les heures vendues).'
+                    + (f" Techniciens déclarés : {num(tech.get('mecanique'))} + {num(tech.get('apprentis'))} apprentis." if tech.get("mecanique") else "")
+                    + "</div>")
         content = est
         return f"""
       <div class="eyebrow">Atelier</div>
@@ -463,10 +475,10 @@ def p_pieces_carrosserie(F, d):
       <table class="t num fo small"><thead><tr><th class="lab">Canal</th><th>Ventes</th><th>Part des ventes</th><th>Profit brut</th><th>Marge</th></tr></thead>
       <tbody>{body}</tbody></table>"""
     rr = []
-    for typ in MAIN_TYPES:
+    for typ in types_for(fr):
         a_, b_ = F.tm(fr, typ).get("pc_mo"), F.tm(fa, typ).get("pc_mo")
         if a_ is not None:
-            rr.append(f"{escape(TYPES[typ].lower())} <b>{num(a_, 2)} $</b>" + (f" ({y-1} : {num(b_, 2)} $)" if b_ is not None else ""))
+            rr.append(f"{escape(TYPES[typ][0].lower() + TYPES[typ][1:])} <b>{num(a_, 2)} $</b>" + (f" ({y-1} : {num(b_, 2)} $)" if b_ is not None else ""))
     if rr:
         parts += f'<p class="note" style="font-size:8.6pt;color:var(--ink2)">Pièces vendues par dollar de main-d\'œuvre, cumul {y} : ' + " ; ".join(rr) + ".</p>"
     car = (fr or {}).get("carrosserie") or {}
@@ -492,7 +504,7 @@ def p_pieces_carrosserie(F, d):
       <h1>Pièces et carrosserie</h1>
       {key(msg)}
       {parts}
-      <div class="note">Montants en k$. Pièces sur BT client / garantie / interne : pièces facturées sur ces bons de travail ; le total comprend aussi
+      <div class="note">Montants en k$. Pièces sur BT client / garantie / interne{" / entretien BMW" if d == "bmw" else ""} : pièces facturées sur ces bons de travail ; le total comprend aussi
       les ajustements (escomptes, allocations d'achat, rectifications d'inventaire).</div>"""
 
 
@@ -510,7 +522,8 @@ def p_methode(F, d):
         "hyundai": "Les états de septembre et octobre 2025 (« FFS Hyundai F 09-2026 » et « 10-2026 ») reprennent les BT et heures d'août 2026 : retirés pour ces deux mois. "
                    "Août 2025 vient du Réalisé (pas d'état Hyundai Canada) : pas d'heures ce mois-là.",
         "vw": "Le Réalisé VW reste la source retenue (règle du 25 septembre) ; ses heures viennent de l'état Volkswagen Canada du même mois quand les BT concordent (± 3 %).",
-        "bmw": "Esthétique : BT du bloc Service du Réalisé. Pas de carrosserie à la concession.",
+        "bmw": "Types de BT de l'état BMW Canada (pages 8 et 9) : client, entretien payé par BMW (BMW Service Inclus), garantie, interne, "
+               "programme SPA (esthétique). Budget des BT garantie et interne retiré (définition du Réalisé différente). Pas de carrosserie à la concession.",
     }[d]
     return f"""
       <div class="eyebrow">Méthode</div>
@@ -518,6 +531,7 @@ def p_methode(F, d):
       <h2>Sources de {escape(DEALERS[d])}</h2>
       <ul class="retenir compact">
         <li><b>Fichier d'{MOIS[m]} {y}</b> : {escape(SOURCE_LABELS.get(src, '—'))}.</li>
+        {"<li><b>Types de BT</b> : état BMW Canada (pages 8 à 10), " + MOIS[m] + " " + str(y) + " et " + str(y - 1) + ".</li>" if (F.av.native(d, F.P, "ytd") or {}).get("source_types") == "etat_bmw" else ""}
         <li><b>An passé</b> : {"colonnes « année précédente » du Réalisé" if ap == "natif" else ("fichiers " + str(y-1) + " de la concession" if ap else "non disponible")}.</li>
         {("<li><b>Heures vendues</b> : état " + ("Volkswagen Canada" if d == "vw" else "Hyundai Canada") + (" (repris dans le Réalisé)" if hs else "") + ".</li>") if has_h else ""}
         <li><b>À savoir</b> : {escape(lim)}</li>

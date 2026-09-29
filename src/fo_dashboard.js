@@ -245,12 +245,8 @@ function foFootBasis() {
     `l’écart du Groupe ne compte que les concessions qui ont ${state.basis === 'budget' ? 'un budget' : 'l’année précédente'} pour la ligne.`;
 }
 function foNoHoursNote() {
-  const P = state.refPeriod, mode = foMode();
-  const none = orderedKeys(state.dealers).filter(d => {
-    const f = foGet(d, P, mode, 'real');
-    return f && !Object.values(f.types).some(t => t.h);
-  });
-  return none.length ? `Heures vendues absentes des fichiers de ${escapeHtml(dealerListText(none))} (Réalisé et état GM n’en donnent pas) : heures par BT et taux effectif non calculés pour ${none.length > 1 ? 'ces concessions' : 'cette concession'}.` : '';
+  // Mention des heures manquantes retirée (demande du 29 septembre 2026).
+  return '';
 }
 
 function renderFoBtView(container) {

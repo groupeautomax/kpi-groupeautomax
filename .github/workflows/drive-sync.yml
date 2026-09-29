@@ -40,7 +40,7 @@ jobs:
           python-version: "3.11"
 
       - name: Install dependencies
-        run: pip install google-api-python-client google-auth
+        run: pip install google-api-python-client google-auth pdfplumber openpyxl
 
       - name: Synchroniser sources/ depuis Google Drive
         env:

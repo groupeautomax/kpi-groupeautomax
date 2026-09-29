@@ -23,12 +23,12 @@ LOGO_LIGHT = _load("logo-automax-blanc.svg")
 
 SEC = "sec"
 FAMILY_LABELS = {
-    "PB neufs": "PB\nneufs", "PB usagés": "PB\nusagés", "Après-vente": "Après-\nvente",
+    "PB neufs": "PB\nneufs", "PB usagés": "PB\nusagés", "Gros et encan": "Gros et\nencan", "Après-vente": "Après-\nvente",
     "Autres PB": "Autres\nPB", "Autres revenus": "Autres\nrevenus", "Dépenses variables": "Dépenses\nvariables",
     "Personnel": "Personnel", "Semi-fixes et autres": "Semi-fixes\net autres", "Amortissement": "Amort. et\nautres",
 }
 FAMILY_SHORT = {
-    "PB neufs": "PB neufs", "PB usagés": "PB usagés", "Après-vente": "Après-vente", "Autres PB": "Autres PB",
+    "PB neufs": "PB neufs", "PB usagés": "PB usagés", "Gros et encan": "Gros et encan", "Après-vente": "Après-vente", "Autres PB": "Autres PB",
     "Autres revenus": "Autres revenus", "Dépenses variables": "Dép. variables", "Personnel": "Personnel",
     "Semi-fixes et autres": "Semi-fixes et autres", "Amortissement": "Amort.",
 }
@@ -109,7 +109,7 @@ def fmt_delta(r, b, kind):
 
 
 def unreliable_ap(s, P, mode, dealers, key):
-    pb, u = ("pb_neuf", "u_neuf") if key == "gpa_neuf" else ("pb_usage", "u_usage")
+    pb, u = ("pbv_neuf", "u_neuf") if key == "gpa_neuf" else ("pbv_usage", "u_usage")
     bad = []
     for d in dealers:
         a = s.comp(d, P, mode, "ap")

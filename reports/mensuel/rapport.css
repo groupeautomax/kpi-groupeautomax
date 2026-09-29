@@ -177,3 +177,20 @@ table.cov td.c { white-space: nowrap; }
 
 .nodata { margin-top: 18px; border: 1px dashed var(--line2); background: var(--tint2); color: var(--muted); padding: 12px 15px; font-size: 8.4pt; text-align: center; }
 .two { display: grid; grid-template-columns: 1fr 1fr; gap: 22px; }
+
+/* --- opérations fixes (bons de travail) */
+table.fo td { vertical-align: top; }
+table.fo td .dsub { font-size: 7pt; line-height: 1.2; margin-top: 1px; }
+table.fo td .dsub.pos { color: var(--pos); } table.fo td .dsub.neg { color: var(--neg); } table.fo td .dsub.muted { color: var(--muted); }
+table.fo tr.strong td { font-weight: 700; background: var(--tint); }
+table.fo tr.sub td { color: var(--ink2); font-size: 8.2pt; }
+table.fo tr.sub td.lab { padding-left: 18px; font-style: italic; }
+table.fo.small { font-size: 8pt; } table.fo.small th { font-size: 7.2pt; white-space: normal; vertical-align: bottom; }
+table.fo.small td { padding: 4px 5px; }
+.legend { display: flex; gap: 14px; flex-wrap: wrap; margin: 0 0 10px; }
+.lgd { display: inline-flex; align-items: center; font-size: 8.2pt; color: var(--ink2); }
+table.fo td { padding-top: 3.5px; padding-bottom: 3.5px; }
+.key .kn { display: block; font-size: 8.6pt; color: var(--ink2); margin-top: 5px; }
+table.fo.small td { padding-top: 2.5px; padding-bottom: 2.5px; }
+.retenir.compact li { margin-bottom: 5px; font-size: 9pt; line-height: 1.45; }
+table.t.tight td { padding-top: 3px; padding-bottom: 3px; }

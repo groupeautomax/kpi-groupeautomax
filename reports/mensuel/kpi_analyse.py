@@ -21,8 +21,9 @@ SEUILS = {
     "ebt_cumul_budget_pct": -0.10, # EBT cumulatif sous le budget de plus de 10 %
     "ebt_mois_ap_pct": -0.25,      # EBT du mois sous l'AP de plus de 25 %…
     "ebt_mois_ap_abs": -50000,     # …et de plus de 50 k$
-    "gpa_neuf_pct": -0.15,         # profit par unité neuve (cumul) en baisse de plus de 15 %
-    "gpa_usage_pct": -0.20,        # profit par unité usagée (cumul) en baisse de plus de 20 %
+    "gpa_neuf_pct": -0.15,         # profit véhicule par unité neuve (cumul) en baisse de plus de 15 %
+    "gpa_usage_pct": -0.20,        # profit véhicule par unité usagée (cumul) en baisse de plus de 20 %
+    "fi_unite_pct": -0.15,         # F&I par unité (cumul, neufs ou usagés) en baisse de plus de 15 %
     "pers_pct_pb_pts": 0.03,       # personnel % PB (cumul) en hausse de plus de 3 points
     "positif_ap_pct": 0.15,        # EBT cumulatif au-dessus de l'AP de plus de 15 %
     "positif_budget_pct": 0.05,    # EBT cumulatif au-dessus du budget de plus de 5 %
@@ -175,7 +176,8 @@ def rank(values):
 
 
 # ------------------------------------------------------------ commentaires
-FAMILLE_PB = {"neuf_vol", "neuf_marge", "neuf_nd", "usage_vol", "usage_marge", "usage_nd", "service", "carrosserie", "pieces", "pb_autres", "ar"}
+FAMILLE_PB = {"neuf_vol", "neuf_marge", "neuf_fi", "neuf_nd", "usage_vol", "usage_marge", "usage_fi", "usage_nd", "gros",
+              "service", "carrosserie", "pieces", "pb_autres", "ar"}
 
 
 def phrase_poste(key, val, b, real=None, base=None):
@@ -189,13 +191,19 @@ def phrase_poste(key, val, b, real=None, base=None):
         du = real["u_usage"] - base["u_usage"]
         return f"{'hausse' if du > 0 else 'baisse'} du volume d'usagés ({num(du, sign=True)} unités, {km})"
     if key == "neuf_marge":
-        return f"profit par unité neuve {'en hausse' if val > 0 else 'en recul'} ({km})"
+        return f"profit véhicule par unité neuve {'en hausse' if val > 0 else 'en recul'} ({km})"
     if key == "usage_marge":
-        return f"profit par unité usagée {'en hausse' if val > 0 else 'en recul'} ({km})"
+        return f"profit véhicule par unité usagée {'en hausse' if val > 0 else 'en recul'} ({km})"
+    if key == "neuf_fi":
+        return f"F&I par unité neuve {'en hausse' if val > 0 else 'en recul'} ({km})"
+    if key == "usage_fi":
+        return f"F&I par unité usagée {'en hausse' if val > 0 else 'en recul'} ({km})"
+    if key == "gros":
+        return f"gros, encan et export {'en hausse' if val > 0 else 'en recul'} ({km})"
     if key == "neuf_nd":
-        return f"profit brut des neufs {'en hausse' if val > 0 else 'en recul'} ({km})"
+        return f"profit véhicule et F&I des neufs {'en hausse' if val > 0 else 'en recul'} ({km})"
     if key == "usage_nd":
-        return f"profit brut des usagés {'en hausse' if val > 0 else 'en recul'} ({km})"
+        return f"profit véhicule et F&I des usagés {'en hausse' if val > 0 else 'en recul'} ({km})"
     if key in ("service", "carrosserie", "pieces"):
         lab = {"service": "du service", "carrosserie": "de la carrosserie", "pieces": "des pièces"}[key]
         return f"profit brut {lab} {'en hausse' if val > 0 else 'en recul'} ({km})"
@@ -286,7 +294,13 @@ def alertes(s, period):
                 if a and r and abs(a) <= GPA_PLAUSIBLE_MAX:
                     vp = r / a - 1
                     if vp <= seuil:
-                        out.append((d, "attention", f"Profit brut par unité {lab} (cumul) de {money(r)}, {pct(vp, 0, sign=True)} vs l'an passé ({money(a)})."))
+                        out.append((d, "attention", f"Profit véhicule par unité {lab} (cumul) de {money(r)}, {pct(vp, 0, sign=True)} vs l'an passé ({money(a)})."))
+            for k, lab in (("fi_unite_neuf", "neuve"), ("fi_unite_usage", "usagée")):
+                a, r = ay_r.get(k), ry_r.get(k)
+                if a and r and a > 0:
+                    vp = r / a - 1
+                    if vp <= SEUILS["fi_unite_pct"]:
+                        out.append((d, "attention", f"F&I par unité {lab} (cumul) de {money(r)}, {pct(vp, 0, sign=True)} vs l'an passé ({money(a)})."))
             a, r = ay_r.get("pers_pct_pb"), ry_r.get("pers_pct_pb")
             if a is not None and r is not None and r - a >= SEUILS["pers_pct_pb_pts"]:
                 out.append((d, "attention", f"Personnel à {pct(r, 0)} du profit brut (cumul), {pts(r - a, 0)} vs l'an passé."))
@@ -417,9 +431,9 @@ def controle_donnees(s, period):
                 anomalies.append((d, "valider", f"Écarts opposés sur l'année : dépenses variables {kmoney(dv, sign=True)}, personnel {kmoney(dp, sign=True)} vs l'an passé — probable reclassement de postes.",
                                   "Lire le total des dépenses plutôt que les catégories ; confirmer avec le contrôleur."))
             for k, lab in (("u_neuf", "neuves"), ("u_usage", "usagées")):
-                pbk = "pb_neuf" if k == "u_neuf" else "pb_usage"
+                pbk = "pbv_neuf" if k == "u_neuf" else "pbv_usage"
                 if ay[k] and abs(ay[pbk] / ay[k]) > GPA_PLAUSIBLE_MAX:
-                    anomalies.append((d, "valider", f"Unités {lab} de l'an passé probablement incomplètes : profit par unité de {money(ay[pbk]/ay[k])} en {y-1}.",
+                    anomalies.append((d, "valider", f"Unités {lab} de l'an passé probablement incomplètes : profit véhicule par unité de {money(ay[pbk]/ay[k])} en {y-1}.",
                                       "Le pont d'écart ne sépare pas volume et profit par unité pour ce poste."))
     ordre = {"erreur": 0, "manque": 1, "valider": 2, "info": 3}
     anomalies.sort(key=lambda a: (ordre[a[1]], list(DEALERS).index(a[0])))

@@ -45,8 +45,42 @@ Ce fichier sert de mémoire : décisions à respecter, limites connues, historiq
 - `Rapport_<Concession>_AAAA-MM.pdf` — environ 14 à 15 pages chacun, pour chaque concession qui a des données ce mois-là.
 - Contrôle : le script signale « ATTENTION — contenu qui déborde » si une page déborde en hauteur ou en largeur ;
   aucun avertissement ne doit rester.
-- Code : `rapport_kpi.py` (Groupe), `rapport_concession.py` (concessions), `rapport_commun.py` (mise en page commune),
-  `kpi_data.py`, `kpi_analyse.py`, `kpi_svg.py`, `rapport.css`.
+- `Rapport_Operations_fixes_AAAA-MM.pdf` — analyse approfondie de l'après-vente (environ 13 pages) : bons de travail par
+  type (client, garantie, interne, esthétique), $ et heures par BT, atelier, pièces par canal, carrosserie, tendances 24 mois.
+  `python rapport_apres_vente.py --data ../../data/data.json --mois AAAA-MM --sortie sortie`
+- `Rapport_Operations_fixes_<Concession>_AAAA-MM.pdf` — un rapport opérations fixes par concession (environ 10 pages) : départements
+  Service / Pièces / Carrosserie, BT par type, positionnement dans le Groupe, détail mensuel vs an passé, tendances, atelier, pièces.
+  `python rapport_apres_vente_concession.py --data ../../data/data.json --mois AAAA-MM --sortie sortie`
+- Le rapport du Groupe contient 2 pages « Après-vente : bons de travail » ; chaque rapport de concession, 1 page.
+- Code : `rapport_kpi.py` (Groupe), `rapport_concession.py` (concessions), `rapport_apres_vente.py` (opérations fixes),
+  `rapport_commun.py` (mise en page commune), `kpi_data.py`, `kpi_apres_vente.py`, `kpi_analyse.py`, `kpi_svg.py`, `rapport.css`.
+
+## Opérations fixes (bons de travail) — règles
+
+- Données : `sections.<month|ytd>.apres_vente` de data.json, lues par `src/apres_vente.py` (Réalisé : blocs Service,
+  Pièces, Carrosserie, colonne # = BT ; état GM : Page 6 par compte ; état Hyundai : Pages 4 et 6 ; état VW : Pages 5 et 6).
+- Types : client (atelier, service rapide, contrats, prépayé ; service mobile de STM inclus, détail « mobile »), garantie,
+  interne (inspection des véhicules neufs de l'état GM incluse, détail « inspection »), esthétique (Réalisé BMW/VW).
+- Montants = ventes ; profit brut à part. Ratios par BT : seulement les montants des concessions qui ont des BT pour le
+  type (l'esthétique VW a des ventes sans BT). Groupe recalculé à partir des sommes, écarts à périmètre comparable.
+- Heures : seulement VW (état VW Canada) et Hyundai (état Hyundai Canada). Quand le Réalisé VW est retenu, ses heures
+  viennent de l'état VW du même mois si les nombres de BT concordent (écart ≤ 3 %). BMW, STM et HAWKS : pas d'heures dans
+  leurs fichiers (à demander : rapport DMS mensuel des heures vendues par type).
+- Heures à 0 avec de la main-d'œuvre = donnée absente (jamais zéro). Techniciens de l'état GM non utilisés (STM incohérent).
+
+## Profit véhicule, F&I et gros — règles (28 septembre 2026, refait le 29)
+
+- Chaque département véhicules (neufs, usagés) est séparé en trois : **profit véhicule détail** (lignes véhicules de
+  l'état ou du Réalisé ; neufs : démos et flottes inclus), **F&I** (ligne « Total F&I » ; état GM : le transfert F&A des
+  autres revenus est ramené dans le département) et **gros, encan, export et autres** = profit brut du département −
+  profit véhicule − F&I. Clés data.json : `pbv_neuf`, `fi_neuf`, `pbv_usage`, `fi_usage` (fonction `vehicle_split_kpis`
+  de `src/extract.py`, appelée après chaque calcul des indicateurs).
+- Par unité : profit véhicule et F&I divisés par les unités détail ; « profit brut du département par unité » garde
+  l'ancienne définition (avec F&I et gros). Sans séparation disponible : profit véhicule = profit brut, F&I = 0.
+- Pont d'écart : par famille neufs / usagés = volume (écart d'unités × (véhicule + F&I) par unité de l'an passé), marge
+  véhicule par unité, F&I par unité, non décomposé ; famille « Gros et encan » = écart du montant (jamais divisé par les
+  unités détail). Le pont du Groupe additionne ceux des concessions (pas d'effet de mix).
+- Ces clés ne vont pas dans le gabarit budgets.csv (pas de budget par composante).
 
 ## Limites connues
 
@@ -72,3 +106,17 @@ Ce fichier sert de mémoire : décisions à respecter, limites connues, historiq
 - Même jour : lecteur de l'état financier Volkswagen Canada (`etat_vw`) et règle VW ci-dessus (commit b5a1a07). Le
   cumul d'août de VW ne change pas (833 482 $, identique dans le Réalisé et l'état) ; les mois de janvier, février, juin
   et juillet 2026 prennent les chiffres de l'état.
+
+### Opérations fixes — 29 septembre 2026
+- Demande du client : approfondir les résultats des opérations fixes ($ par BT client, garantie, interne ; heures par BT).
+- Le travail du 28 septembre sur ce sujet (zip `depot-github-kpi.zip`) n'avait jamais été déposé sur GitHub : refait.
+- Ajouts : `src/apres_vente.py` (lecteurs), `src/fo_dashboard.js` (onglet « Opérations fixes » du tableau de bord :
+  Bons de travail, Atelier et heures, Pièces, Tendances), `reports/mensuel/kpi_apres_vente.py`, `rapport_apres_vente.py`,
+  `rapport_apres_vente_concession.py` (un rapport par concession, demandé le 29 septembre).
+- `src/extract.py` : lecture des opérations fixes pour chaque fichier ; règles du 28 septembre refaites (classeur vide
+  jamais retenu seul ; deux copies d'un même fichier : seule la plus récemment modifiée dans Drive est classée) ;
+  fonction `main()` (même appel qu'avant en ligne de commande).
+- Même jour : séparation profit véhicule / F&I / gros refaite (perdue avec le zip du 28 sept.) ; chiffres identiques
+  à la version du 28 (cumul août 2026 : profit véhicule usagé Groupe 1 609 $/u, F&I usagé 1 318 $/u, véhicule neuf
+  1 604 $/u, F&I neuf 590 $/u, F&I total 2,87 M$, gros 2,90 M$). EBT inchangé (août 578 670 $, cumul 6 436 502 $).
+- Tableau de bord : résumé des filtres tronqué sur téléphone (débordait de 64 px).

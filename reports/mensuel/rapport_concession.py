@@ -40,10 +40,13 @@ OPS_ROWS = [
     ("u_detail", "Total unités détail", "unit", "total"),
     ("ratio_usage_neuf", "Usagés vendus par neuf", "ratio_x", ""),
     ("u_flottes", "Unités flottes", "unit", ""),
-    (SEC, "Profit brut par unité ($)"),
-    ("gpa_neuf", "Par unité neuve", "gpa", ""),
-    ("gpa_usage", "Par unité usagée", "gpa", ""),
-    ("pb_vehicules_unite", "Véhicules (neufs + usagés) par unité", "gpa", ""),
+    (SEC, "Profit par unité ($) — véhicule et F&I séparés"),
+    ("gpa_neuf", "Profit véhicule par unité neuve", "gpa", ""),
+    ("fi_unite_neuf", "F&I par unité neuve", "gpa", ""),
+    ("gpa_usage", "Profit véhicule par unité usagée", "gpa", ""),
+    ("fi_unite_usage", "F&I par unité usagée", "gpa", ""),
+    ("pb_vehicules_unite", "Véhicule + F&I par unité détail", "gpa", ""),
+    ("gros_total", "Gros, encan, export et autres (k$)", "money", ""),
     (SEC, "Indicateurs de gestion"),
     ("absorption", "Taux d'absorption après-vente", "ratio", ""),
     ("part_apres_vente", "Part de l'après-vente dans le PB", "ratio", ""),
@@ -365,11 +368,16 @@ def constats(s, P, d):
         out.append(f"<b>Volume.</b> Unités neuves : {num(ay['u_neuf'])} → {num(ry['u_neuf'])} ({num(ry['u_neuf'] - ay['u_neuf'], sign=True)}) ; "
                    f"unités usagées : {num(ay['u_usage'])} → {num(ry['u_usage'])} ({num(ry['u_usage'] - ay['u_usage'], sign=True)}).")
         g = []
-        for k, lab in (("gpa_neuf", "neuve"), ("gpa_usage", "usagée")):
-            if rr.get(k) and ra.get(k) and abs(ra[k]) <= GPA_PLAUSIBLE_MAX:
-                g.append(f"par unité {lab} {money(ra[k])} → {money(rr[k])} ({pct(rr[k] / ra[k] - 1, 0, sign=True)})")
+        for k, lab in (("gpa_neuf", "profit véhicule par unité neuve"), ("fi_unite_neuf", "F&I par unité neuve"),
+                       ("gpa_usage", "profit véhicule par unité usagée"), ("fi_unite_usage", "F&I par unité usagée")):
+            if rr.get(k) and ra.get(k) and abs(ra[k]) <= GPA_PLAUSIBLE_MAX and ra[k] > 0:
+                g.append(f"{lab} {money(ra[k])} → {money(rr[k])} ({pct(rr[k] / ra[k] - 1, 0, sign=True)})")
         if g:
-            out.append("<b>Profit par unité.</b> " + " ; ".join(g).capitalize() + ".")
+            out.append("<b>Profit par unité.</b> " + " ; ".join(g)[0].upper() + " ; ".join(g)[1:] + ".")
+        if ry["gros_neuf"] + ry["gros_usage"] or ay["gros_neuf"] + ay["gros_usage"]:
+            gr, ga = ry["gros_neuf"] + ry["gros_usage"], ay["gros_neuf"] + ay["gros_usage"]
+            out.append(f"<b>Gros, encan et export.</b> {kmoney(gr)} de profit brut depuis janvier, {kmoney(gr - ga, sign=True)} par rapport à {y-1} "
+                       "(montant à part : il n'est pas divisé par les unités au détail).")
         deps = [("pb_neuf", "véhicules neufs"), ("pb_usage", "véhicules usagés"), ("pb_service", "service"), ("pb_carrosserie", "carrosserie"), ("pb_pieces", "pièces")]
         big = max(deps, key=lambda t: abs(ry[t[0]] - ay[t[0]]))
         vp = var_pct(ry[big[0]], ay[big[0]])
@@ -422,6 +430,10 @@ def build_book(s, P, d):
     bk.add(p_resultats(s, P, d, "month"))
     bk.add(p_resultats(s, P, d, "ytd"))
     bk.add(p_operations(s, P, d))
+    import rapport_apres_vente as rav   # après-vente : bons de travail et heures
+    fo_page = rav.page_concession(s, P, d)
+    if fo_page:
+        bk.add(fo_page)
     bk.add(p_compo(s, P, d, "pb"))
     bk.add(p_compo(s, P, d, "dep"))
     bk.add(p_pont(s, P, d, "month"))

@@ -40,9 +40,12 @@ BASE_KEYS = [
     "pb_carrosserie", "pb_pieces", "autres_revenus", "depenses",
     "depenses_variables", "depenses_personnel", "depenses_semifixes",
     "ebitda", "ebt", "unites_neuf", "unites_usage", "unites_flottes",
+    # séparation profit véhicule / F&I / gros (28 septembre 2026)
+    "pbv_neuf", "fi_neuf", "pbv_usage", "fi_usage",
 ]
+SPLIT_KEYS = {"pbv_neuf", "fi_neuf", "pbv_usage", "fi_usage"}
 # Indicateurs acceptés dans budgets.csv (mêmes clés, dépenses en positif)
-BUDGET_CSV_KEYS = [k for k in BASE_KEYS if k != "ebitda"]
+BUDGET_CSV_KEYS = [k for k in BASE_KEYS if k != "ebitda" and k not in SPLIT_KEYS]
 EXPENSE_KEYS = {"depenses", "depenses_variables", "depenses_personnel", "depenses_semifixes"}
 
 
@@ -310,6 +313,16 @@ class Store:
             c["u_neuf"] = v("unites_neuf") or 0.0
             c["u_usage"] = v("unites_usage") or 0.0
             c["u_flottes"] = v("unites_flottes") or 0.0
+            # Profit véhicule (détail ; neufs : avec démos et flottes), F&I, et
+            # gros / encan / export / autres = reste du profit brut du département.
+            # Sans détail dans la source : tout reste dans le véhicule.
+            for d_ in ("neuf", "usage"):
+                pbv, fi = v("pbv_" + d_), v("fi_" + d_)
+                if pbv is None:
+                    pbv, fi = c["pb_" + d_], 0.0
+                c["pbv_" + d_] = pbv
+                c["fi_" + d_] = fi or 0.0
+                c["gros_" + d_] = c["pb_" + d_] - c["pbv_" + d_] - c["fi_" + d_]
             out = c
         self._cache[ck] = out
         return out
@@ -326,9 +339,14 @@ def ratios(c):
     u_detail = c["u_neuf"] + c["u_usage"]
     return {
         "marge_brute": div(c["pb"], c["ventes"]),
-        "gpa_neuf": div(c["pb_neuf"], c["u_neuf"]),
-        "gpa_usage": div(c["pb_usage"], c["u_usage"]),
-        "pb_vehicules_unite": div(c["pb_neuf"] + c["pb_usage"], u_detail),
+        # profit véhicule par unité (sans F&I ni gros) ; F&I par unité
+        "gpa_neuf": div(c["pbv_neuf"], c["u_neuf"]),
+        "gpa_usage": div(c["pbv_usage"], c["u_usage"]),
+        "fi_unite_neuf": div(c["fi_neuf"], c["u_neuf"]),
+        "fi_unite_usage": div(c["fi_usage"], c["u_usage"]),
+        "fi_total": c["fi_neuf"] + c["fi_usage"],
+        "gros_total": c["gros_neuf"] + c["gros_usage"],
+        "pb_vehicules_unite": div(c["pbv_neuf"] + c["fi_neuf"] + c["pbv_usage"] + c["fi_usage"], u_detail),
         "ratio_usage_neuf": div(c["u_usage"], c["u_neuf"]),
         "absorption": div(apres_vente, frais_fixes),
         "part_apres_vente": div(apres_vente, c["pb"]),
@@ -355,16 +373,19 @@ def add_comps(comps):
 # ------------------------------------------------------------ pont d'écart
 BRIDGE_ITEMS = [
     # clé, libellé, famille (pour le graphique condensé)
-    ("neuf_vol", "Véhicules neufs — volume", "PB neufs"),
-    ("neuf_marge", "Véhicules neufs — profit par unité", "PB neufs"),
+    ("neuf_vol", "Véhicules neufs — volume (véhicule + F&I)", "PB neufs"),
+    ("neuf_marge", "Véhicules neufs — profit véhicule par unité", "PB neufs"),
+    ("neuf_fi", "Véhicules neufs — F&I par unité", "PB neufs"),
     ("neuf_nd", "Véhicules neufs — non décomposé¹", "PB neufs"),
-    ("usage_vol", "Véhicules usagés — volume", "PB usagés"),
-    ("usage_marge", "Véhicules usagés — profit par unité", "PB usagés"),
+    ("usage_vol", "Véhicules usagés — volume (véhicule + F&I)", "PB usagés"),
+    ("usage_marge", "Véhicules usagés — profit véhicule par unité", "PB usagés"),
+    ("usage_fi", "Véhicules usagés — F&I par unité", "PB usagés"),
     ("usage_nd", "Véhicules usagés — non décomposé¹", "PB usagés"),
+    ("gros", "Gros, encan, export et autres (neufs et usagés)", "Gros et encan"),
     ("service", "Service", "Après-vente"),
     ("carrosserie", "Carrosserie", "Après-vente"),
     ("pieces", "Pièces", "Après-vente"),
-    ("pb_autres", "Autres sources de PB (gros, F&I, divers)", "Autres PB"),
+    ("pb_autres", "Autres sources de PB (divers)", "Autres PB"),
     ("ar", "Autres revenus", "Autres revenus"),
     ("dep_var", "Dépenses variables", "Dépenses variables"),
     ("dep_pers", "Dépenses de personnel", "Personnel"),
@@ -372,7 +393,7 @@ BRIDGE_ITEMS = [
     ("dep_autres", "Autres dépenses (fixes non ventilées)", "Semi-fixes et autres"),
     ("sous_baiia", "Amortissement et éléments sous le BAIIA", "Amortissement"),
 ]
-BRIDGE_FAMILIES = ["PB neufs", "PB usagés", "Après-vente", "Autres PB", "Autres revenus",
+BRIDGE_FAMILIES = ["PB neufs", "PB usagés", "Gros et encan", "Après-vente", "Autres PB", "Autres revenus",
                    "Dépenses variables", "Personnel", "Semi-fixes et autres", "Amortissement"]
 
 
@@ -391,15 +412,17 @@ def split_fiable(pb_b, u_b, u_r):
     return True
 
 
-def _vol_marge(pb_r, u_r, pb_b, u_b):
-    """Décompose Δ PB en effet volume (au profit/unité de référence) et effet
-    profit par unité (au volume réel). Somme = Δ PB exactement. Si la
-    décomposition n'est pas fiable, tout l'écart va dans une 3e composante
-    « non décomposé »."""
-    if split_fiable(pb_b, u_b, u_r):
-        vol = (u_r - u_b) * (pb_b / u_b)
-        return vol, (pb_r - pb_b) - vol, 0.0, True
-    return 0.0, 0.0, pb_r - pb_b, False
+def _vol_marge(v_r, f_r, u_r, v_b, f_b, u_b):
+    """Décompose Δ (véhicule + F&I) en effet volume (au profit par unité de
+    référence), effet profit véhicule par unité et effet F&I par unité (au
+    volume réel). Somme exacte. Si la décomposition n'est pas fiable, tout
+    l'écart va dans « non décomposé »."""
+    if split_fiable(v_b + f_b, u_b, u_r):
+        vol = (u_r - u_b) * ((v_b + f_b) / u_b)
+        marge = (v_r / u_r - v_b / u_b) * u_r if u_r else (v_r - v_b)
+        fi = (v_r + f_r) - (v_b + f_b) - vol - marge
+        return vol, marge, fi, 0.0, True
+    return 0.0, 0.0, 0.0, (v_r + f_r) - (v_b + f_b), False
 
 
 class Bridge(OrderedDict):
@@ -415,12 +438,13 @@ def bridge(real, base):
     if not real or not base:
         return None
     b = Bridge()
-    b["neuf_vol"], b["neuf_marge"], b["neuf_nd"], ok_n = _vol_marge(real["pb_neuf"], real["u_neuf"], base["pb_neuf"], base["u_neuf"])
-    b["usage_vol"], b["usage_marge"], b["usage_nd"], ok_u = _vol_marge(real["pb_usage"], real["u_usage"], base["pb_usage"], base["u_usage"])
-    if not ok_n:
-        b.non_decompose.add("neuf")
-    if not ok_u:
-        b.non_decompose.add("usage")
+    for d_ in ("neuf", "usage"):
+        vol, marge, fi, nd, ok = _vol_marge(real["pbv_" + d_], real["fi_" + d_], real["u_" + d_],
+                                             base["pbv_" + d_], base["fi_" + d_], base["u_" + d_])
+        b[d_ + "_vol"], b[d_ + "_marge"], b[d_ + "_fi"], b[d_ + "_nd"] = vol, marge, fi, nd
+        if not ok:
+            b.non_decompose.add(d_)
+    b["gros"] = (real["gros_neuf"] + real["gros_usage"]) - (base["gros_neuf"] + base["gros_usage"])
     for k in ("service", "carrosserie", "pieces"):
         b[k] = real["pb_" + k] - base["pb_" + k]
     b["pb_autres"] = real["pb_autres"] - base["pb_autres"]

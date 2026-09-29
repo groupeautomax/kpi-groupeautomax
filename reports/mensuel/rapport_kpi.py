@@ -46,18 +46,23 @@ KEY_ROWS = [
     (SEC, "Véhicules"),
     ("u_neuf", "Unités neuves", "unit", ""),
     ("u_usage", "Unités usagées", "unit", ""),
-    ("gpa_neuf", "Profit brut par unité neuve ($)", "gpa", ""),
-    ("gpa_usage", "Profit brut par unité usagée ($)", "gpa", ""),
+    ("gpa_neuf", "Profit véhicule par unité neuve ($)", "gpa", ""),
+    ("fi_unite_neuf", "F&I par unité neuve ($)", "gpa", ""),
+    ("gpa_usage", "Profit véhicule par unité usagée ($)", "gpa", ""),
+    ("fi_unite_usage", "F&I par unité usagée ($)", "gpa", ""),
+    ("gros_total", "Gros, encan, export et autres", "money", ""),
 ]
 BUDGET_ROWS = [("ventes", "Ventes nettes", "money", ""), ("pb", "Profit brut", "money", ""),
                ("dep", "Dépenses totales", "exp", ""), ("ebt", "EBT", "money", "total strong")]
 PB_ITEMS = [("Véhicules neufs", "pb_neuf"), ("Véhicules usagés", "pb_usage"), ("Service", "pb_service"),
-            ("Carrosserie", "pb_carrosserie"), ("Pièces", "pb_pieces"), ("Autres sources (gros, F&I)", "pb_autres")]
+            ("Carrosserie", "pb_carrosserie"), ("Pièces", "pb_pieces"), ("Autres sources", "pb_autres")]
 DEP_ITEMS = [("Variables", "dep_var"), ("Personnel", "dep_pers"), ("Semi-fixes", "dep_semi"), ("Autres (fixes non ventilées)", "dep_autres")]
 IND_ROWS = [
     ("marge_brute", "Marge brute", "ratio"),
-    ("gpa_neuf", "Profit brut / unité neuve ($)", "gpa"),
-    ("gpa_usage", "Profit brut / unité usagée ($)", "gpa"),
+    ("gpa_neuf", "Profit véhicule / unité neuve ($)", "gpa"),
+    ("fi_unite_neuf", "F&I / unité neuve ($)", "gpa"),
+    ("gpa_usage", "Profit véhicule / unité usagée ($)", "gpa"),
+    ("fi_unite_usage", "F&I / unité usagée ($)", "gpa"),
     ("ratio_usage_neuf", "Usagés vendus par neuf", "ratio_x"),
     ("part_apres_vente", "Part de l'après-vente dans le PB", "ratio"),
     ("absorption", "Taux d'absorption après-vente", "ratio"),
@@ -68,7 +73,8 @@ IND_ROWS = [
     ("ebt_unite", "EBT par unité détail ($)", "gpa"),
 ]
 FAM_PHRASE = {
-    "PB neufs": "le profit brut des neufs", "PB usagés": "le profit brut des usagés", "Après-vente": "l'après-vente",
+    "PB neufs": "le profit brut des neufs", "PB usagés": "le profit brut des usagés", "Gros et encan": "le gros, l'encan et l'export",
+    "Après-vente": "l'après-vente",
     "Autres PB": "les autres sources de profit brut", "Autres revenus": "les autres revenus",
     "Dépenses variables": "les dépenses variables", "Personnel": "les dépenses de personnel",
     "Semi-fixes et autres": "les dépenses semi-fixes et autres", "Amortissement": "l'amortissement",
@@ -97,7 +103,7 @@ def gpa_notes(s, P, dealers, mode="ytd"):
             foot[k] = "<sup>1</sup>"
             nc.add(k)
             notes.append(f"<sup>1</sup> Les unités {lab} {y-1} de {', '.join(DEALERS[b] for b in bad)} semblent incomplètes : "
-                         f"le profit par unité {y-1} n'est pas comparable (n.c.).")
+                         f"le profit véhicule par unité {y-1} n'est pas comparable (n.c.).")
     return foot, " ".join(dict.fromkeys(notes)), nc
 
 
@@ -143,8 +149,9 @@ def retenir(s, P, marks):
                f"({pct(var_pct(gy['ebt'], gyb['ebt']), 0, sign=True)}) par rapport à {y-1} — {phrase_familles(by)}.")
     du = sum(s.comp(d, P, "ytd", "real")["u_usage"] - s.comp(d, P, "ytd", "ap")["u_usage"] for d in rc.ACTIVE if s.comp(d, P, "ytd", "ap"))
     out.append(f"<b>Véhicules usagés :</b> {num(du, sign=True)} unités par rapport à {y-1} (effet volume {kmoney(by['usage_vol'], sign=True)}), "
-               f"mais un profit par unité plus bas ({kmoney(by['usage_marge'], sign=True)}). <b>Neufs :</b> volume {kmoney(by['neuf_vol'], sign=True)}, "
-               f"profit par unité {kmoney(by['neuf_marge'], sign=True)}.")
+               f"profit véhicule par unité {kmoney(by['usage_marge'], sign=True)}, F&I par unité {kmoney(by['usage_fi'], sign=True)}. "
+               f"<b>Neufs :</b> volume {kmoney(by['neuf_vol'], sign=True)}, profit véhicule par unité {kmoney(by['neuf_marge'], sign=True)}, "
+               f"F&I par unité {kmoney(by['neuf_fi'], sign=True)}. <b>Gros, encan et export :</b> {kmoney(by['gros'], sign=True)}.")
     deltas = {}
     for d in rc.ACTIVE:
         r, a = s.comp(d, P, "ytd", "real"), s.comp(d, P, "ytd", "ap")
@@ -213,7 +220,8 @@ def p_resultats(s, P, mode):
     lab_r = f"{mois_court(m)} {y}" if mode == "month" else f"Cumul {y}"
     lab_b = f"{mois_court(m)} {y-1}" if mode == "month" else f"Cumul {y-1}"
     table = comp_table(KEY_ROWS, [{"h": lab_r, "t": "v", "c": r}, {"h": lab_b, "t": "v", "c": b, "vcls": "muted"},
-                                  {"h": "Écart", "t": "d", "c": (r, b), "cls": "sep", "nc": nc}, {"h": "%", "t": "p", "c": (r, b), "nc": nc}], foot=foot)
+                                  {"h": "Écart", "t": "d", "c": (r, b), "cls": "sep", "nc": nc}, {"h": "%", "t": "p", "c": (r, b), "nc": nc}], foot=foot,
+                       cls="tight")
     titre = f"Résultats du groupe — {MOIS[m]} {y}" if mode == "month" else f"Résultats cumulatifs — {MOIS[1]} à {MOIS[m]} {y}"
     ref = f"{MOIS[m]} {y-1}" if mode == "month" else f"la même période de {y-1}"
     k = (f"L'EBT du groupe est de <b>{kmoney(r['ebt'])}</b>, soit <b>{kmoney(d, sign=True)}</b> ({pct(var_pct(r['ebt'], b['ebt']), 0, sign=True)}) "
@@ -259,7 +267,8 @@ def p_pont(s, P, mode):
       <div class="chart">{svg}</div>
       <h2>Les postes qui pèsent le plus</h2>
       <table class="t num"><thead><tr><th class="lab">Poste</th><th>Effet sur l'EBT</th><th class="lab"></th></tr></thead><tbody>{rows}</tbody></table>
-      <div class="note">Effet volume = écart d'unités × profit par unité de l'an passé ; effet profit par unité = écart de profit par unité × unités vendues.
+      <div class="note">Effet volume = écart d'unités × (profit véhicule + F&amp;I) par unité de l'an passé ; effets profit véhicule et F&amp;I par unité = écart
+      par unité × unités vendues ; gros, encan et export : écart du montant (il n'est jamais divisé par les unités au détail).
       Le pont du groupe additionne ceux des concessions, ce qui neutralise l'effet de mix entre concessions.</div>"""
 
 
@@ -325,13 +334,16 @@ def p_heat(s, P):
     rows.append(("Groupe", group_bridge(s, P, "ytd", "ap"), gr["ebt"] - gb["ebt"], True))
     vmax = max([abs(v) for _, b, _, _ in rows if b for v in bridge_families(b).values()] + [1])
     tmax = max([abs(t) for _, _, t, _ in rows if t is not None] + [1])
-    head = "".join(f"<th>{escape(FAMILY_SHORT[f])}</th>" for f in BRIDGE_FAMILIES) + "<th class='tot'>Écart d'EBT</th>"
+    # familles nulles pour toutes les concessions : colonne retirée (tableau plus lisible)
+    fams = [f for f in BRIDGE_FAMILIES if any(b and abs(bridge_families(b)[f]) >= 500 for _, b, _, _ in rows)]
+    head = "".join(f"<th>{escape(FAMILY_SHORT[f])}</th>" for f in fams) + "<th class='tot'>Écart d'EBT</th>"
     body = ""
     for name, b, tot, is_g in rows:
         if not b:
-            body += f'<tr><td class="lab">{escape(name)}</td>' + "<td class='muted'>—</td>" * (len(BRIDGE_FAMILIES) + 1) + "</tr>"
+            body += f'<tr><td class="lab">{escape(name)}</td>' + "<td class='muted'>—</td>" * (len(fams) + 1) + "</tr>"
             continue
-        tds = "".join(f'<td style="{heat_color(v, vmax)}">{num(v/1000, sign=True)}</td>' for v in bridge_families(b).values())
+        bf = bridge_families(b)
+        tds = "".join(f'<td style="{heat_color(bf[f], vmax)}">{num(bf[f]/1000, sign=True)}</td>' for f in fams)
         tds += f'<td class="tot" style="{heat_color(tot, tmax)}"><b>{num(tot/1000, sign=True)}</b></td>'
         body += f'<tr class="{"total strong" if is_g else ""}"><td class="lab">{escape(name)}</td>{tds}</tr>'
     return f"""
@@ -535,8 +547,8 @@ def p_methode(part):
       à partir des sommes, jamais additionnés.</p>
       <h2>Écart d'EBT</h2>
       <p>EBT = profit brut + autres revenus − dépenses − éléments sous le BAIIA (amortissement, etc.). L'écart d'EBT est réparti entre ces postes ; la somme des barres
-      du graphique égale exactement l'écart. Pour les véhicules, l'écart de profit brut est séparé en effet volume (écart d'unités × profit par unité de l'an passé)
-      et effet profit par unité (écart de profit par unité × unités vendues).</p>
+      du graphique égale exactement l'écart. Pour les véhicules, l'écart est séparé en effet volume (écart d'unités × profit véhicule + F&amp;I par unité
+      de l'an passé), effet profit véhicule par unité, effet F&amp;I par unité (écart par unité × unités vendues) et gros, encan et export (écart du montant).</p>
       <p>Dans l'état financier GM (HAWKS, STM), l'amortissement est compris dans les dépenses ; son poste « amortissement » est donc nul pour les mois
       tirés de cet état.</p>
       <h2>Graphiques en anneau</h2>
@@ -549,8 +561,9 @@ def p_methode(part):
       <h2>Indicateurs</h2>
       <dl class="defs">
         <dt>Marge brute</dt><dd>Profit brut ÷ ventes nettes.</dd>
-        <dt>Profit brut par unité</dt><dd>Profit brut du département ÷ unités vendues (neuves ou usagées).</dd>
-        <dt>Autres sources de profit brut</dt><dd>Profit brut total − somme des cinq départements (gros, F&amp;I, divers).</dd>
+        <dt>Profit véhicule et F&amp;I par unité</dt><dd>Profit brut des véhicules au détail (neufs : avec démos et flottes), ou F&amp;I, ÷ unités au détail.
+        État GM : le F&amp;I transféré hors des départements y est ramené.</dd>
+        <dt>Gros, encan, export et autres</dt><dd>Profit brut du département − véhicule − F&amp;I : un montant, jamais par unité.</dd>
         <dt>Taux d'absorption après-vente</dt><dd>Profit brut service + pièces + carrosserie ÷ (dépenses totales − dépenses variables).</dd>
         <dt>Dépenses % du profit brut</dt><dd>Dépenses totales ÷ profit brut.</dd>
         <dt>EBT des 12 derniers mois</dt><dd>Somme des 12 derniers EBT mensuels (n/d s'il manque un mois).</dd>
@@ -562,13 +575,25 @@ def p_methode(part):
         <dt>{level_chip('critique')}</dt><dd>EBT du mois négatif.</dd>
         <dt>{level_chip('eleve')}</dt><dd>EBT cumulatif sous l'an passé de plus de {pct(-SEUILS['ebt_cumul_ap_pct'], 0)} et de {kmoney(-SEUILS['ebt_cumul_ap_abs'])}, ou sous le budget de plus de {pct(-SEUILS['ebt_cumul_budget_pct'], 0)}.</dd>
         <dt>{level_chip('attention')}</dt><dd>EBT du mois sous l'an passé de plus de {pct(-SEUILS['ebt_mois_ap_pct'], 0)} et de {kmoney(-SEUILS['ebt_mois_ap_abs'])} ; dépenses supérieures au profit brut ;
-        profit par unité neuve en baisse de plus de {pct(-SEUILS['gpa_neuf_pct'], 0)} ou usagée de plus de {pct(-SEUILS['gpa_usage_pct'], 0)} ; personnel % du PB en hausse de plus de {num(SEUILS['pers_pct_pb_pts'] * 100)} pts.</dd>
+        profit véhicule par unité neuve en baisse de plus de {pct(-SEUILS['gpa_neuf_pct'], 0)} ou usagée de plus de {pct(-SEUILS['gpa_usage_pct'], 0)} ;
+        F&amp;I par unité en baisse de plus de {pct(-SEUILS['fi_unite_pct'], 0)} ; personnel % du PB en hausse de plus de {num(SEUILS['pers_pct_pb_pts'] * 100)} pts.</dd>
         <dt>{level_chip('positif')}</dt><dd>EBT cumulatif au-dessus de l'an passé de plus de {pct(SEUILS['positif_ap_pct'], 0)} ou du budget de plus de {pct(SEUILS['positif_budget_pct'], 0)}.</dd>
       </dl>
       <p class="note">Ces seuils sont des conventions de présentation (réglables dans kpi_analyse.py), pas une politique du Groupe.</p>"""
 
 
 # ============================================================== assemblage
+def apres_vente_pages(s, P):
+    """Pages « après-vente : bons de travail » (rapport_apres_vente.py) ; aucune
+    si data.json n'a pas encore le détail des opérations fixes."""
+    import rapport_apres_vente as rav
+    import kpi_apres_vente as kav
+    av = kav.AVStore(s)
+    if not any(av.get(d, P, "ytd") for d in DEALERS):
+        return []
+    return rav.pages_groupe(s, P)
+
+
 def build_book(s, P, marks):
     al = alertes(s, P)
     couverture, anomalies = controle_donnees(s, P)
@@ -576,7 +601,8 @@ def build_book(s, P, marks):
     toc = [("L'essentiel du mois", marks.get("essentiel", "")), ("Alertes", marks.get("alertes", "")),
            ("Résultats du groupe", marks.get("resultats", "")), ("Analyse des écarts", marks.get("pont", "")),
            ("Composition du profit brut et des dépenses", marks.get("compo", "")), ("Résultats par concession", marks.get("concessions", "")),
-           ("Indicateurs de gestion", marks.get("ind", "")), ("Tendances", marks.get("tend", "")),
+           ("Indicateurs de gestion", marks.get("ind", "")), ("Après-vente : bons de travail", marks.get("apres", "")),
+           ("Tendances", marks.get("tend", "")),
            ("Qualité des données", marks.get("qualite", "")), ("Méthode", marks.get("methode", ""))]
     bk.add_cover(p_cover(s, P, toc))
     bk.mark("essentiel"); bk.add(p_essentiel(s, P, marks))
@@ -589,6 +615,11 @@ def build_book(s, P, marks):
     bk.mark("compo"); bk.add(p_compo(s, P, "pb")); bk.add(p_compo(s, P, "dep"))
     bk.mark("concessions"); bk.add(p_concessions(s, P)); bk.add(p_heat(s, P))
     bk.mark("ind"); bk.add(p_ind(s, P, False)); bk.add(p_ind(s, P, True))
+    fo_pages = apres_vente_pages(s, P)
+    if fo_pages:
+        bk.mark("apres")
+        for pg in fo_pages:
+            bk.add(pg)
     bk.mark("tend"); bk.add(p_tendances(s, P)); bk.add(p_tendances_table(s, P))
     bk.mark("qualite"); bk.add(p_couverture(s, P, couverture))
     iparts = chunks(anomalies, 8)

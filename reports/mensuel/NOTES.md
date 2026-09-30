@@ -51,6 +51,10 @@ Ce fichier sert de mémoire : décisions à respecter, limites connues, historiq
 - `Rapport_Operations_fixes_<Concession>_AAAA-MM.pdf` — un rapport opérations fixes par concession (environ 10 pages) : départements
   Service / Pièces / Carrosserie, BT par type, positionnement dans le Groupe, détail mensuel vs an passé, tendances, atelier, pièces.
   `python rapport_apres_vente_concession.py --data ../../data/data.json --mois AAAA-MM --sortie sortie`
+- `Rapport_Ventes_AAAA-MM.pdf` — analyse approfondie des ventes de véhicules du Groupe (environ 16 pages) :
+  `python rapport_ventes.py --data ../../data/data.json --mois AAAA-MM --sortie sortie`
+- `Rapport_Ventes_<Concession>_AAAA-MM.pdf` — un rapport Ventes par concession (environ 11 à 13 pages) :
+  `python rapport_ventes_concession.py --data ../../data/data.json --mois AAAA-MM --sortie sortie`
 - Le rapport du Groupe contient 2 pages « Après-vente : bons de travail » ; chaque rapport de concession, 1 page.
 - Code : `rapport_kpi.py` (Groupe), `rapport_concession.py` (concessions), `rapport_apres_vente.py` (opérations fixes),
   `rapport_commun.py` (mise en page commune), `kpi_data.py`, `kpi_apres_vente.py`, `kpi_analyse.py`, `kpi_svg.py`, `rapport.css`.
@@ -137,10 +141,14 @@ Ce fichier sert de mémoire : décisions à respecter, limites connues, historiq
 
 - Workflow GitHub « Rapports mensuels par courriel » (`.github/workflows/rapports-mensuels.yml`), le 20 à 14 h 07 UTC :
   `envoi_rapports.py` vise le mois précédent et, pour chaque concession dont le fichier du mois est dans data.json,
-  produit `Rapport_<Concession>_AAAA-MM.pdf` et `Rapport_Operations_fixes_<Concession>_AAAA-MM.pdf`, puis les envoie au
+  produit `Rapport_<Concession>_AAAA-MM.pdf`, `Rapport_Operations_fixes_<Concession>_AAAA-MM.pdf` et
+  `Rapport_Ventes_<Concession>_AAAA-MM.pdf` (ajouté le 29 septembre 2026, accord du client), puis les envoie au
   script Apps Script « Envoi rapports KPI » de Maxime (web app, compte mallard@groupeautomax.com), qui les expédie au
   directeur de la concession, Maxime en copie, puis envoie à Maxime un résumé (envoyés, en attente, avertissements).
-- Chaque directeur reçoit seulement les rapports de sa concession ; le rapport du Groupe reste pour Maxime.
+- Chaque directeur reçoit seulement les rapports de sa concession (3 PDF) ; les rapports du Groupe restent pour Maxime.
+- Chaque fichier envoyé porte son `libelle` (dictionnaire `LIBELLES` d'`envoi_rapports.py`), affiché tel quel dans le
+  courriel par le script Apps Script (version 3 du déploiement, 29 septembre 2026) : un nouveau rapport n'exige plus de
+  modifier le script.
 - Concession sans données du mois : pas d'envoi, signalée dans le résumé. Relance manuelle (Actions → Run workflow) :
   seules les concessions pas encore envoyées partent ; `essai = oui` : tout part à Maxime seulement ; `forcer = oui` : renvoi.
 - Secrets GitHub : `APPS_SCRIPT_URL`, `RAPPORTS_TOKEN`. Les adresses des directeurs sont dans le script Apps Script,
@@ -234,3 +242,5 @@ Ce fichier sert de mémoire : décisions à respecter, limites connues, historiq
   et scindées ; encadrés « Bravo / À améliorer » retirés de ces pages (repris dans la page des étoiles).
 - Soir (3) : rapports « Ventes de véhicules » (Groupe et concessions) ; workflow « Update dashboard » : `git pull
   --rebase --autostash` avant le push (échec du 29 septembre : un commit était arrivé pendant la reconstruction).
+- Soir (4) : le rapport Ventes de chaque concession part aussi aux directeurs le 20 (3 PDF par concession) ; libellés
+  des rapports envoyés par `envoi_rapports.py`, script Apps Script mis à jour (version 3).

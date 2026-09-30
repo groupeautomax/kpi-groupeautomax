@@ -7,8 +7,9 @@ Allard, 29 septembre 2026).
 Le 20 de chaque mois (workflow GitHub « Rapports mensuels par courriel ») :
   1. vise le mois civil précédent (ou --mois / variable MOIS) ;
   2. pour chaque concession dont le fichier de ce mois est dans data.json,
-     produit son rapport mensuel et son rapport Opérations fixes ;
-  3. envoie les deux PDF au script Apps Script de Maxime (web app), qui
+     produit son rapport mensuel, son rapport Opérations fixes et son rapport
+     Ventes de véhicules (ajouté le 29 septembre 2026) ;
+  3. envoie les trois PDF au script Apps Script de Maxime (web app), qui
      les expédie par courriel au directeur de la concession, Maxime en copie ;
   4. envoie à Maxime un résumé : concessions envoyées, concessions sans
      données du mois (non envoyées), avertissements.
@@ -57,9 +58,18 @@ def post(url, payload, timeout=180):
         return {"ok": False, "erreur": "réponse non JSON du script (déploiement ou accès « Tout le monde » à vérifier)"}
 
 
-def fichier(path):
+# Libellé de chaque rapport dans le courriel (le script Apps Script l'affiche tel quel).
+LIBELLES = {
+    "mensuel": "Rapport mensuel de performance",
+    "fo": "Rapport Opérations fixes (service, pièces, carrosserie, bons de travail)",
+    "ventes": "Rapport Ventes de véhicules (neufs et usagés, F&I, frais de vente, gros et encan)",
+}
+
+
+def fichier(path, genre):
     with open(path, "rb") as f:
-        return {"nom": os.path.basename(path), "contenu_b64": base64.b64encode(f.read()).decode("ascii")}
+        return {"nom": os.path.basename(path), "libelle": LIBELLES[genre],
+                "contenu_b64": base64.b64encode(f.read()).decode("ascii")}
 
 
 def main():
@@ -84,9 +94,12 @@ def main():
     import rapport_concession as rcon
     import rapport_apres_vente_concession as rfo
     import kpi_apres_vente as kav
+    import rapport_ventes_concession as rve
+    import kpi_ventes as kv
 
     rc.setup(s, P)
     av = kav.AVStore(s)
+    vs = kv.VStore(s)
     dealers = [a.concession] if a.concession else list(DEALERS)
     out = tempfile.mkdtemp(prefix="rapports_")
     envoyes, manquants, avert, erreurs = [], [], [], []
@@ -100,16 +113,23 @@ def main():
         pdfs = []
         try:
             for fp, n, over in rcon.generate(s, P, out, [d]):
-                pdfs.append(fp)
+                pdfs.append((fp, "mensuel"))
                 if over:
                     avert.append(f"{DEALERS[d]} : rapport mensuel, contenu qui déborde (pages {', '.join(str(o['page']) for o in over)})")
             if av.get(d, P, "ytd"):
                 for fp, n, over in rfo.generate(s, P, out, [d]):
-                    pdfs.append(fp)
+                    pdfs.append((fp, "fo"))
                     if over:
                         avert.append(f"{DEALERS[d]} : rapport Opérations fixes, contenu qui déborde")
             else:
                 avert.append(f"{DEALERS[d]} : pas de détail des opérations fixes pour {P} (rapport Opérations fixes non joint)")
+            if vs.view(d, P, "ytd"):
+                for fp, n, over in rve.generate(s, P, out, [d]):
+                    pdfs.append((fp, "ventes"))
+                    if over:
+                        avert.append(f"{DEALERS[d]} : rapport Ventes de véhicules, contenu qui déborde")
+            else:
+                avert.append(f"{DEALERS[d]} : pas de détail des ventes de véhicules pour {P} (rapport Ventes non joint)")
         except Exception as exc:  # noqa: BLE001
             erreurs.append(f"{DEALERS[d]} : production des PDF impossible ({type(exc).__name__})")
             print(f"{d} : erreur de production ({type(exc).__name__})")
@@ -120,7 +140,7 @@ def main():
             continue
         rep = post(url, {"token": token, "type": "rapport", "concession": d, "mois": P,
                          "mois_label": label_period(P), "essai": essai, "forcer": forcer,
-                         "fichiers": [fichier(p) for p in pdfs]})
+                         "fichiers": [fichier(p, g) for p, g in pdfs]})
         if rep.get("ok"):
             statut = rep.get("statut", "envoye")
             print(f"{d} : {statut}")

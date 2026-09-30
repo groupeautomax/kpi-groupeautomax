@@ -19,6 +19,14 @@ Génère le rapport mensuel de performance du Groupe (PDF, environ 20 pages) et 
     # rapports détaillés par concession (toutes, ou une seule avec --concession vw)
     python rapport_concession.py --data ../data/data.json --mois 2026-09 --sortie ./sortie
 
+    # opérations fixes (Groupe, puis une par concession)
+    python rapport_apres_vente.py --data ../data/data.json --mois 2026-09 --sortie ./sortie
+    python rapport_apres_vente_concession.py --data ../data/data.json --mois 2026-09 --sortie ./sortie
+
+    # ventes de véhicules (Groupe, puis une par concession)
+    python rapport_ventes.py --data ../data/data.json --mois 2026-09 --sortie ./sortie
+    python rapport_ventes_concession.py --data ../data/data.json --mois 2026-09 --sortie ./sortie
+
     # gabarit de budget à remplir (concessions sans budget dans leurs fichiers)
     python rapport_kpi.py --data ../data/data.json --gabarit-budget budgets.csv --annee 2026
 
@@ -34,6 +42,9 @@ Un mois n'est comparé au budget que si `pb_total` et `ebt` sont saisis pour tou
 - `rapport_commun.py` : mise en page commune (couverture, tableaux, anneaux, pagination, production des PDF).
 - `rapport_kpi.py` + `rapport.css` : rapport du Groupe.
 - `rapport_concession.py` : rapports détaillés par concession.
+- `rapport_apres_vente.py`, `rapport_apres_vente_concession.py`, `kpi_apres_vente.py` : rapports Opérations fixes.
+- `rapport_ventes.py`, `rapport_ventes_concession.py`, `kpi_ventes.py` : rapports Ventes de véhicules.
+- `envoi_rapports.py` : envoi du 20 aux directeurs (rapport mensuel, Opérations fixes et Ventes de leur concession).
 - `logo/` : logo Groupe Automax (version foncée et version blanche), couleurs anthracite #1D1D1B et vert #008848.
 - `fonts/` : police Inter (intégrée au PDF).
 

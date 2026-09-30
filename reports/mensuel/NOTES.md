@@ -172,6 +172,27 @@ Ce fichier sert de mémoire : décisions à respecter, limites connues, historiq
 - Vérification d'août 2026 : EBT, ventes, unités et montants par unité des étoiles recalculés à partir de data.json
   (sans kpi_data) : identiques.
 
+## Rapports « Ventes de véhicules » — règles (29 septembre 2026)
+
+- Demande du client : « fais un rapport détaillé pour les ventes comme tu as fait pour les fixes ». Deux scripts, même
+  principe que les Opérations fixes : `rapport_ventes.py` (Groupe, ~16 pages, `Rapport_Ventes_AAAA-MM.pdf`) et
+  `rapport_ventes_concession.py` (une par concession, 11 à 13 pages, `Rapport_Ventes_<concession>_AAAA-MM.pdf`).
+  Données : `kpi_ventes.py`, qui lit data.json tel quel (aucune nouvelle extraction) : indicateurs (unités, profit
+  véhicule, F&I, gros) et lignes des départements « Véhicules neufs » / « Véhicules usagés ».
+- Lignes ramenées à des clés communes (`LINE_RULES`, `MIX_RULES`) : ventes nettes, commissions vendeurs et F&I,
+  publicité nette (ristournes, coop), intérêts sur stocks nets (crédits du constructeur : souvent négatifs à l'état GM),
+  préparation et livraison, F&I par produit (Réalisé seulement), ventes au gros (unités), lignes de modèles (autos,
+  camions et VUS, électriques, fin de série ; usagés certifiés / non certifiés / autres marques).
+- An passé : lignes comparées seulement si le fichier de l'an passé a le même format (`VStore.same_format`) ; Hyundai
+  (Réalisé 2025, état Hyundai 2026) : unités, profit véhicule, F&I et gros comparés, frais, profit du département et
+  modèles non. Groupe : sommes des concessions ; ratios sur les concessions qui ont numérateur et dénominateur.
+- Pages : sommaire, 3 étoiles / 3 points (`rapport_etoiles.page_ventes_*`, candidats `ventes_cands`), neufs et usagés
+  (volumes, profit par unité, budget BMW / VW), F&I, frais de vente et profit du département, positionnement (rang),
+  composite (Hyundai : page véhicules ; VW : indicateurs ventes et page ventes du bulletin ; Groupe :
+  `rapport_composite.page_ventes_groupe`), mix, gros / encan / export, détail mensuel, tendances 12 et 24 mois, méthode.
+- Vérification d'août 2026 : commissions, intérêts, publicité, ventes, unités en gros, unités et F&I relus directement
+  dans les lignes de data.json pour les 5 concessions : identiques.
+
 ## Historique
 
 ### Août 2026 — première version (25 septembre 2026)
@@ -211,3 +232,5 @@ Ce fichier sert de mémoire : décisions à respecter, limites connues, historiq
   l'« Analyse des revenus » Hyundai (déposée sur Drive) : page par type de travail au rapport Opérations fixes.
 - Soir (2) : page « 3 étoiles et 3 points à améliorer » dans chaque rapport ; pages de comparaison aux composites aérées
   et scindées ; encadrés « Bravo / À améliorer » retirés de ces pages (repris dans la page des étoiles).
+- Soir (3) : rapports « Ventes de véhicules » (Groupe et concessions) ; workflow « Update dashboard » : `git pull
+  --rebase --autostash` avant le push (échec du 29 septembre : un commit était arrivé pendant la reconstruction).

@@ -916,7 +916,7 @@ def _hy_ar_cands(H, src):
     return out
 
 
-def _vw_cands(R, sections, src, sommaire=False):
+def _vw_cands(R, sections, src, sommaire=False, only=None, rang=True):
     out = []
     comp = R.get("comparateurs") or {}
     for sec_key in sections:
@@ -932,6 +932,8 @@ def _vw_cands(R, sections, src, sommaire=False):
         lab = {r[0]: r[1].strip() for r in VW_SUM_ROWS if r[0] != "sec"}
         typ = {r[0]: (r[2], r[3]) for r in VW_SUM_ROWS if r[0] != "sec"}
         for k, rec in (R.get("sommaire") or {}).items():
+            if only is not None and k not in only:
+                continue
             if k.startswith("_") or k not in typ or rec.get("ytd") is None or rec.get("national") in (None, 0):
                 continue
             t, sens = typ[k]
@@ -944,7 +946,7 @@ def _vw_cands(R, sections, src, sommaire=False):
             out.append(_cc(sc, "comp:vw:" + k, lab[k], _vf(rec["ytd"], t),
                            f"{_vf(rec['national'], t)} pour la moyenne nationale{pt_}", src))
         nat = (R.get("classement") or {}).get("national") or {}
-        if nat.get("rang") and nat.get("yoy") is not None and abs(nat["yoy"]) >= 5:
+        if rang and nat.get("rang") and nat.get("yoy") is not None and abs(nat["yoy"]) >= 5:
             sc = max(-1.5, min(1.5, nat["yoy"] / 30)) * W_COMP
             out.append(_cc(sc, "comp:vw:rang", "Rang national Volkswagen Canada", f"{nat['rang']}<sup>e</sup> sur {nat.get('n', '—')}",
                            f"{num(nat['yoy'], sign=True)} places en un an ({num(nat.get('mom'), sign=True)} ce mois-ci)", src))
@@ -975,6 +977,100 @@ def etoiles_fo(s, P, d):
     if d == "vw" and e.get("vw_report_card"):
         return _vw_cands(e["vw_report_card"], ("service", "parts"), "vs moyenne nationale (bulletin VW)")
     return []
+
+
+VW_SALES_KEYS = {"nv_bpv", "nv_aged", "ms_total", "reg_eff", "sales_eff", "cpo_bpv", "cem_sales"}
+
+
+def etoiles_ventes(s, P, d):
+    """Candidats « ventes » (neufs, occasion) du composite pour les rapports Ventes."""
+    e = comp_of(s, d, P)
+    if d == "hyundai":
+        H = HyComp(e)
+        if H.ok and H.ef:
+            return _hy_rows_cands(H, [r for r in HY_ROWS if r[0] in ("neuf", "occasion")], f"vs groupe {H.groupe} (composite Hyundai)")
+    elif d == "vw" and e.get("vw_report_card"):
+        return _vw_cands(e["vw_report_card"], ("new", "used"), "vs moyenne nationale (bulletin VW)", sommaire=True,
+                         only=VW_SALES_KEYS, rang=False)
+    return []
+
+
+def etoiles_ventes_groupe(s, P):
+    return _per_dealer(s, P, etoiles_ventes)
+
+
+def pages_ventes_concession(s, P, d):
+    """Pages « ventes » du composite pour le rapport Ventes de la concession."""
+    e = comp_of(s, d, P)
+    if d == "hyundai":
+        H = HyComp(e)
+        if H.ok and H.ef:
+            return hy_page_sommaire(s, P, d, H)[1:]
+    elif d == "vw" and e.get("vw_report_card"):
+        R = e["vw_report_card"]
+        return vw_page_bulletin(s, P, d, R)[1:2] + [vw_page_ventes(s, P, d, R)]
+    return []
+
+
+def page_ventes_groupe(s, P):
+    """Rapport Ventes du Groupe : neufs et occasion face aux composites."""
+    y, m = split(P)
+    eh, ev = comp_of(s, "hyundai", P), comp_of(s, "vw", P)
+    H = HyComp(eh) if eh else None
+    R = ev.get("vw_report_card")
+    if not ((H and H.ok and H.ef) or R):
+        return None
+    blocks, msg = "", []
+    if H and H.ok and H.ef:
+        rows = [("neuf", "unites", "Neufs : unités au détail", "u", 1), ("neuf", "pb_unite", "Neufs : profit brut par unité ($)", "d", 1),
+                ("neuf", "fi_unite", "Neufs : F&I par unité ($)", "d", 1), ("neuf", "profit_op_pct_pb", "Neufs : profit d'opération (% du PB)", "pct", 1),
+                ("occasion", "unites", "Occasion : unités au détail", "u", 1), ("occasion", "pb_unite", "Occasion : profit brut par unité ($)", "d", 1),
+                ("occasion", "fi_unite", "Occasion : F&I par unité ($)", "d", 1), ("occasion", "profit_op_pct_pb", "Occasion : profit d'opération (% du PB)", "pct", 1)]
+        tr = ""
+        for dept, k, lab, t, sens in rows:
+            v, g = H.c(dept, k, "ytd"), H.g(dept, k, "ytd")
+            if v is None and g is None:
+                continue
+            gt, gc = _gap(v, g, t, sens)
+            tr += f'<tr><td class="lab">{escape(lab)}</td><td>{_fmt(v, t)}</td><td class="muted">{_fmt(g, t)}</td><td class="{gc}">{gt}</td></tr>'
+        blocks += (f'<div class="band-lab">Hyundai Longueuil <span>cumul {MOIS[1]}–{MOIS[m]} {y} · composite Hyundai Canada, groupe {escape(H.label)}</span></div>'
+                   f'<table class="t num fo comp"><thead><tr><th class="lab">Indicateur</th><th>Hyundai Longueuil</th><th>Moyenne du groupe</th>'
+                   f'<th>Écart</th></tr></thead><tbody>{tr}</tbody></table>')
+        vo, vog = H.c("occasion", "unites", "ytd"), H.g("occasion", "unites", "ytd")
+        if vo is not None and vog:
+            msg.append(f"Hyundai Longueuil : <b>{num(vo)}</b> véhicules d'occasion au détail depuis janvier, contre {num(vog)} en moyenne pour son groupe")
+    if R:
+        summ = R.get("sommaire") or {}
+        comp = R.get("comparateurs") or {}
+        pick_ = [("sommaire", "nv_bpv", "Ventes neuves vs objectif", "pct", 1), ("sommaire", "nv_aged", "Inventaire neuf de plus de 90 jours", "pct", -1),
+                 ("sommaire", "ms_total", "Part de marché", "pct", 1), ("new", "fi_pnv", "F&I par véhicule neuf ($)", "d", 1),
+                 ("sommaire", "cpo_bpv", "VO certifiés vs objectif", "pct", 1), ("used", "fi_puvr", "F&I par véhicule d'occasion ($)", "d", 1),
+                 ("sommaire", "cem_sales", "Satisfaction ventes (3 questions clés)", "pct", 1)]
+        tr = ""
+        for sec, k, lab, t, sens in pick_:
+            rec = summ.get(k) if sec == "sommaire" else (comp.get(sec) or {}).get(k)
+            if not rec:
+                continue
+            v = rec.get("ytd")
+            tr += (f'<tr><td class="lab">{escape(lab)}</td><td class="{_vcls(v, rec.get("national"), sens, t)}">{_vf(v, t)}</td>'
+                   f'<td class="muted">{_vf(rec.get("national"), t)}</td><td class="muted">{_vf(rec.get("geo"), t)}</td></tr>')
+        nd = (R.get("classement") or {}).get("national_dept") or {}
+        na = (R.get("classement") or {}).get("national") or {}
+        head = f"rang national des ventes {nd.get('ventes', '—')} sur {na.get('n', '—')}"
+        blocks += (f'<div class="band-lab" style="margin-top:22px">Volkswagen Brossard <span>bulletin Volkswagen Canada · {escape(head)}</span></div>'
+                   f'<table class="t num fo comp"><thead><tr><th class="lab">Indicateur</th><th>VW Brossard</th><th>National</th>'
+                   f'<th>Québec</th></tr></thead><tbody>{tr}</tbody></table>')
+        ns = (comp.get("new") or {}).get("nv_sales") or {}
+        if ns.get("ytd") is not None:
+            msg.append(f"VW Brossard : <b>{num(ns['ytd'])}</b> véhicules neufs (objectif {num(ns.get('objectif'))})")
+    return f"""
+      <div class="eyebrow">Comparaison aux composites des constructeurs</div>
+      <h1>Ventes face aux composites</h1>
+      {key(" ; ".join(msg) + "." if msg else "Ventes comparées aux composites des constructeurs.")}
+      {blocks}
+      <p class="lead" style="margin-top:18px">{_status_line(s, P)}</p>
+      <div class="note">Hyundai : moyenne du groupe de comparaison (eComposite) ; profit brut par unité avec F&I et gros, comme le composite.
+      VW : vert / rouge = au-dessus / au-dessous de la moyenne nationale.</div>"""
 
 
 def _per_dealer(s, P, f):

@@ -206,8 +206,8 @@ h2.st-h { display: flex; align-items: center; gap: 8px; margin: 22px 0 12px; fon
 h2.st-h svg { flex: none; }
 h2.st-h.good { color: var(--accent-d); }
 h2.st-h.bad { color: var(--neg); }
-.st-list { display: flex; flex-direction: column; gap: 12px; }
-.st-card { display: flex; gap: 14px; align-items: flex-start; border: 1px solid var(--line); border-radius: 8px; padding: 14px 18px; background: #fff; }
+.st-list { display: flex; flex-direction: column; gap: 11px; }
+.st-card { display: flex; gap: 14px; align-items: flex-start; border: 1px solid var(--line); border-radius: 8px; padding: 13px 18px; background: #fff; }
 .st-card.good { border-left: 5px solid var(--accent); background: var(--tint2); }
 .st-card.bad { border-left: 5px solid var(--neg); background: #fdf6f5; }
 .st-ico { flex: none; width: 34px; height: 34px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-top: 2px; }

@@ -67,16 +67,17 @@ def c_pct(title, r, a, fam, w, ref, sens=1, floor=0.10, min_pts=0.005):
     return cand(_cap(rel) * w, fam, title, pct(r, 1), f"{pts(r - a, 1)} par rapport {ref} ({pct(a, 1)})")
 
 
-def c_unit(title, r, a, fam, w, ref, n_r, n_a, min_n=20, min_rel=0.03):
-    """Montant par unité ($) : seulement avec assez d'unités des deux côtés."""
+def c_unit(title, r, a, fam, w, ref, n_r, n_a, min_n=20, min_rel=0.03, sens=1):
+    """Montant par unité ($) : seulement avec assez d'unités des deux côtés.
+    sens = -1 pour un coût par unité (une baisse est favorable)."""
     if r is None or a is None or not a or (n_r or 0) < min_n * RELAX[0] or (n_a or 0) < min_n * RELAX[0]:
         return None
-    if a <= 0 or abs(a) > GPA_PLAUSIBLE_MAX:
+    if a <= 0 or (sens < 0 and r < 0) or abs(a) > GPA_PLAUSIBLE_MAX:
         return None
     rel = (r - a) / abs(a)
     if abs(rel) < min_rel * RELAX[0]:
         return None
-    return cand(_cap(rel) * w, fam, title, money(r), f"{money(r - a, sign=True)} ({pct(rel, 0, sign=True)}) par rapport {ref} ({money(a)})")
+    return cand(_cap(rel * sens) * w, fam, title, money(r), f"{money(r - a, sign=True)} ({pct(rel, 0, sign=True)}) par rapport {ref} ({money(a)})")
 
 
 def c_count(title, r, a, fam, w, ref, min_abs=5, min_rel=0.03, unit=""):
@@ -173,16 +174,19 @@ def _sel(lst, good, n, max_ext, out=None):
     candidats « externes » (composite ou concession nommée dans un rapport du Groupe)."""
     out = list(out or [])
     fams = {c["fam"] for c in out}
+    tags = {c.get("tag", c["fam"]) for c in out}
     n_ext = sum(c["kind"] != "an" for c in out)
     for c in lst:
         if len(out) >= n:
             break
-        if (c["score"] > 0) != good or abs(c["score"]) <= MIN_SCORE or c["fam"] in fams:
+        tag = c.get("tag", c["fam"])     # même indicateur (ex. unités usagées) : une seule fois
+        if (c["score"] > 0) != good or abs(c["score"]) <= MIN_SCORE or c["fam"] in fams or tag in tags:
             continue
         if c["kind"] != "an" and n_ext >= max_ext:
             continue
         out.append(c)
         fams.add(c["fam"])
+        tags.add(tag)
         n_ext += c["kind"] != "an"
     return out
 
@@ -381,4 +385,72 @@ def page_fo_groupe(F, s, P):
         return cands + rcomp.etoiles_fo_groupe(s, P)
     good, bad = pick_all(build, max_ext=2)
     return page("Opérations fixes : 3 étoiles et 3 points à améliorer", _lead(P), good, bad,
+                NOTE + " Groupe : concessions comparables.")
+
+
+# ------------------------------------------------------------ rapports Ventes
+def ventes_cands(S, d, ref, prefix=""):
+    """Ventes de véhicules (rapport Ventes) : neufs et usagés, cumul vs an passé."""
+    out = []
+    min_abs = 50000 if d == "groupe" else 20000
+    for suf, lab in (("neuf", "Neufs"), ("usage", "Usagés")):
+        r, a = S.m2(d, suf)
+        if r.get("u") is None or a.get("u") is None:
+            continue
+        p = f"{prefix}{lab.lower() if prefix else lab} — "
+        out += _keep([
+            c_count(p + "unités vendues au détail", r["u"], a["u"], suf + "_u", 0.8, ref, unit="unités"),
+            c_unit(p + "profit véhicule par unité", r.get("pbv_u"), a.get("pbv_u"), suf + "_pbv", 0.8, ref, r["u"], a["u"]),
+            c_unit(p + "F&I par unité", r.get("fi_u"), a.get("fi_u"), "fi_" + suf, 0.7, ref, r["u"], a["u"]),
+            c_money(p + "profit brut du département", r.get("pb"), a.get("pb"), suf + "_pb", 0.9, ref, min_abs),
+            c_money(p + "gros, encan et export (profit brut)", r.get("gros"), a.get("gros"), "gros_" + suf, 0.4, ref, min_abs),
+            c_unit(p + "commissions des vendeurs par unité", r.get("comm_u"), a.get("comm_u"), suf + "_comm", 0.5, ref, r["u"], a["u"], sens=-1),
+            c_unit(p + "intérêts sur stocks par unité", r.get("int_u"), a.get("int_u"), suf + "_int", 0.4, ref, r["u"], a["u"], sens=-1),
+            c_unit(p + "publicité par unité", r.get("pub_u"), a.get("pub_u"), suf + "_pub", 0.4, ref, r["u"], a["u"], sens=-1),
+            c_money(p + "profit du département (après frais)", r.get("profit"), a.get("profit"), suf + "_pb", 0.7, ref, min_abs),
+        ])
+    return out
+
+
+def ventes_vs_groupe(S, d):
+    out = []
+    for suf, lab in (("neuf", "Neufs"), ("usage", "Usagés")):
+        r, _ = S.m2(d, suf)
+        g, _ = S.m2("groupe", suf)
+        out += _keep([
+            c_vs(f"{lab} — profit véhicule par unité", r.get("pbv_u"), g.get("pbv_u"), suf + "_pbv", 0.4, "d", n_v=r.get("u")),
+            c_vs(f"{lab} — F&I par unité", r.get("fi_u"), g.get("fi_u"), "fi_" + suf, 0.4, "d", n_v=r.get("u")),
+            c_vs(f"{lab} — commissions des vendeurs par unité", r.get("comm_u"), g.get("comm_u"), suf + "_comm", 0.3, "d", sens=-1, n_v=r.get("u")),
+        ])
+    return out
+
+
+def page_ventes_concession(S, s, P, d):
+    import rapport_composite as rcomp
+    y, m = split(P)
+    ref = f"à {MOIS[1]}–{MOIS[m]} {y-1}"
+    good, bad = pick_all(lambda: ventes_cands(S, d, ref) + rcomp.etoiles_ventes(s, P, d), fill=lambda: ventes_vs_groupe(S, d))
+    return page(f"{DEALERS[d]} : 3 étoiles et 3 points à améliorer — ventes", _lead(P), good, bad, NOTE)
+
+
+def page_ventes_groupe(S, s, P):
+    import rapport_composite as rcomp
+    y, m = split(P)
+    ref = f"à {MOIS[1]}–{MOIS[m]} {y-1}"
+
+    def build():
+        cands = ventes_cands(S, "groupe", ref, prefix="Groupe : ")
+        for d in S.dealers:       # une concession par famille : unités et profit + F&I par unité
+            for suf, lab in (("neuf", "neufs"), ("usage", "usagés")):
+                r, a = S.m2(d, suf)
+                if r.get("u") is None or a.get("u") is None:
+                    continue
+                for c, tag in ((c_count(f"{DEALERS[d]} : véhicules {lab} vendus", r["u"], a["u"], "d:" + d, 0.7, ref, unit="unités"), suf + "_u"),
+                               (c_unit(f"{DEALERS[d]} : profit + F&I par unité ({lab})", r.get("tot_u"), a.get("tot_u"), "d:" + d, 0.7, ref,
+                                       r["u"], a["u"]), suf + "_pbv")):
+                    if c:
+                        cands.append(dict(c, kind="dealer", tag=tag))
+        return cands + rcomp.etoiles_ventes_groupe(s, P)
+    good, bad = pick_all(build, max_ext=2)
+    return page("Ventes de véhicules : 3 étoiles et 3 points à améliorer", _lead(P), good, bad,
                 NOTE + " Groupe : concessions comparables.")

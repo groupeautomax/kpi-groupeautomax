@@ -56,5 +56,17 @@ jobs:
             echo "No changes to commit."
           else
             git commit -m "Mise à jour automatique des données KPI"
-            git push
+            # Un autre commit a pu arriver sur main pendant la reconstruction
+            # (~40 min : synchro Drive, dépôt de code) : on se replace dessus
+            # avant de pousser. Seuls index.html et data/data.json sont
+            # commités ici, et une seule reconstruction tourne à la fois
+            # (concurrency), donc pas de conflit possible.
+            for i in 1 2 3; do
+              if git pull --rebase --autostash origin main && git push; then
+                exit 0
+              fi
+              echo "Push refusé, nouvelle tentative ($i/3)"
+              sleep 15
+            done
+            exit 1
           fi

@@ -141,13 +141,18 @@ def main():
         rep = post(url, {"token": token, "type": "rapport", "concession": d, "mois": P,
                          "mois_label": label_period(P), "essai": essai, "forcer": forcer,
                          "fichiers": [fichier(p, g) for p, g in pdfs]})
-        if rep.get("ok"):
-            statut = rep.get("statut", "envoye")
+        if rep.get("ok") and rep.get("statut"):
+            statut = rep["statut"]
             print(f"{d} : {statut}")
             if statut == "deja_envoye":
                 avert.append(f"{DEALERS[d]} : déjà envoyé pour {P}, pas renvoyé")
             else:
                 envoyes.append(d)
+        elif rep.get("ok"):
+            # réponse sans statut (ex. 29 sept. 2026 : redirection suivie jusqu'à doGet) : le courriel a pu partir
+            avert.append(f"{DEALERS[d]} : réponse incomplète du script — vérifier dans « Messages envoyés » que le courriel "
+                         f"est parti (une relance ne renvoie pas un rapport déjà envoyé)")
+            print(f"{d} : réponse incomplète")
         else:
             erreurs.append(f"{DEALERS[d]} : envoi refusé par le script ({rep.get('erreur', 'erreur inconnue')})")
             print(f"{d} : envoi refusé")

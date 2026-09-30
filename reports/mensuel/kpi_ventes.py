@@ -50,6 +50,13 @@ LINE_RULES = [
     ("flottes_ligne", ("neuf",), r"^flottes$"),
     ("rachat_bail", ("neuf", "usage"), r"^rachat bail"),
 ]
+# Lignes identiques d'un format de fichier à l'autre : comparées à l'an passé même quand le fichier de l'an passé
+# a un autre format (vérifié le 30 septembre 2026 pour Hyundai Longueuil : Réalisé et état Hyundai Canada d'avril à
+# juillet 2025, identiques au dollar près). Les autres lignes (dépenses totales, profit du département, préparation,
+# autres revenus, ventes, F&I par produit) dépendent de la répartition des frais propre à chaque format : non comparées.
+CORE_KEYS = {"u", "u_fl", "pb", "pbv", "fi", "gros"}     # indicateurs de data.json (toujours comparés)
+CROSS_FORMAT_KEYS = {"comm_vend", "comm_fi", "pub", "int_stocks", "var", "pers", "gros_ligne", "gros_ligne_u",
+                     "flottes_ligne", "flottes_ligne_u", "mix"}
 # Lignes de modèles (profit brut et unités au détail)
 MIX_RULES = {
     "neuf": [("Autos", r"^autos detail"), ("Camions et VUS", r"^camions detail"), ("Véhicules électriques", r"^vehicules electriques"),
@@ -141,8 +148,8 @@ class VStore:
         out = None
         if c:
             deps, f = self._lines(d, P, mode, base)
-            if base == "ap" and not self.same_format(d, P, mode):
-                deps = None      # lignes de formats différents (ex. Réalisé 2025 / état 2026) : non comparées
+            # formats différents (ex. Réalisé 2025 / état 2026) : seulement les lignes identiques d'un format à l'autre
+            cross = base == "ap" and not self.same_format(d, P, mode)
             out = {}
             for suf, dn in DEPT_NAMES.items():
                 v = {"u": c["u_" + suf], "pb": c["pb_" + suf], "pbv": c["pbv_" + suf], "fi": c["fi_" + suf],
@@ -150,7 +157,10 @@ class VStore:
                 if suf == "neuf":
                     v["u_fl"] = c.get("u_flottes")
                 if deps and f:
-                    v.update(canon_dept(deps.get(dn), f, suf))
+                    cd = canon_dept(deps.get(dn), f, suf)
+                    if cross:
+                        cd = {k: x for k, x in cd.items() if k in CROSS_FORMAT_KEYS}
+                    v.update(cd)
                 out[suf] = v
             out["ventes_tot"] = c["ventes"]
         self._c[ck] = out
@@ -174,7 +184,15 @@ class VStore:
             return None
         out = {"_dealers": ds}
         for suf in DEPT_NAMES:
-            views = [self.view(d, P, mode, base)[suf] for d in ds]
+            views = []
+            for d in ds:
+                v = self.view(d, P, mode, base)[suf]
+                if require:
+                    # périmètre comparable ligne par ligne : une ligne absente de l'autre base (ex. dépenses d'un an
+                    # passé d'un autre format) est retirée des deux côtés
+                    o = self.view(d, P, mode, require)[suf]
+                    v = {k: (x if k in CORE_KEYS or o.get(k) is not None else None) for k, x in v.items()}
+                views.append(v)
             out[suf] = {"_parts": views}
         return out
 

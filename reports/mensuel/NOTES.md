@@ -191,9 +191,15 @@ Ce fichier sert de mémoire : décisions à respecter, limites connues, historiq
   publicité nette (ristournes, coop), intérêts sur stocks nets (crédits du constructeur : souvent négatifs à l'état GM),
   préparation et livraison, F&I par produit (Réalisé seulement), ventes au gros (unités), lignes de modèles (autos,
   camions et VUS, électriques, fin de série ; usagés certifiés / non certifiés / autres marques).
-- An passé : lignes comparées seulement si le fichier de l'an passé a le même format (`VStore.same_format`) ; Hyundai
-  (Réalisé 2025, état Hyundai 2026) : unités, profit véhicule, F&I et gros comparés, frais, profit du département et
-  modèles non. Groupe : sommes des concessions ; ratios sur les concessions qui ont numérateur et dénominateur.
+- An passé : toutes les lignes comparées si le fichier de l'an passé a le même format (`VStore.same_format`) ; sinon
+  seulement `CROSS_FORMAT_KEYS` (commissions vendeurs et F&I, publicité, intérêts sur stocks, frais de personnel et
+  variables, ventes au gros, flottes, lignes de modèles). Vérifié le 30 septembre 2026 (demande du client : « Hyundai
+  Longueuil 2025 n'apparaît pas ») : Réalisé et état Hyundai Canada d'avril à juillet 2025 identiques au dollar près sur
+  ces lignes, et cumul août 2025 du Réalisé = états janvier–juillet + Réalisé d'août. Dépenses totales, profit du
+  département, préparation, autres revenus : non comparés (l'état Hyundai répartit loyer et frais indirects). Cause :
+  pas d'état Hyundai Canada d'août 2025 dans Drive (cumul 2025 lu dans le Réalisé) ; s'il est déposé, tout se compare.
+  Groupe : sommes des concessions ; ratios sur les concessions qui ont numérateur et dénominateur ; périmètre comparable
+  ligne par ligne (une ligne absente de l'an passé d'une concession est retirée des deux années).
 - Pages : sommaire, 3 étoiles / 3 points (`rapport_etoiles.page_ventes_*`, candidats `ventes_cands`), neufs et usagés
   (volumes, profit par unité, budget BMW / VW), F&I, frais de vente et profit du département, positionnement (rang),
   composite (Hyundai : page véhicules ; VW : indicateurs ventes et page ventes du bulletin ; Groupe :
@@ -244,3 +250,6 @@ Ce fichier sert de mémoire : décisions à respecter, limites connues, historiq
   --rebase --autostash` avant le push (échec du 29 septembre : un commit était arrivé pendant la reconstruction).
 - Soir (4) : le rapport Ventes de chaque concession part aussi aux directeurs le 20 (3 PDF par concession) ; libellés
   des rapports envoyés par `envoi_rapports.py`, script Apps Script mis à jour (version 3).
+- 30 septembre : essai d'envoi réussi (5 courriels [ESSAI] à Maxime, 3 PDF chacun) ; produit 7 min avant la mise à jour
+  du tableau de bord qui a ajouté les composites à data.json → PDF de l'essai sans pages composites (normal, corrigé
+  depuis). Rapports Ventes : lignes de Hyundai 2025 comparées malgré le format différent (voir règles ci-dessus).

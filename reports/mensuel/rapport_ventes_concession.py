@@ -150,7 +150,7 @@ def p_dept(S, d, suf):
       {key(msg)}
       <table class="t num fo comp{' dep' if has_b else ''}">{head}<tbody>{body}</tbody></table>
       {mix_tbl}
-      <div class="note">{note}Gros, encan, export et autres = profit brut du département − profit véhicule − F&I.{'' if S.V.same_format(d, S.P) else f' An passé : fichiers {y-1} d’un autre format — lignes de produits non comparées.'}</div>"""
+      <div class="note">{note}Gros, encan, export et autres = profit brut du département − profit véhicule − F&I.{'' if S.V.same_format(d, S.P) else f' An passé : fichier {y-1} d’un autre format — lignes de modèles comparées quand elles existent dans les deux fichiers.'}</div>"""
 
 
 def _two_dept_table(S, d, rows, head_lab):
@@ -204,7 +204,8 @@ def p_frais(S, d):
     ru, _ = S.m2(d, "usage")
     msg = (f"Commissions des vendeurs depuis janvier : <b>{money(rn.get('comm_u'))}</b> par unité neuve et <b>{money(ru.get('comm_u'))}</b> par unité usagée ; "
            f"profit des départements : <b>{kmoney(rn.get('profit'))}</b> (neufs) et <b>{kmoney(ru.get('profit'))}</b> (usagés).")
-    fmt_note = "" if S.V.same_format(d, S.P) else f" An passé : fichiers {y-1} d’un autre format — frais et profit du département non comparés."
+    fmt_note = "" if S.V.same_format(d, S.P) else (f" An passé : fichier {y-1} d’un autre format — commissions, publicité et intérêts comparés "
+                                                     "(mêmes montants dans les deux formats) ; dépenses totales et profit du département non comparés.")
     return f"""
       <div class="eyebrow">Frais de vente</div>
       <h1>Frais de vente et profit des départements</h1>
@@ -344,8 +345,9 @@ def p_methode(S, d):
                "le gros, l'encan et l'export (dont l'export aux États-Unis) sont à part. Commissions F&I non détaillées.",
         "hawks": "État GM : le F&I (transfert F&A) est ramené dans les départements ; intérêts sur stocks nets des crédits de GM ; ventes en gros (882 unités "
                  "usagées depuis janvier) et export à part. Commissions F&I non détaillées.",
-        "hyundai": f"{y} : état Hyundai Canada ; {y-1} : Réalisé du Groupe (autre format) — unités, profit véhicule, F&I et gros se comparent, "
-                   "les frais, le profit du département et les lignes de produits non. L'état répartit le loyer et les frais indirects entre départements.",
+        "hyundai": f"{y} : état Hyundai Canada ; cumul {y-1} : Réalisé du Groupe (pas d'état Hyundai Canada d'août {y-1} dans Drive). Unités, profit "
+                   "véhicule, F&I, gros, commissions, publicité, intérêts sur stocks et lignes de modèles se comparent (mêmes montants dans les deux "
+                   "formats) ; les dépenses totales et le profit du département non : l'état répartit le loyer et les frais indirects entre départements.",
         "vw": "Réalisé VW : F&I détaillé par produit, autres revenus du département (programmes du constructeur, retenues, frais d'administration).",
         "bmw": "Réalisé BMW : F&I détaillé par produit, autres revenus du département (programmes BMW, retenues, frais d'administration).",
     }[d]

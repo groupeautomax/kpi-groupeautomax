@@ -382,7 +382,7 @@ def p_frais(S, suf):
       ristournes du constructeur ; intérêts sur stocks nets des crédits du constructeur (négatif = le crédit dépasse l'intérêt, fréquent à l'état GM).
       Dépenses et profit du département : chaque format répartit différemment les frais fixes (l'état Hyundai répartit loyer et frais indirects
       entre départements, l'état GM inscrit le loyer au département) — comparer une concession à elle-même d'une année à l'autre. Hyundai : an passé
-      au Réalisé, lignes non comparées.</div>"""
+      au Réalisé (autre format) — commissions, publicité et intérêts comparés, dépenses et profit du département non.</div>"""
 
 
 def p_mix(S, suf):
@@ -498,7 +498,7 @@ def p_methode(S):
     y, m = S.y, S.m
     src = "".join(f"<li><b>{escape(DEALERS[d])}</b> : {escape(SOURCE_LABELS.get(S.s.source_format(d, S.P), '—'))} ({MOIS[m]} {y}) ; an passé : "
                   f"{escape(SOURCE_LABELS.get(S.s.source_format(d, prior_year(S.P)), '—'))}"
-                  f"{'' if S.V.same_format(d, S.P) else ' — frais, profit du département et mix non comparés à l’an passé'}.</li>" for d in S.dealers)
+                  f"{'' if S.V.same_format(d, S.P) else ' — dépenses totales et profit du département non comparés à l’an passé (commissions, publicité, intérêts et modèles comparés)'}.</li>" for d in S.dealers)
     return f"""
       <div class="eyebrow">Méthode</div>
       <h1>Sources et définitions</h1>

@@ -426,6 +426,8 @@ def build_book(s, P, d):
     bk = Book()
     bk.add_cover(p_cover(s, P, d))
     bk.add(p_coup_doeil(s, P, d))
+    import rapport_etoiles as ret        # 3 étoiles et 3 points à améliorer (demande du 29 septembre 2026)
+    bk.add(ret.page_concession(s, P, d))
     bk.add(p_base(s, P, d))
     bk.add(p_resultats(s, P, d, "month"))
     bk.add(p_resultats(s, P, d, "ytd"))

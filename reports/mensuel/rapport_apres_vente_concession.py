@@ -555,6 +555,8 @@ def build_book(s, P, d):
     bk = Book()
     bk.add_cover(p_cover(F, d))
     bk.add(p_essentiel(F, d))
+    import rapport_etoiles as ret        # 3 étoiles et 3 points à améliorer
+    bk.add(ret.page_fo_concession(F, s, P, d))
     bk.add(p_departements(F, d))
     bk.add(p_bt(F, d))
     bk.add(p_position(F, d))

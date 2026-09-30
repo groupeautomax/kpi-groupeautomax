@@ -598,7 +598,7 @@ def build_book(s, P, marks):
     al = alertes(s, P)
     couverture, anomalies = controle_donnees(s, P)
     bk = Book()
-    toc = [("L'essentiel du mois", marks.get("essentiel", "")), ("Alertes", marks.get("alertes", "")),
+    toc = [("L'essentiel du mois, 3 étoiles et 3 points à améliorer", marks.get("essentiel", "")), ("Alertes", marks.get("alertes", "")),
            ("Résultats du groupe", marks.get("resultats", "")), ("Analyse des écarts", marks.get("pont", "")),
            ("Composition du profit brut et des dépenses", marks.get("compo", "")), ("Résultats par concession", marks.get("concessions", "")),
            ("Indicateurs de gestion", marks.get("ind", "")),
@@ -610,6 +610,8 @@ def build_book(s, P, marks):
         toc = [t for t in toc if t[1] != ""]
     bk.add_cover(p_cover(s, P, toc))
     bk.mark("essentiel"); bk.add(p_essentiel(s, P, marks))
+    import rapport_etoiles as ret        # 3 étoiles et 3 points à améliorer
+    bk.mark("etoiles"); bk.add(ret.page_groupe(s, P))
     parts = chunks(al, 16)
     bk.mark("alertes")
     for i, part in enumerate(parts):

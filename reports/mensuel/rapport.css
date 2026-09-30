@@ -66,7 +66,7 @@ code { font-family: 'DejaVu Sans Mono', monospace; font-size: 8pt; background: v
 .cv-kd { font-size: 8.8pt; color: var(--ink2); }
 .cv-toc { margin-top: 0.4in; width: 4.4in; }
 .cv-toc-h { font-size: 7.6pt; letter-spacing: .14em; text-transform: uppercase; color: var(--accent); font-weight: 700; margin-bottom: 7px; }
-.toc-row { display: flex; align-items: baseline; font-size: 9.2pt; color: var(--ink); padding: 2.5px 0; }
+.toc-row { display: flex; align-items: baseline; font-size: 9pt; color: var(--ink); padding: 1.5px 0; }
 .toc-dots { flex: 1; border-bottom: 1px dotted var(--line2); margin: 0 7px; transform: translateY(-3px); }
 .cv-foot { position: absolute; left: 0.85in; right: 0.85in; bottom: 0.65in; font-size: 8pt; color: var(--muted); line-height: 1.75; }
 .cv-conf { margin-top: 9px; display: inline-block; border: 1px solid var(--line2); padding: 4px 11px; letter-spacing: .12em; text-transform: uppercase; font-size: 7.2pt; color: var(--ink2); }
@@ -200,3 +200,34 @@ table.t.tight td { padding-top: 3px; padding-bottom: 3px; }
 .bravo .callout li { margin-bottom: 2px; }
 .callout.compact { font-size: 8.4pt; line-height: 1.4; padding: 7px 11px; margin: 6px 0; }
 .callout.compact li { margin-bottom: 2px; }
+
+/* --- « 3 étoiles et 3 points à améliorer » (rapport_etoiles.py) : cartes aérées */
+h2.st-h { display: flex; align-items: center; gap: 8px; margin: 22px 0 12px; font-size: 11pt; }
+h2.st-h svg { flex: none; }
+h2.st-h.good { color: var(--accent-d); }
+h2.st-h.bad { color: var(--neg); }
+.st-list { display: flex; flex-direction: column; gap: 12px; }
+.st-card { display: flex; gap: 14px; align-items: flex-start; border: 1px solid var(--line); border-radius: 8px; padding: 14px 18px; background: #fff; }
+.st-card.good { border-left: 5px solid var(--accent); background: var(--tint2); }
+.st-card.bad { border-left: 5px solid var(--neg); background: #fdf6f5; }
+.st-ico { flex: none; width: 34px; height: 34px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-top: 2px; }
+.st-card.good .st-ico { background: var(--tint); color: #d8a400; }
+.st-card.bad .st-ico { background: #f7e1de; color: var(--neg); }
+.st-body { flex: 1; min-width: 0; }
+.st-t { font-size: 10.4pt; font-weight: 700; line-height: 1.35; }
+.st-src { display: inline-block; margin-left: 8px; font-size: 7.6pt; font-weight: 600; color: var(--muted); background: #fff;
+          border: 1px solid var(--line2); border-radius: 10px; padding: 0 7px; vertical-align: 1px; }
+.st-row { display: flex; align-items: baseline; gap: 14px; margin-top: 5px; flex-wrap: wrap; }
+.st-v { font-size: 17pt; font-weight: 700; line-height: 1.15; white-space: nowrap; }
+.st-c { font-size: 9.6pt; line-height: 1.4; }
+
+/* --- pages de comparaison aux composites : rangées aérées (demande du 29 septembre 2026 : « c'est trop condensé ») */
+table.fo.comp { font-size: 9pt; }
+table.fo.comp th { white-space: normal; vertical-align: bottom; }
+table.fo.comp td { padding-top: 6px; padding-bottom: 6px; }
+table.fo.comp tr.sec td { padding-top: 9px; }
+table.fo.comp td.lab { white-space: normal; }
+table.fo.comp.dep td, table.fo.comp.dep th { padding-left: 5px; padding-right: 5px; }
+table.fo.comp.dep { font-size: 8.6pt; }
+table.fo.comp td.lab:first-child { min-width: 2.05in; }
+table.fo.comp.dep td.lab:first-child { min-width: 1.55in; }

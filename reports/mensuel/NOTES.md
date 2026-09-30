@@ -106,7 +106,9 @@ Ce fichier sert de mémoire : décisions à respecter, limites connues, historiq
 - Pages (`reports/mensuel/rapport_composite.py`) : rapport de Hyundai (sommaire vs groupe + dépenses en % du PB), de VW
   (bulletin : classement, indicateurs et points ; ventes, F&I et CEM), rapports Opérations fixes de Hyundai et de VW
   (service et pièces), rapport du Groupe (« Nos concessions face à leur réseau », avec l'état des composites reçus) et
-  rapport Opérations fixes du Groupe (« Après-vente face aux composites »). Encadrés « Bravo / À améliorer » (2 + 2).
+  rapport Opérations fixes du Groupe (« Après-vente face aux composites »). Plus d'encadrés « Bravo / À améliorer » sur ces
+  pages : leurs meilleurs et pires écarts alimentent la page « 3 étoiles et 3 points à améliorer » (voir plus bas). Pages
+  aérées (classe `comp` : police 9 pt, rangées de 6 px ; pages denses scindées en deux).
   Analyse des revenus (`hyundai_ar`, postes `AR_LINES`) : page « Main-d'œuvre et pièces par type de travail » du
   rapport Opérations fixes de Hyundai (BT client / garantie / interne : nombre, $ par BT, marge ; pièces par type) ;
   Hyundai Longueuil : page 4 de l'état (colonnes unités / ventes / PB). Pièces « par BT » = ventes de pièces du type ÷
@@ -152,6 +154,24 @@ Ce fichier sert de mémoire : décisions à respecter, limites connues, historiq
   budgets manquants. Il contient des données confidentielles : il ne va jamais dans ce dépôt public (le garder dans Google Drive).
 - Le dépôt est public : ne jamais y déposer les PDF ni les HTML générés.
 
+## 3 étoiles et 3 points à améliorer — règles (29 septembre 2026)
+
+- Demande du client : « je veux dans chaque rapport 3 étoiles pour les meilleures stats et trois points à améliorer ;
+  aussi c'est trop condensé ». Une page par rapport, juste après le sommaire (`reports/mensuel/rapport_etoiles.py`) :
+  rapport mensuel et Opérations fixes de chaque concession, rapport du Groupe et Opérations fixes du Groupe.
+- Candidats, cumul depuis janvier : chaque indicateur vs la même période de l'an passé ; EBT vs budget s'il existe ;
+  comparaisons au composite (`rapport_composite.etoiles_*` : Hyundai vs moyenne du groupe, VW vs moyenne nationale,
+  rang national VW). Score = écart relatif dans le sens favorable, plafonné à ±150 %, × poids (EBT 1 ; composite 0,6).
+- Sélection : 3 + 3, une seule fois chaque famille (neufs, usagés, F&I, dépenses, un type de BT…), au plus 2
+  comparaisons au composite ; rapports du Groupe : au plus 2 éléments propres à une concession. Seuils de matérialité
+  (20 k$ par concession, 50 k$ Groupe, ½ point, 5 unités, 20 unités pour un montant par unité) ; s'il en manque, 2e passe
+  aux seuils × 0,25, puis comparaison à l'ensemble du Groupe, puis « progression la plus faible » (points à améliorer
+  seulement, affichés en gris).
+- Exclus : frais d'emploi du composite (classement des charges sociales), profit d'opération nul (frais répartis
+  jusqu'à l'équilibre).
+- Vérification d'août 2026 : EBT, ventes, unités et montants par unité des étoiles recalculés à partir de data.json
+  (sans kpi_data) : identiques.
+
 ## Historique
 
 ### Août 2026 — première version (25 septembre 2026)
@@ -189,3 +209,5 @@ Ce fichier sert de mémoire : décisions à respecter, limites connues, historiq
 - Soir : composites des constructeurs ajoutés aux rapports (voir « Composites des constructeurs — règles ») :
   Hyundai (eComposite, groupe Est A (850+)) et VW (Dealer Report Card) d'août 2026 ; BMW et GM à venir. Ajout de
   l'« Analyse des revenus » Hyundai (déposée sur Drive) : page par type de travail au rapport Opérations fixes.
+- Soir (2) : page « 3 étoiles et 3 points à améliorer » dans chaque rapport ; pages de comparaison aux composites aérées
+  et scindées ; encadrés « Bravo / À améliorer » retirés de ces pages (repris dans la page des étoiles).

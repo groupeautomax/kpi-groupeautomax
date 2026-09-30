@@ -887,6 +887,8 @@ def build_book(s, P):
     bk = Book()
     bk.add_cover(p_cover(F))
     bk.add(p_essentiel(F))
+    import rapport_etoiles as ret        # 3 étoiles et 3 points à améliorer
+    bk.add(ret.page_fo_groupe(F, s, P))
     bk.add(p_overview(F))
     for typ in MAIN_TYPES:
         bk.add(p_type(F, typ))

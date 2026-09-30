@@ -252,48 +252,6 @@ def _rel(v, g, t, sens):
     return (v / g - 1) * sens
 
 
-def _bravo(H, rows, mode="ytd", n=2):
-    """(meilleurs, moins bons) : [(texte)] — écarts relatifs les plus grands."""
-    cand = []
-    for r in rows:
-        if r[0] == "sec":
-            continue
-        dept, k, lab, t, sens = r
-        if (t == "k" and k not in ("profit_op", "pn_avant_bonis")) or k == "pb_unite":
-            continue
-        v, g = H.c(dept, k, mode), H.g(dept, k, mode)
-        rel = _rel(v, g, t, sens)
-        if rel is None:
-            continue
-        if t == "k" and (g is None or g <= 0):
-            continue
-        dl = "" if dept == "total" else DEPT_LAB[dept].replace("Véhicules ", "").lower() + " — "
-        txt = f"{dl}{lab[0].lower() + lab[1:]} : <b>{_fmt(v, t)}{'' if t in ('pct', 'u') else (' k$' if t == 'k' else ' $')}</b> contre {_fmt(g, t)}{'' if t in ('pct', 'u') else (' k$' if t == 'k' else ' $')} ({_gap(v, g, t, sens)[0]})"
-        cand.append((rel, txt[0].upper() + txt[1:], (dept, k.replace("_pct_pb", ""))))
-    def pick(lst, keep):
-        out, fams = [], set()
-        for r, t, fam in lst:
-            if keep(r) and fam not in fams:
-                out.append(t)
-                fams.add(fam)
-            if len(out) == n:
-                break
-        return out
-    good = pick(sorted(cand, key=lambda x: -x[0]), lambda r: r > 0.02)
-    bad = pick(sorted(cand, key=lambda x: x[0]), lambda r: r < -0.02)
-    return good, bad
-
-
-def bravo_box(good, bad, ref):
-    if not good and not bad:
-        return ""
-    g = "".join(f"<li>{t}</li>" for t in good) or "<li class='muted'>—</li>"
-    b = "".join(f"<li>{t}</li>" for t in bad) or "<li class='muted'>—</li>"
-    return (f'<div class="two bravo">'
-            f'<div class="callout"><div class="ch">Bravo — mieux que {escape(ref)}</div><ul>{g}</ul></div>'
-            f'<div class="callout"><div class="ch">À améliorer — sous {escape(ref)}</div><ul>{b}</ul></div></div>')
-
-
 def _hy_key(H, P):
     y, m = split(P)
     v, g = H.c("total", "pn_pct_pb", "ytd"), H.g("total", "pn_pct_pb", "ytd")
@@ -309,21 +267,34 @@ def _hy_key(H, P):
 
 def hy_page_sommaire(s, P, d, H):
     y, m = split(P)
-    body = _hy_table(H, HY_ROWS)
-    good, bad = _bravo(H, HY_ROWS)
+    cut = next(i for i, r in enumerate(HY_ROWS) if r[0] == "sec" and r[1] == "Véhicules neufs")
+    body = _hy_table(H, HY_ROWS[:cut])
+    body2 = _hy_table(H, HY_ROWS[cut:])
     tr = (H.ef.get("lignes") or {}).get("total", {})
     trend = ""
     if tr.get("ventes", {}).get("pad_ecart") is not None:
         trend = (f" Le groupe lui-même, depuis janvier par rapport à {y-1} : ventes {pct(tr['ventes']['pad_ecart'], 1, sign=True)}, "
                  f"profit brut {pct(tr['pb']['pad_ecart'], 1, sign=True)}, profit net avant bonis {pct(tr['pn_avant_bonis']['pad_ecart'], 1, sign=True)}.")
-    return f"""
+    p1 = f"""
       <div class="eyebrow">Comparaison au composite Hyundai</div>
       <h1>Hyundai Longueuil face au groupe {escape(H.groupe)}</h1>
       {key(_hy_key(H, P))}
-      <table class="t num fo small">{_hy_head(P)}<tbody>{''.join(body)}</tbody></table>
-      {bravo_box(good, bad, "le groupe")}
+      <table class="t num fo comp">{_hy_head(P)}<tbody>{''.join(body)}</tbody></table>
       <div class="note">Groupe : eComposite Hyundai Canada (« ÉF ‐ Sommaire »). Hyundai Longueuil : état Hyundai Canada, mêmes définitions.
       Montants : écart en % de la moyenne ; ratios : écart en points. Absorption = PB pièces + service + carrosserie ÷ (dépenses − frais de vente des véhicules).{trend}</div>"""
+    nv, nvg = H.c("neuf", "unites", "ytd"), H.g("neuf", "unites", "ytd")
+    vo, vog = H.c("occasion", "unites", "ytd"), H.g("occasion", "unites", "ytd")
+    k2 = "Véhicules neufs et d'occasion comparés au composite Hyundai."
+    if None not in (nv, nvg, vo, vog):
+        k2 = (f"Depuis janvier, <b>{num(nv)}</b> véhicules neufs au détail (moyenne du groupe : {num(nvg)}) et <b>{num(vo)}</b> véhicules "
+              f"d'occasion (moyenne : {num(vog)}).")
+    p2 = f"""
+      <div class="eyebrow">Comparaison au composite Hyundai</div>
+      <h1>Véhicules neufs et d'occasion face au groupe</h1>
+      {key(k2)}
+      <table class="t num fo comp">{_hy_head(P)}<tbody>{''.join(body2)}</tbody></table>
+      <div class="note">Profit brut du département par unité : avec F&I et gros, comme le composite. F&I = bureau commercial ÷ unités au détail.</div>"""
+    return [p1, p2]
 
 
 # regroupements de postes pour la page des dépenses
@@ -387,7 +358,7 @@ def _top_table(rows, title):
     tr = "".join(f'<tr>{"<td class=lab>" + escape(DEPT_LAB[dp]) + "</td>" if show_dept else ""}<td class="lab">{escape(lab)}</td><td>{pct(a, 1)}</td>'
                  f'<td class="muted">{pct(b, 1)}</td><td class="{"neg" if eff > 0 else "pos"}">{num(eff / 1000, sign=True)}</td></tr>'
                  for eff, dp, lab, a, b in rows)
-    return (f'<table class="t num fo small"><thead><tr>{"<th class=lab>Département</th>" if show_dept else ""}<th class="lab">{escape(title)}</th>'
+    return (f'<table class="t num fo comp"><thead><tr>{"<th class=lab>Département</th>" if show_dept else ""}<th class="lab">{escape(title)}</th>'
             f'<th>Hyundai Longueuil (% PB)</th><th>Groupe (% PB)</th><th>Effet (k$)</th></tr></thead><tbody>{tr}</tbody></table>')
 
 
@@ -425,19 +396,26 @@ def hy_page_depenses(s, P, d, H):
                f"par rapport au ratio du groupe.")
         if worst:
             msg += f" Poste le plus au-dessus du groupe : {escape(worst[0][2].lower())} ({kmoney(worst[0][0], sign=True)})."
-    return f"""
+    p1 = f"""
       <div class="eyebrow">Comparaison au composite Hyundai</div>
       <h1>Dépenses en % du profit brut — cumul {MOIS[1]}–{MOIS[m]} {y}</h1>
       {key(msg)}
-      <table class="t num fo small">{head}<tbody>{body}</tbody></table>
-      <div class="band-lab">Postes où Hyundai Longueuil dépense plus que le groupe <span>concession ; effet = écart de ratio × profit brut de Hyundai Longueuil</span></div>
+      <table class="t num fo comp dep">{head}<tbody>{body}</tbody></table>
+      <div class="note">H. L. = Hyundai Longueuil, Grp = moyenne du groupe {escape(H.label)} (eComposite Hyundai Canada, « P&P »).
+      Vert = ratio plus bas que le groupe. Salaires et commissions : directeurs, vendeurs et F&I. Facteur location : loyer ou intérêt
+      hypothécaire, taxes foncières, entretien et assurance des bâtiments.</div>"""
+    p2 = f"""
+      <div class="eyebrow">Comparaison au composite Hyundai</div>
+      <h1>Dépenses : les postes qui pèsent le plus</h1>
+      {key("Chaque poste en % du profit brut, comparé au groupe ; effet = écart de ratio × profit brut de Hyundai Longueuil "
+           "(ce que le poste coûte de plus ou de moins qu'au ratio du groupe).", "Comment lire")}
+      <div class="band-lab">Postes où Hyundai Longueuil dépense plus que le groupe <span>cumul {MOIS[1]}–{MOIS[m]} {y}</span></div>
       {_top_table(worst, "Poste") or '<p class="muted">Aucun poste au-dessus du groupe de plus de 1 k$.</p>'}
-      <div class="band-lab">Postes où Hyundai Longueuil dépense moins que le groupe</div>
+      <div class="band-lab" style="margin-top:26px">Postes où Hyundai Longueuil dépense moins que le groupe</div>
       {_top_table(best, "Poste") or '<p class="muted">Aucun.</p>'}
-      <div class="note">H. L. = Hyundai Longueuil, Grp = moyenne du groupe (vert = ratio plus bas que le groupe). Groupe : eComposite Hyundai Canada (« P&P »), {escape(H.label)}.
-      Salaires et commissions : directeurs, vendeurs et F&I. Facteur location : loyer ou intérêt hypothécaire, taxes foncières, entretien et assurance des
-      bâtiments. Postes comparés au total de la concession (chaque concession répartit ses frais fixes entre départements à sa façon) ; frais d'emploi
-      en sous-total (charges sociales classées différemment d'une concession à l'autre).</div>"""
+      <div class="note">Postes comparés au total de la concession : chaque concession répartit ses frais fixes entre départements à sa façon.
+      Frais d'emploi en sous-total : les charges sociales sont classées différemment d'une concession à l'autre.</div>"""
+    return [p1, p2]
 
 
 def hy_page_fo(s, P, d, H):
@@ -446,9 +424,9 @@ def hy_page_fo(s, P, d, H):
     if not (H.c("carrosserie", "pb", "ytd") or 0):
         rows = [r for r in rows if not (r[0] == "sec" and r[1] == "Carrosserie")]
     body = _hy_table(H, rows)
-    good, bad = _bravo(H, rows)
     gaps = hy_top_gaps(H, ("service", "pieces"), "ytd", blocs=("vente", "directs"))
-    worst = sorted([g for g in gaps if g[0] > 1000], key=lambda g: -g[0])[:3]
+    worst = sorted([g for g in gaps if g[0] > 1000], key=lambda g: -g[0])[:5]
+    best = sorted([g for g in gaps if g[0] < -1000], key=lambda g: g[0])[:5]
     sv, pc_ = (H.ef.get("lignes") or {}).get("service", {}), (H.ef.get("lignes") or {}).get("pieces", {})
     trend = ""
     if sv.get("ventes", {}).get("pad_ecart") is not None and pc_.get("ventes", {}).get("pad_ecart") is not None:
@@ -463,14 +441,24 @@ def hy_page_fo(s, P, d, H):
         msg.append(f"pièces : <b>{pct(b, 1)}</b> (groupe : {pct(bg, 1)})")
     carros = "" if (H.c("carrosserie", "pb", "ytd") or 0) else \
         f" Pas de carrosserie à Hyundai Longueuil (groupe : {kmoney(H.g('carrosserie', 'ventes', 'ytd'))} de ventes moyennes depuis janvier)."
-    return f"""
+    p1 = f"""
       <div class="eyebrow">Comparaison au composite Hyundai</div>
       <h1>Service et pièces face au groupe {escape(H.groupe)}</h1>
       {key(" ; ".join(msg) + "." if msg else "Service et pièces comparés au composite Hyundai.")}
-      <table class="t num fo small">{_hy_head(P)}<tbody>{''.join(body)}</tbody></table>
-      {bravo_box(good, bad, "le groupe")}
-      {('<div class="band-lab">Postes où l’écart pèse le plus <span>cumul, frais directs ; effet = écart de ratio × profit brut du département</span></div>' + _top_table(worst, "Poste")) if worst else ''}
+      <table class="t num fo comp">{_hy_head(P)}<tbody>{''.join(body)}</tbody></table>
       <div class="note">{trend}Groupe : eComposite Hyundai Canada ({escape(H.label)}) ; Hyundai Longueuil : état Hyundai Canada, mêmes définitions.{carros}</div>"""
+    p2 = f"""
+      <div class="eyebrow">Comparaison au composite Hyundai</div>
+      <h1>Service et pièces : les postes qui pèsent le plus</h1>
+      {key("Frais de vente et frais directs du service et des pièces, en % du profit brut du département, comparés au groupe ; "
+           "effet = écart de ratio × profit brut du département de Hyundai Longueuil.", "Comment lire")}
+      <div class="band-lab">Postes au-dessus du groupe <span>cumul {MOIS[1]}–{MOIS[m]} {y}</span></div>
+      {_top_table(worst, "Poste") or '<p class="muted">Aucun poste au-dessus du groupe de plus de 1 k$.</p>'}
+      <div class="band-lab" style="margin-top:26px">Postes sous le groupe</div>
+      {_top_table(best, "Poste") or '<p class="muted">Aucun.</p>'}
+      <div class="note">Frais fixes (loyer, etc.) non comparés par département : chaque concession les répartit à sa façon (voir la page des
+      dépenses du rapport mensuel). Frais d'emploi : charges sociales classées différemment d'une concession à l'autre.</div>"""
+    return [p1, p2]
 
 
 # Analyse des revenus : (clé, libellé, clé des BT pour « par BT » ou None)
@@ -532,73 +520,13 @@ def _ar_table(H, rows, first, vol):
             f'<th colspan="3" class="sep">Marge brute</th><th rowspan="2" class="sep">Écart de PB<br>(k$)</th></tr>'
             f'<tr><th>H. L.</th><th>Grp</th><th class="sep">H. L.</th><th>Grp</th><th>Écart</th>'
             f'<th class="sep">H. L.</th><th>Grp</th><th>Écart</th></tr></thead>')
-    return f'<table class="t num fo small">{head}<tbody>{"".join(body)}</tbody></table>'
-
-
-def _ar_bravo(H, n=3):
-    cand = []
-    for rows, dom in ((AR_MO_ROWS, "M-O"), (AR_PC_ROWS, "pièces")):
-        for k, lab, per in rows:
-            if k in ("mo_total", "pc_total"):
-                continue
-            R = ar_row(H, k, per)
-            c, g, e = R["c"], R["g"], R["effet"]
-            if e is None or abs(e) < 5000:
-                continue
-            if per:
-                what = "M-O" if dom == "M-O" else "pièces"
-                unit = "BT" if k != "sous_traitance" else "travail"
-                txt = (f"{lab} : <b>{num(c['par'])} $</b> de {what} par {unit} contre {num(g['par'])} $ "
-                       f"(marge {pct(c['marge'], 1)} contre {pct(g['marge'], 1)}) — {num(e / 1000, sign=True)} k$ de PB")
-            else:
-                txt = (f"{lab} : marge de <b>{pct(c['marge'], 1)}</b> contre {pct(g['marge'], 1)} sur "
-                       f"{kmoney(c['ventes'])} de ventes — {num(e / 1000, sign=True)} k$ de PB")
-            cand.append((e, txt))
-    bad = [t for e, t in sorted(cand, key=lambda x: x[0]) if e < 0][:n]
-    # Bravo : ratios et volumes au-dessus du groupe (écart relatif)
-    pos = []
-    for rows in (AR_MO_ROWS, AR_PC_ROWS):
-        for k, lab, per in rows:
-            R = ar_row(H, k, per)
-            c, g = R["c"], R["g"]
-            if k == "mo_total":
-                r = _rel(c["marge"], g["marge"], "pct", 1)
-                if r is not None:
-                    pos.append((r, k, f"Marge brute de la main-d'œuvre : <b>{pct(c['marge'], 1)}</b> contre {pct(g['marge'], 1)}"))
-                continue
-            if k == "pc_total":
-                continue
-            if per and k.startswith("mo_"):
-                r = _rel(c["n"], g["n"], "u", 1)
-                if r is not None:
-                    pos.append((r, k, f"{lab} : <b>{num(c['n'])}</b> BT depuis janvier contre {num(g['n'])} en moyenne"))
-            if per:
-                r = _rel(c["par"], g["par"], "d", 1)
-                if r is not None:
-                    pos.append((r, k, f"{lab} : <b>{num(c['par'])} $</b> par BT contre {num(g['par'])} $"))
-            else:
-                r = _rel(c["ventes"], g["ventes"], "k", 1)
-                if r is not None:
-                    pos.append((r, k, f"{lab} : <b>{kmoney(c['ventes'])}</b> de ventes contre {kmoney(g['ventes'])}"))
-            if not k.startswith("mo_"):
-                r = _rel(c["marge"], g["marge"], "pct", 1)
-                if r is not None:
-                    pos.append((r, k, f"{lab} : marge de <b>{pct(c['marge'], 1)}</b> contre {pct(g['marge'], 1)}"))
-    good, seen = [], set()
-    for r, k, t in sorted(pos, key=lambda x: -x[0]):
-        if r > 0.02 and k not in seen:
-            good.append(t)
-            seen.add(k)
-        if len(good) == n:
-            break
-    return good, bad
+    return f'<table class="t num fo comp dep">{head}<tbody>{"".join(body)}</tbody></table>'
 
 
 def hy_page_ar(s, P, d, H):
     """Rapport Opérations fixes : main-d'œuvre et pièces par type de travail
     (eComposite « Analyse des revenus »)."""
     y, m = split(P)
-    good, bad = _ar_bravo(H)
     msg = []
     c = ar_row(H, "mo_client", "mo_client")
     cm = ar_row(H, "mo_client", "mo_client", "month")
@@ -614,19 +542,31 @@ def hy_page_ar(s, P, d, H):
     bc, bg = H.ar_c("pc_boni_gros", "pb", "ytd"), H.ar_g("pc_boni_gros", "pb", "ytd")
     boni = (f" Escompte / boni pour ventes en gros (hors marge des ventes en gros, compris dans le total) : {kmoney(bc)} depuis janvier"
             f" (groupe : {kmoney(bg)}).") if bc is not None and bg is not None else ""
-    return f"""
+    src = (f"H. L. = Hyundai Longueuil (page 4 de l'état Hyundai Canada), Grp = moyenne du groupe {escape(H.label)} (eComposite Hyundai Canada, "
+           f"« Analyse des revenus »). Écart de PB = profit brut réel − profit brut au ratio du groupe.")
+    e_mo = sum(e for e in (ar_row(H, k, per)["effet"] for k, _, per in AR_MO_ROWS if k != "mo_total") if e is not None)
+    e_pc = sum(e for e in (ar_row(H, k, per)["effet"] for k, _, per in AR_PC_ROWS if k != "pc_total") if e is not None)
+    p1 = f"""
       <div class="eyebrow">Comparaison au composite Hyundai</div>
-      <h1>Main-d'œuvre et pièces par type de travail</h1>
-      {key(" ; ".join(msg) + "." if msg else "Service et pièces par type, comparés au composite Hyundai.")}
+      <h1>Main-d'œuvre par type de travail</h1>
+      {key(" ; ".join(msg[:1]) + "." if msg else "Main-d'œuvre par type, comparée au composite Hyundai.")}
       <div class="band-lab">Main-d'œuvre <span>cumul {MOIS[1]}–{MOIS[m]} {y} · BT = bons de travail</span></div>
       {_ar_table(H, AR_MO_ROWS, "Type de travail", "n")}
+      <p class="lead" style="margin-top:16px">Écart de profit brut de la main-d'œuvre et de la sous-traitance par rapport au ratio du groupe :
+      <b class="{'neg' if e_mo < 0 else 'pos'}">{num(e_mo / 1000, sign=True)} k$</b> depuis janvier.</p>
+      <div class="note">{src} Écart de PB des lignes par BT : BT de Hyundai Longueuil × (PB par BT du groupe − PB par BT de Hyundai Longueuil).
+      BT internes : surtout la remise en état des véhicules d'occasion.</div>"""
+    p2 = f"""
+      <div class="eyebrow">Comparaison au composite Hyundai</div>
+      <h1>Pièces par type de vente</h1>
+      {key((msg[1][0].upper() + msg[1][1:] + ".") if len(msg) > 1 else "Pièces par type de vente, comparées au composite Hyundai.")}
       <div class="band-lab">Pièces <span>cumul {MOIS[1]}–{MOIS[m]} {y} · par BT = ventes de pièces ÷ BT du même type</span></div>
       {_ar_table(H, AR_PC_ROWS, "Type de vente", "k")}
-      {bravo_box(good, bad, "le groupe")}
-      <div class="note">H. L. = Hyundai Longueuil, Grp = moyenne du groupe {escape(H.label)} (eComposite Hyundai Canada, « Analyse des revenus ») ;
-      Hyundai Longueuil : page 4 de l'état Hyundai Canada. Écart de PB = profit brut réel − profit brut au ratio du groupe (PB par BT pour les
-      lignes par BT, marge pour les autres) ; somme des lignes : {num(tot / 1000, sign=True)} k$. BT internes : surtout la remise en état des
-      véhicules d'occasion. Ventes en gros et pneus : selon la clientèle de chaque concession.{boni}</div>"""
+      <p class="lead" style="margin-top:16px">Écart de profit brut des pièces par rapport au ratio du groupe :
+      <b class="{'neg' if e_pc < 0 else 'pos'}">{num(e_pc / 1000, sign=True)} k$</b> depuis janvier (main-d'œuvre et pièces : {num(tot / 1000, sign=True)} k$).</p>
+      <div class="note">{src} Lignes sans BT : ventes × (marge du groupe − marge de Hyundai Longueuil). Ventes en gros et pneus : selon la
+      clientèle de chaque concession.{boni}</div>"""
+    return [p1, p2]
 
 
 # ============================================================ Volkswagen
@@ -739,7 +679,7 @@ def vw_page_bulletin(s, P, d, R):
 
     rk_rows = ""
     if na or ge:
-        rk_rows = (f'<table class="t num fo small"><thead><tr><th class="lab">Classement</th><th>Global</th><th>Ventes</th><th>Après-vente</th>'
+        rk_rows = (f'<table class="t num fo comp"><thead><tr><th class="lab">Classement</th><th>Global</th><th>Ventes</th><th>Après-vente</th>'
                    f'<th class="sep">Variation du mois</th><th>vs l\'an passé</th></tr></thead><tbody>'
                    + (f'<tr><td class="lab">National ({na["n"]} concessions)</td><td><b>{na["rang"]}</b></td><td>{nd.get("ventes", "—")}</td>'
                       f'<td>{nd.get("apres_vente", "—")}</td><td class="sep">{num(na["mom"], sign=True)}</td><td>{num(na["yoy"], sign=True)}</td></tr>' if na else "")
@@ -750,9 +690,12 @@ def vw_page_bulletin(s, P, d, R):
                       f'<td class="sep" colspan="2">expérience client : {num(p["experience"][0], 1)} / {num(p["experience"][1])}</td></tr>' if p.get("total") else "")
                    + "</tbody></table>")
     summ = R.get("sommaire") or {}
-    body = ""
+    body, bodies = "", []
     for r in VW_SUM_ROWS:
         if r[0] == "sec":
+            if r[1] == "Pièces et accessoires":      # 2 pages : ventes ; après-vente et expérience client
+                bodies.append(body)
+                body = ""
             body += f'<tr class="sec"><td colspan="8">{escape(r[1])}</td></tr>'
             continue
         k, lab, t, sens = r
@@ -767,22 +710,34 @@ def vw_page_bulletin(s, P, d, R):
                  f'<td class="muted">{_vf(rec.get("mois"), t)}</td>'
                  f'<td class="sep">{_vf(rec.get("national"), t)}</td><td>{_vf(rec.get("geo"), t)}</td>'
                  f'<td class="sep">{pts_}</td><td>{escape(rec.get("rang_national") or "—")}</td></tr>')
+    bodies.append(body)
     missed = vw_missed(R, 3)
     miss_txt = ""
     if missed:
         miss_txt = ('<div class="callout compact"><div class="ch">Où sont les points manqués</div><ul>' +
                     "".join(f"<li>{escape(l)} : {num(a, 1)} sur {num(b)} ({num(mi, 1)} point{'s' if mi >= 2 else ''} manqué{'s' if mi >= 2 else ''})</li>"
                             for mi, l, a, b in missed) + "</ul></div>")
-    return f"""
+    p1 = f"""
       <div class="eyebrow">Comparaison au composite Volkswagen</div>
       <h1>Bulletin Volkswagen Canada — {MOIS[m]} {y}</h1>
       {key(vw_key(R))}
+      <div class="band-lab">Classement et points</div>
       {rk_rows}
-      <table class="t num fo small"><thead><tr><th class="lab">Indicateur</th><th>{y} cumul</th><th>{y-1} cumul</th><th>{MOIS[m].capitalize()}</th>
-      <th class="sep">National</th><th>Québec</th><th class="sep">Points</th><th>Rang national</th></tr></thead><tbody>{body}</tbody></table>
-      {miss_txt}
-      <div class="note">Source : « Dealer Report Card » de Volkswagen Canada, {MOIS[m]} {y}. Vert / rouge : cumul {y} au-dessus / au-dessous de la moyenne
-      nationale. * données de juillet. Rangs et points : classement préliminaire du programme Wolfsburg Crest Club.</div>"""
+      <div style="margin-top:22px">{miss_txt.replace('callout compact', 'callout')}</div>
+      <div class="note">Source : « Dealer Report Card » de Volkswagen Canada, {MOIS[m]} {y}. Rangs et points : classement préliminaire du
+      programme Wolfsburg Crest Club. Détail des indicateurs à la page suivante.</div>"""
+    head = (f'<thead><tr><th class="lab">Indicateur</th><th>{y} cumul</th><th>{y-1} cumul</th><th>{MOIS[m].capitalize()}</th>'
+            f'<th class="sep">National</th><th>Québec</th><th class="sep">Points</th><th>Rang national</th></tr></thead>')
+    out = [p1]
+    titles = ["Indicateurs du bulletin VW — ventes", "Indicateurs du bulletin VW — après-vente et expérience client"]
+    for i, b in enumerate(x for x in bodies if x):
+        out.append(f"""
+      <div class="eyebrow">Comparaison au composite Volkswagen</div>
+      <h1>{titles[min(i, 1)]}</h1>
+      <table class="t num fo comp">{head}<tbody>{b}</tbody></table>
+      <div class="note">Vert / rouge : cumul {y} au-dessus / au-dessous de la moyenne nationale. * données de juillet.
+      Points et rangs : classement préliminaire du programme Wolfsburg Crest Club.</div>""")
+    return out
 
 
 def _vw_comp_table(R, sections, with_obj=True):
@@ -803,7 +758,7 @@ def _vw_comp_table(R, sections, with_obj=True):
             body += (f'<tr><td class="lab">{escape(lab)}</td><td class="{_vcls(v, rec.get("national"), sens, t)}"><b>{_vf(v, t)}</b></td>'
                      f'<td class="muted">{_vf(rec.get("ytd_ap"), t)}</td><td class="sep">{_vf(rec.get("national"), t)}</td>'
                      f'<td>{_vf(rec.get("geo"), t)}</td><td class="sep muted">{_vf(rec.get("objectif"), t)}</td></tr>')
-    return (f'<table class="t num fo small"><thead><tr><th class="lab">Indicateur</th><th>{y} cumul</th><th>{y-1} cumul</th>'
+    return (f'<table class="t num fo comp"><thead><tr><th class="lab">Indicateur</th><th>{y} cumul</th><th>{y-1} cumul</th>'
             f'<th class="sep">National</th><th>Québec</th><th class="sep">Objectif VW</th></tr></thead><tbody>{body}</tbody></table>')
 
 
@@ -824,31 +779,12 @@ def _vw_cem_table(R, only=None):
                  f'<td class="sep muted">{_vf(rec.get("cible"), t)}</td></tr>')
     if not body:
         return ""
-    return (f'<table class="t num fo small"><thead><tr><th class="lab">Expérience client (CEM)</th><th>{y} cumul</th><th>{y-1} cumul</th>'
+    return (f'<table class="t num fo comp"><thead><tr><th class="lab">Expérience client (CEM)</th><th>{y} cumul</th><th>{y-1} cumul</th>'
             f'<th>3 derniers mois</th><th class="sep">National</th><th>Québec</th><th class="sep">Cible</th></tr></thead><tbody>{body}</tbody></table>')
-
-
-def _vw_bravo(R, sections):
-    """Écarts les plus favorables / défavorables vs la moyenne nationale."""
-    comp = R.get("comparateurs") or {}
-    cand = []
-    for sec_key in sections:
-        for k, lab, t, sens in VW_COMP_LAB[sec_key]:
-            rec = (comp.get(sec_key) or {}).get(k)
-            if not rec or sens == 0 or rec.get("ytd") is None or not rec.get("national"):
-                continue
-            v, n_ = rec["ytd"], rec["national"]
-            rel = (v - n_) / abs(n_) * sens
-            cand.append((rel, f"{lab} : <b>{_vf(v, t)}</b> contre {_vf(n_, t)} au national"))
-    cand.sort(key=lambda x: -x[0])
-    good = [t for r, t in cand if r > 0.03][:2]
-    bad = [t for r, t in sorted(cand, key=lambda x: x[0]) if r < -0.03][:2]
-    return good, bad
 
 
 def vw_page_ventes(s, P, d, R):
     y, m = split(P)
-    good, bad = _vw_bravo(R, ("new", "used"))
     comp = R.get("comparateurs") or {}
     ns = (comp.get("new") or {}).get("nv_sales") or {}
     msg = "Ventes, F&I et expérience client comparés aux moyennes de Volkswagen Canada."
@@ -860,15 +796,13 @@ def vw_page_ventes(s, P, d, R):
       <h1>Ventes, F&I et expérience client — bulletin VW</h1>
       {key(msg)}
       {_vw_comp_table(R, [("new", "Véhicules neufs et financement"), ("used", "Véhicules d'occasion")])}
-      {_vw_cem_table(R)}
-      {bravo_box(good, bad, "la moyenne nationale")}
+      <div style="margin-top:18px">{_vw_cem_table(R)}</div>
       <div class="note">Source : « Dealer Report Card » de Volkswagen Canada. Vert / rouge : cumul {y} au-dessus / au-dessous de la moyenne nationale.
       Certains indicateurs portent sur juillet ou sur 12 mois (fidélité : fins de contrat de mai 2025 à avril 2026), comme dans le bulletin.</div>"""
 
 
 def vw_page_fo(s, P, d, R):
     y, m = split(P)
-    good, bad = _vw_bravo(R, ("service", "parts"))
     sv = (R.get("comparateurs") or {}).get("service") or {}
     ab, hr = sv.get("absorption") or {}, sv.get("cp_hours_ro") or {}
     msg = "Service et pièces comparés aux moyennes de Volkswagen Canada."
@@ -878,15 +812,186 @@ def vw_page_fo(s, P, d, R):
         if hr.get("ytd") is not None:
             msg += f" ; <b>{num(hr['ytd'], 1)} h</b> vendues par BT client (national {num(hr.get('national'), 1)} h)"
         msg += "."
-    return f"""
+    p1 = f"""
       <div class="eyebrow">Comparaison au composite Volkswagen</div>
-      <h1>Service et pièces — bulletin Volkswagen Canada</h1>
+      <h1>Service — bulletin Volkswagen Canada</h1>
       {key(msg)}
-      {_vw_comp_table(R, [("service", "Service"), ("parts", "Pièces et accessoires")])}
-      {_vw_cem_table(R, only=("cem_service_osat", "cem_service_top3"))}
-      {bravo_box(good, bad, "la moyenne nationale")}
+      {_vw_comp_table(R, [("service", "Service")])}
       <div class="note">Source : « Dealer Report Card » de Volkswagen Canada, {MOIS[m]} {y} (données de juillet pour le service et les pièces).
-      Vert / rouge : cumul {y} au-dessus / au-dessous de la moyenne nationale ; rotation des pièces et répartition de la main-d'œuvre : sans couleur.</div>"""
+      Vert / rouge : cumul {y} au-dessus / au-dessous de la moyenne nationale ; répartition de la main-d'œuvre : sans couleur.</div>"""
+    pa = (R.get("comparateurs") or {}).get("parts") or {}
+    fl = pa.get("parts_loyalty") or {}
+    k2 = "Pièces, accessoires et satisfaction du service comparés aux moyennes de Volkswagen Canada."
+    if fl.get("ytd") is not None:
+        k2 = f"Fidélité pièces de <b>{pct(fl['ytd'], 1)}</b> (national {pct(fl.get('national'), 1)}, objectif {pct(fl.get('objectif'), 1)})."
+    p2 = f"""
+      <div class="eyebrow">Comparaison au composite Volkswagen</div>
+      <h1>Pièces et satisfaction du service — bulletin VW</h1>
+      {key(k2)}
+      {_vw_comp_table(R, [("parts", "Pièces et accessoires")])}
+      <div style="margin-top:22px">{_vw_cem_table(R, only=("cem_service_osat", "cem_service_top3"))}</div>
+      <div class="note">Vert / rouge : cumul {y} au-dessus / au-dessous de la moyenne nationale ; rotation de l'inventaire : sans couleur.</div>"""
+    return [p1, p2]
+
+
+# ============================================================ étoiles (rapport_etoiles)
+# Candidats « comparaison au composite » pour la page « 3 étoiles et 3 points
+# à améliorer » de chaque rapport : même format que rapport_etoiles.cand.
+W_COMP = 0.6       # poids d'une comparaison au composite (l'évolution de la concession pèse davantage)
+UNIT_SFX = {"k": " k$", "d": " $", "pct": "", "u": ""}
+
+
+def _comp_score(v, g, t, sens):
+    if v is None or g is None or sens == 0:
+        return None
+    if t == "pct":
+        if abs(v - g) < 0.005:
+            return None
+        rel = (v - g) / max(abs(g), 0.10) * sens
+    else:
+        if not g or g <= 0:
+            return None
+        rel = (v / g - 1) * sens
+        if abs(rel) < 0.03:
+            return None
+    return max(-1.5, min(1.5, rel)) * W_COMP
+
+
+def _cc(score, fam, title, value, comp, src):
+    return {"score": score, "fam": fam, "title": title, "value": value, "comp": comp, "src": src, "kind": "comp"}
+
+
+def _lc(t):
+    """Première lettre en minuscule, sauf sigle (« VO », « F&I »)."""
+    return t[0].lower() + t[1:] if len(t) > 1 and t[1].islower() else t
+
+
+AR_TITLES = {"mo_client": "Main-d'œuvre par BT client", "mo_garantie": "Main-d'œuvre par BT garantie",
+             "mo_interne": "Main-d'œuvre par BT interne", "sous_traitance": "Sous-traitance : ventes par travail",
+             "pc_client": "Pièces par BT client", "pc_garantie": "Pièces par BT garantie", "pc_interne": "Pièces par BT interne",
+             "pc_comptoir": "Comptoir pièces : marge brute", "pc_accessoires": "Accessoires : marge brute",
+             "pc_gros": "Ventes en gros : marge brute", "pc_pneus": "Roues et pneus : marge brute"}
+
+
+def _hy_rows_cands(H, rows, src):
+    out = []
+    for r in rows:
+        if r[0] == "sec":
+            continue
+        dept, k, lab, t, sens = r
+        # frais d'emploi : charges sociales classées différemment d'une concession à l'autre
+        if (t == "k" and k not in ("profit_op", "pn_avant_bonis")) or k in ("pb_unite", "emploi_pct_pb"):
+            continue
+        v, g = H.c(dept, k, "ytd"), H.g(dept, k, "ytd")
+        if k.startswith("profit_op") and (v is None or abs(v) < (0.005 if t == "pct" else 1000)):
+            continue      # profit d'opération nul : frais répartis jusqu'à l'équilibre, pas un résultat
+        sc = _comp_score(v, g, t, sens)
+        if sc is None:
+            continue
+        dl = "" if dept == "total" else DEPT_LAB[dept] + " — "
+        u = UNIT_SFX.get(t, "")
+        out.append(_cc(sc, "comp:" + dept + ":" + k.replace("_pct_pb", "").replace("pn", "pn_avant_bonis", 1).replace("pn_avant_bonis_avant_bonis", "pn_avant_bonis"), f"{dl}{_lc(lab) if dl else lab}",
+                       f"{_fmt(v, t)}{u}", f"{_fmt(g, t)}{u} pour la moyenne du groupe ({_gap(v, g, t, sens)[0]}{' $' if t == 'd' else ''})", src))
+    return out
+
+
+def _hy_ar_cands(H, src):
+    out = []
+    for rows in (AR_MO_ROWS, AR_PC_ROWS):
+        for k, lab, per in rows:
+            if k in ("mo_total", "pc_total"):
+                continue
+            A = ar_row(H, k, per)
+            c, g = A["c"], A["g"]
+            if per:
+                sc = _comp_score(c["par"], g["par"], "d", 1)
+                if sc is not None:
+                    out.append(_cc(sc, "comp:ar:" + k, AR_TITLES.get(k, lab), f"{num(c['par'])} $",
+                                   f"{num(g['par'])} $ pour la moyenne du groupe ({_gap(c['par'], g['par'], 'k', 1)[0]})", src))
+            else:
+                sc = _comp_score(c["marge"], g["marge"], "pct", 1)
+                if sc is not None:
+                    out.append(_cc(sc, "comp:ar:" + k, AR_TITLES.get(k, lab + " : marge brute"), pct(c["marge"], 1),
+                                   f"{pct(g['marge'], 1)} pour la moyenne du groupe ({pts(c['marge'] - g['marge'], 1)})", src))
+    return out
+
+
+def _vw_cands(R, sections, src, sommaire=False):
+    out = []
+    comp = R.get("comparateurs") or {}
+    for sec_key in sections:
+        for k, lab, t, sens in VW_COMP_LAB[sec_key]:
+            rec = (comp.get(sec_key) or {}).get(k)
+            if not rec or rec.get("ytd") is None or rec.get("national") in (None, 0) or isinstance(rec.get("national"), str):
+                continue
+            sc = _comp_score(rec["ytd"], rec["national"], "pct" if t == "pct" else "d", sens)
+            if sc is None:
+                continue
+            out.append(_cc(sc, "comp:vw:" + k, lab, _vf(rec["ytd"], t), f"{_vf(rec['national'], t)} pour la moyenne nationale", src))
+    if sommaire:
+        lab = {r[0]: r[1].strip() for r in VW_SUM_ROWS if r[0] != "sec"}
+        typ = {r[0]: (r[2], r[3]) for r in VW_SUM_ROWS if r[0] != "sec"}
+        for k, rec in (R.get("sommaire") or {}).items():
+            if k.startswith("_") or k not in typ or rec.get("ytd") is None or rec.get("national") in (None, 0):
+                continue
+            t, sens = typ[k]
+            if isinstance(rec.get("national"), str) or sens == 0:
+                continue
+            sc = _comp_score(rec["ytd"], rec["national"], "pct" if t == "pct" else "d", sens)
+            if sc is None:
+                continue
+            pt_ = f" ; {num(rec['points'], 1)} sur {num(rec['points_max'])} points" if rec.get("points_max") else ""
+            out.append(_cc(sc, "comp:vw:" + k, lab[k], _vf(rec["ytd"], t),
+                           f"{_vf(rec['national'], t)} pour la moyenne nationale{pt_}", src))
+        nat = (R.get("classement") or {}).get("national") or {}
+        if nat.get("rang") and nat.get("yoy") is not None and abs(nat["yoy"]) >= 5:
+            sc = max(-1.5, min(1.5, nat["yoy"] / 30)) * W_COMP
+            out.append(_cc(sc, "comp:vw:rang", "Rang national Volkswagen Canada", f"{nat['rang']}<sup>e</sup> sur {nat.get('n', '—')}",
+                           f"{num(nat['yoy'], sign=True)} places en un an ({num(nat.get('mom'), sign=True)} ce mois-ci)", src))
+    return out
+
+
+def etoiles_concession(s, P, d):
+    e = comp_of(s, d, P)
+    if d == "hyundai":
+        H = HyComp(e)
+        if H.ok and H.ef:
+            return _hy_rows_cands(H, HY_ROWS, f"vs groupe {H.groupe} (composite Hyundai)")
+    elif d == "vw" and e.get("vw_report_card"):
+        return _vw_cands(e["vw_report_card"], ("new", "used"), "vs moyenne nationale (bulletin VW)", sommaire=True)
+    return []
+
+
+def etoiles_fo(s, P, d):
+    e = comp_of(s, d, P)
+    if d == "hyundai":
+        H = HyComp(e)
+        out = []
+        if H.ok and H.ef:
+            out += _hy_rows_cands(H, HY_FO_ROWS, f"vs groupe {H.groupe} (composite Hyundai)")
+        if H.ar_ok:
+            out += _hy_ar_cands(H, f"vs groupe {H.groupe} (composite Hyundai)")
+        return out
+    if d == "vw" and e.get("vw_report_card"):
+        return _vw_cands(e["vw_report_card"], ("service", "parts"), "vs moyenne nationale (bulletin VW)")
+    return []
+
+
+def _per_dealer(s, P, f):
+    """Candidats du composite de chaque concession, préfixés du nom (une famille par concession)."""
+    out = []
+    for d in DEALERS:
+        for c in f(s, P, d):
+            out.append(dict(c, title=f"{DEALERS[d]} : {_lc(c['title'])}", fam="d:" + d))
+    return out
+
+
+def etoiles_groupe(s, P):
+    return _per_dealer(s, P, etoiles_concession)
+
+
+def etoiles_fo_groupe(s, P):
+    return _per_dealer(s, P, etoiles_fo)
 
 
 # ============================================================ assemblage
@@ -896,11 +1001,11 @@ def pages_concession(s, P, d):
     if d == "hyundai":
         H = HyComp(e)
         if H.ok and H.ef:
-            out.append(hy_page_sommaire(s, P, d, H))
+            out += hy_page_sommaire(s, P, d, H)
         if H.ok and H.pp:
-            out.append(hy_page_depenses(s, P, d, H))
+            out += hy_page_depenses(s, P, d, H)
     elif d == "vw" and e.get("vw_report_card"):
-        out += [vw_page_bulletin(s, P, d, e["vw_report_card"]), vw_page_ventes(s, P, d, e["vw_report_card"])]
+        out += vw_page_bulletin(s, P, d, e["vw_report_card"]) + [vw_page_ventes(s, P, d, e["vw_report_card"])]
     return out
 
 
@@ -908,23 +1013,25 @@ def pages_fo_concession(s, P, d):
     e = comp_of(s, d, P)
     if d == "hyundai":
         H = HyComp(e)
-        out = [hy_page_fo(s, P, d, H)] if H.ok and H.ef else []
+        out = hy_page_fo(s, P, d, H) if H.ok and H.ef else []
         if H.ar_ok:
-            out.append(hy_page_ar(s, P, d, H))
+            out += hy_page_ar(s, P, d, H)
         return out
     if d == "vw" and e.get("vw_report_card"):
-        return [vw_page_fo(s, P, d, e["vw_report_card"])]
+        return vw_page_fo(s, P, d, e["vw_report_card"])
     return []
 
 
-def _status_rows(s, P):
-    rows = ""
+def _status_line(s, P):
+    got, wait = [], []
     for d, src in ATTENDUS:
         e = comp_of(s, d, P)
-        got = [k for k in e if k in ("hyundai_ef", "hyundai_pp", "hyundai_ar", "vw_report_card")]
-        st = chip("reçu", "good") if got else chip("en attente", "neutral")
-        rows += f'<tr><td class="lab">{escape(DEALERS.get(d, d))}</td><td class="lab">{escape(src)}</td><td class="lab">{st}</td></tr>'
-    return rows
+        (got if any(k in e for k in ("hyundai_ef", "hyundai_pp", "hyundai_ar", "vw_report_card")) else wait).append(DEALERS.get(d, d))
+    y, m = split(P)
+    t = f"<b>Composites de {MOIS[m]} {y} reçus :</b> {', '.join(got) or 'aucun'}"
+    if wait:
+        t += f" ; <b>en attente :</b> {', '.join(wait)}"
+    return t + "."
 
 
 def page_groupe(s, P):
@@ -954,7 +1061,7 @@ def page_groupe(s, P):
             gt, gc = _gap(v, g, t, sens)
             tr += f'<tr><td class="lab">{escape(lab)}</td><td>{_fmt(v, t)}</td><td class="muted">{_fmt(g, t)}</td><td class="{gc}">{gt}</td></tr>'
         blocks += (f'<div class="band-lab">Hyundai Longueuil <span>cumul {MOIS[1]}–{MOIS[m]} {y} · composite Hyundai Canada, groupe {escape(H.label)}</span></div>'
-                   f'<table class="t num fo small"><thead><tr><th class="lab">Indicateur</th><th>Hyundai Longueuil</th><th>Moyenne du groupe</th>'
+                   f'<table class="t num fo comp"><thead><tr><th class="lab">Indicateur</th><th>Hyundai Longueuil</th><th>Moyenne du groupe</th>'
                    f'<th>Écart</th></tr></thead><tbody>{tr}</tbody></table>')
     if R:
         rk = R.get("classement") or {}
@@ -976,7 +1083,7 @@ def page_groupe(s, P):
         head = (f"rang national {na.get('rang', '—')} sur {na.get('n', '—')} · Québec {ge.get('rang', '—')} sur {ge.get('n', '—')}"
                 + (f" · {num(p['total'][0], 1)} points sur {num(p['total'][1])}" if p.get("total") else ""))
         blocks += (f'<div class="band-lab">Volkswagen Brossard <span>bulletin Volkswagen Canada · {escape(head)}</span></div>'
-                   f'<table class="t num fo small"><thead><tr><th class="lab">Indicateur</th><th>VW Brossard</th><th>National</th>'
+                   f'<table class="t num fo comp"><thead><tr><th class="lab">Indicateur</th><th>VW Brossard</th><th>National</th>'
                    f'<th>Québec</th><th>Rang national</th></tr></thead><tbody>{tr}</tbody></table>')
     msg_parts = []
     if H and H.ok:
@@ -991,11 +1098,8 @@ def page_groupe(s, P):
       <h1>Nos concessions face à leur réseau</h1>
       {key(" ; ".join(msg_parts) + ".")}
       {blocks}
-      <div class="band-lab">Composites du mois</div>
-      <table class="t fo small"><thead><tr><th class="lab">Concession</th><th class="lab">Source</th><th class="lab">{MOIS[m].capitalize()} {y}</th></tr></thead>
-      <tbody>{_status_rows(s, P)}</tbody></table>
-      <div class="note">Détail : pages « Comparaison au composite » des rapports de Hyundai Longueuil et de Volkswagen Brossard (et de leurs rapports
-      Opérations fixes). Les composites de BMW Canada et de GM Canada seront ajoutés dès réception des fichiers.</div>"""
+      <p class="lead" style="margin-top:18px">{_status_line(s, P)}</p>
+      <div class="note">Détail : pages « Comparaison au composite » des rapports des concessions et de leurs rapports Opérations fixes.</div>"""
 
 
 def page_fo_groupe(s, P):
@@ -1026,7 +1130,7 @@ def page_fo_groupe(s, P):
                 tr += (f'<tr><td class="lab">{escape(lab)}</td><td>{num(v) if v is not None else "—"}</td>'
                        f'<td class="muted">{num(g) if g is not None else "—"}</td><td class="{gc}">{gt}</td></tr>')
         blocks += (f'<div class="band-lab">Hyundai Longueuil <span>cumul · composite Hyundai Canada, groupe {escape(H.label)}</span></div>'
-                   f'<table class="t num fo small"><thead><tr><th class="lab">Indicateur</th><th>Hyundai Longueuil</th><th>Moyenne du groupe</th>'
+                   f'<table class="t num fo comp"><thead><tr><th class="lab">Indicateur</th><th>Hyundai Longueuil</th><th>Moyenne du groupe</th>'
                    f'<th>Écart</th></tr></thead><tbody>{tr}</tbody></table>')
         a, ag = H.c("total", "absorption", "ytd"), H.g("total", "absorption", "ytd")
         if a is not None and ag is not None:
@@ -1046,7 +1150,7 @@ def page_fo_groupe(s, P):
                    f'<td class="muted">{_vf(rec.get("national"), t)}</td><td class="muted">{_vf(rec.get("geo"), t)}</td>'
                    f'<td class="muted">{_vf(rec.get("objectif"), t)}</td></tr>')
         blocks += (f'<div class="band-lab">Volkswagen Brossard <span>bulletin Volkswagen Canada (données de juillet)</span></div>'
-                   f'<table class="t num fo small"><thead><tr><th class="lab">Indicateur</th><th>VW Brossard</th><th>National</th>'
+                   f'<table class="t num fo comp"><thead><tr><th class="lab">Indicateur</th><th>VW Brossard</th><th>National</th>'
                    f'<th>Québec</th><th>Objectif VW</th></tr></thead><tbody>{tr}</tbody></table>')
         ab = sv.get("absorption") or {}
         if ab.get("ytd") is not None:

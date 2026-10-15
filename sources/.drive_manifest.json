@@ -251,6 +251,12 @@
     "modifiedTime": "2022-06-10T18:57:22.788Z",
     "name": "Etat financier PA-VW 05 2022.xlsm"
   },
+  "14qdPwADmElexVH73CVyG7mhePoXQAJXh": {
+    "dealer": "hawks",
+    "local_path": "sources/hawks_2026_09_30_EF_HAWKS_DRAFT.xlsm",
+    "modifiedTime": "2026-10-14T23:39:12.323Z",
+    "name": "2026_09_30_EF_HAWKS_DRAFT.xlsm"
+  },
   "14t6uPlo2XzdjObmRAw50h8_FjgJdTmNQ": {
     "dealer": "bmw",
     "local_path": "sources/bmw_2_pagers_BMW_Sherb_2024-07.xlsx",
@@ -1708,7 +1714,7 @@
   "1ZfW8puCGx1SYSyZEUZCwv0y7u8NBh2LR": {
     "dealer": "bmw",
     "local_path": "sources/bmw_2026-09_R_alis_BMW_Sher.xlsx",
-    "modifiedTime": "2026-10-14T20:56:27.156Z",
+    "modifiedTime": "2026-10-15T03:01:55.009Z",
     "name": "2026-09 Réalisé BMW Sher.xlsx"
   },
   "1ZpB7RqXa7E7pJkgf0PGVAu3Bo94V2YbY": {
@@ -2496,7 +2502,7 @@
   "1n-pY5DhF3QACXNFgNvIIklwaV4k-Ji5Y": {
     "dealer": "bmw",
     "local_path": "sources/bmw_2026-Q3_R_alis_BMW_Sher.xlsx",
-    "modifiedTime": "2026-10-14T20:56:40.166Z",
+    "modifiedTime": "2026-10-15T02:39:11.058Z",
     "name": "2026-Q3_Réalisé_BMW Sher.xlsx"
   },
   "1n58qq8bVELG1ngibs-FGJ_fKWAcSl0Yr": {
@@ -3252,5 +3258,11 @@
     "local_path": "sources/vw_2026-05_R_alis_VW.xlsx",
     "modifiedTime": "2026-06-18T21:34:23.000Z",
     "name": "2026-05_Réalisé_VW.xlsx"
+  },
+  "1zcRQOydGopNHZA_1lUoVFRhQhb3XR6GG": {
+    "dealer": "bmw",
+    "local_path": "sources/bmw_2026-09_MANUF_BMW_Sher.xlsm",
+    "modifiedTime": "2026-10-15T02:49:47.014Z",
+    "name": "2026-09 MANUF BMW Sher.xlsm"
   }
 }

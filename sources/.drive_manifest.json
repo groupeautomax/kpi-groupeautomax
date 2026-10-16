@@ -451,6 +451,12 @@
     "modifiedTime": "2021-08-13T15:13:29.000Z",
     "name": "Etat financier VW 07 2021.xlsm"
   },
+  "19PIMhD7GLUgW5F-DPCTk-jaymV3w7Bsz": {
+    "dealer": "hyundai",
+    "local_path": "sources/hyundai_FFS_Hyundai_F_09-2026__19PIMhD7.xlsm",
+    "modifiedTime": "2026-10-16T18:50:59.286Z",
+    "name": "FFS Hyundai F 09-2026.xlsm"
+  },
   "19WPMLMDGZU16xjir4t81ROEwI8UBIW2h": {
     "dealer": "hyundai",
     "local_path": "sources/hyundai_FFS_Hyundai_F_01-2025.xlsm",
@@ -1838,6 +1844,12 @@
     "modifiedTime": "2026-05-14T10:11:31.000Z",
     "name": "Dealer report card avril 2025.pdf",
     "parser_version": 3
+  },
+  "1agTnQD9oAsHRzeyMpvkvgU6ja8pN13om": {
+    "dealer": "hyundai",
+    "local_path": "sources/hyundai_2026-09_R_alis_Hyundai.xlsx",
+    "modifiedTime": "2026-10-16T18:49:43.102Z",
+    "name": "2026-09_Réalisé_Hyundai.xlsx"
   },
   "1ah8rMyENvoFKJeeCDh-UG_1tG02k2vK2": {
     "composite_json": "sources/composites/vw_2025-10_vw_report_card.json",

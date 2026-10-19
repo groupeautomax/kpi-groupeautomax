@@ -325084,49 +325084,49 @@
               },
               "apres_vente": {
                 "types": {
-                  "entretien": {
-                    "pc_pb": {
-                      "real": 27831.0
-                    },
-                    "bt": {
-                      "real": 1034.0
-                    },
-                    "pc_ventes": {
-                      "real": 97447.0
-                    },
-                    "mo_pb": {
-                      "real": 87736.0
-                    },
-                    "mo_ventes": {
-                      "real": 120622.0
-                    }
-                  },
                   "esthetique": {
-                    "bt": {
-                      "real": 528.0,
-                      "budget": 700.0000000000001
-                    },
                     "mo_pb": {
                       "real": 80379.0,
                       "budget": 56000.000000000015
+                    },
+                    "bt": {
+                      "real": 528.0,
+                      "budget": 700.0000000000001
                     },
                     "mo_ventes": {
                       "real": 112228.0,
                       "budget": 140000.0
                     }
                   },
-                  "client": {
+                  "garantie": {
+                    "pc_ventes": {
+                      "real": 680846.0
+                    },
+                    "bt": {
+                      "real": 1257.0
+                    },
                     "pc_pb": {
-                      "real": 275473.0,
-                      "budget": 308565.99999999994
+                      "real": 187611.0
+                    },
+                    "mo_pb": {
+                      "real": 199948.0
+                    },
+                    "mo_ventes": {
+                      "real": 312319.0
+                    }
+                  },
+                  "client": {
+                    "pc_ventes": {
+                      "real": 685101.0,
+                      "budget": 752599.9999999999
                     },
                     "bt": {
                       "real": 2433.0,
                       "budget": 2350.0000000000005
                     },
-                    "pc_ventes": {
-                      "real": 685101.0,
-                      "budget": 752599.9999999999
+                    "pc_pb": {
+                      "real": 275473.0,
+                      "budget": 308565.99999999994
                     },
                     "mo_pb": {
                       "real": 635274.0,
@@ -325137,38 +325137,38 @@
                       "budget": 799000.0
                     }
                   },
-                  "interne": {
+                  "entretien": {
+                    "pc_ventes": {
+                      "real": 97447.0
+                    },
+                    "bt": {
+                      "real": 1034.0
+                    },
                     "pc_pb": {
-                      "real": 84439.0
+                      "real": 27831.0
+                    },
+                    "mo_pb": {
+                      "real": 87736.0
+                    },
+                    "mo_ventes": {
+                      "real": 120622.0
+                    }
+                  },
+                  "interne": {
+                    "pc_ventes": {
+                      "real": 249559.0
                     },
                     "bt": {
                       "real": 1576.0
                     },
-                    "pc_ventes": {
-                      "real": 249559.0
+                    "pc_pb": {
+                      "real": 84439.0
                     },
                     "mo_pb": {
                       "real": 470396.0
                     },
                     "mo_ventes": {
                       "real": 624332.0
-                    }
-                  },
-                  "garantie": {
-                    "pc_pb": {
-                      "real": 187611.0
-                    },
-                    "bt": {
-                      "real": 1257.0
-                    },
-                    "pc_ventes": {
-                      "real": 680846.0
-                    },
-                    "mo_pb": {
-                      "real": 199948.0
-                    },
-                    "mo_ventes": {
-                      "real": 312319.0
                     }
                   }
                 },
@@ -707399,20 +707399,20 @@
                 },
                 "pb_service": {
                   "budget": 0,
-                  "real": 107821.07,
-                  "delta_budget": 107821.07,
+                  "real": 107230.82,
+                  "delta_budget": 107230.82,
                   "prior_year": 152404.22,
-                  "delta_prior_year": -44583.15,
+                  "delta_prior_year": -45173.4,
                   "label": "Profit brut service",
                   "raw_label": "Service",
                   "group": "profit"
                 },
                 "pb_carrosserie": {
                   "budget": 0,
-                  "real": 90104.36,
-                  "delta_budget": 90104.36,
+                  "real": 89391.05,
+                  "delta_budget": 89391.05,
                   "prior_year": 75487.76,
-                  "delta_prior_year": 14616.6,
+                  "delta_prior_year": 13903.29,
                   "label": "Profit brut carrosserie",
                   "raw_label": "Carrosserie",
                   "group": "profit"
@@ -707459,10 +707459,10 @@
                 },
                 "pb_total": {
                   "budget": null,
-                  "real": 569120.87,
+                  "real": 570529.4,
                   "delta_budget": null,
                   "prior_year": 828451.17,
-                  "delta_prior_year": -259330.3,
+                  "delta_prior_year": -257921.77,
                   "label": "Total profit brut",
                   "raw_label": "Profit brut",
                   "group": "profit"
@@ -707478,21 +707478,21 @@
                   "group": "revenue_expense"
                 },
                 "depenses": {
-                  "real": -539643.7,
+                  "real": -493476.53,
                   "budget": 0,
                   "prior_year": -498162.35,
-                  "delta_budget": -539643.7,
-                  "delta_prior_year": -41481.34999999998,
+                  "delta_budget": -493476.53,
+                  "delta_prior_year": 4685.819999999949,
                   "label": "Dépenses",
                   "raw_label": "Total des dépenses",
                   "group": "revenue_expense"
                 },
                 "profit_net": {
                   "budget": null,
-                  "real": 118107.76,
+                  "real": 165683.46,
                   "delta_budget": null,
                   "prior_year": 486315.86,
-                  "delta_prior_year": -368208.1,
+                  "delta_prior_year": -320632.4,
                   "label": "Profit net",
                   "raw_label": "Profit Net",
                   "group": "net"
@@ -707509,72 +707509,72 @@
                 },
                 "ebitda": {
                   "budget": null,
-                  "real": 136626.9,
+                  "real": 184202.6,
                   "delta_budget": null,
                   "prior_year": 497102.09,
-                  "delta_prior_year": -360475.19,
+                  "delta_prior_year": -312899.49,
                   "label": "BAIIA (EBITDA)",
                   "raw_label": "BAIIA Opérationnel",
                   "group": "ebitda"
                 },
                 "ebt": {
                   "budget": null,
-                  "real": 118107.76,
+                  "real": 165683.46,
                   "delta_budget": null,
                   "prior_year": 486315.86,
-                  "delta_prior_year": -368208.1,
+                  "delta_prior_year": -320632.4,
                   "label": "Profit net avant impôt (EBT)",
                   "raw_label": "Profit Net",
                   "group": "ebitda"
                 },
                 "ebt_pct_profit_brut": {
-                  "real": 0.20752667179469275,
+                  "real": 0.2904030186700282,
                   "budget": null,
                   "prior_year": 0.5870181340923207,
                   "delta_budget": null,
-                  "delta_prior_year": -0.379491462297628,
+                  "delta_prior_year": -0.2966151154222925,
                   "label": "EBT % du profit brut",
                   "raw_label": "EBT % of Gross Profit",
                   "group": "ebitda",
                   "format": "percent"
                 },
                 "ros": {
-                  "real": 0.010548630286984837,
+                  "real": 0.014797787750850923,
                   "budget": null,
                   "prior_year": 0.029555633987830506,
                   "delta_budget": null,
-                  "delta_prior_year": -0.019007003700845668,
+                  "delta_prior_year": -0.014757846236979583,
                   "label": "EBT % des ventes (ROS)",
                   "raw_label": "EBT % of Sales (ROS)",
                   "group": "ebitda",
                   "format": "percent"
                 },
                 "depenses_variables": {
-                  "real": 45249.23000000001,
+                  "real": 43667.61,
                   "budget": 0,
                   "prior_year": 151529.13,
-                  "delta_budget": 45249.23000000001,
-                  "delta_prior_year": -106279.9,
+                  "delta_budget": 43667.61,
+                  "delta_prior_year": -107861.52,
                   "label": "Dépenses variables",
                   "raw_label": "Dépenses variables",
                   "group": "revenue_expense"
                 },
                 "depenses_personnel": {
-                  "real": -203982.13,
+                  "real": -224871.96,
                   "budget": 0,
                   "prior_year": -315577.87000000005,
-                  "delta_budget": -203982.13,
-                  "delta_prior_year": 111595.74000000005,
+                  "delta_budget": -224871.96,
+                  "delta_prior_year": 90705.91000000006,
                   "label": "Dépenses de personnel",
                   "raw_label": "Dépenses de personnel",
                   "group": "revenue_expense"
                 },
                 "depenses_semifixes": {
-                  "real": -97836.28,
+                  "real": -102437.05,
                   "budget": 0,
                   "prior_year": -137935.08,
-                  "delta_budget": -97836.28,
-                  "delta_prior_year": 40098.79999999999,
+                  "delta_budget": -102437.05,
+                  "delta_prior_year": 35498.029999999984,
                   "label": "Dépenses semi-fixes",
                   "raw_label": "Dépenses semi-fixes",
                   "group": "revenue_expense"
@@ -707725,10 +707725,10 @@
                   },
                   "total_variables": {
                     "budget": 0,
-                    "real": -76893.91,
-                    "delta_budget": -76893.91,
+                    "real": -75592.29,
+                    "delta_budget": -75592.29,
                     "prior_year": -198993.15,
-                    "delta_prior_year": 122099.24,
+                    "delta_prior_year": 123400.86,
                     "pct": {
                       "budget": null,
                       "real": -0.36,
@@ -707739,44 +707739,44 @@
                   },
                   "total_personnel": {
                     "budget": 0,
-                    "real": 49320.98,
-                    "delta_budget": 49320.98,
+                    "real": 53888.09,
+                    "delta_budget": 53888.09,
                     "prior_year": 73562.37,
-                    "delta_prior_year": -24241.39,
+                    "delta_prior_year": -19674.28,
                     "pct": {
                       "budget": null,
-                      "real": 0.23,
+                      "real": 0.25,
                       "prior_year": 0.29,
                       "delta_budget": null,
-                      "delta_prior_year": -0.05999999999999997
+                      "delta_prior_year": -0.03999999999999998
                     }
                   },
                   "total_semifixes": {
                     "budget": 0,
-                    "real": 24028.4,
-                    "delta_budget": 24028.4,
+                    "real": 25561.99,
+                    "delta_budget": 25561.99,
                     "prior_year": 43060.06,
-                    "delta_prior_year": -19031.66,
+                    "delta_prior_year": -17498.07,
                     "pct": {
                       "budget": null,
-                      "real": 0.11,
+                      "real": 0.12,
                       "prior_year": 0.17,
                       "delta_budget": null,
-                      "delta_prior_year": -0.06000000000000001
+                      "delta_prior_year": -0.05000000000000002
                     }
                   },
                   "total_depenses": {
                     "budget": 0,
-                    "real": -3544.53,
-                    "delta_budget": -3544.53,
+                    "real": 3857.79,
+                    "delta_budget": 3857.79,
                     "prior_year": -82370.72,
-                    "delta_prior_year": 78826.19,
+                    "delta_prior_year": 86228.51,
                     "pct": {
                       "budget": null,
-                      "real": -0.02,
+                      "real": 0.02,
                       "prior_year": -0.33,
                       "delta_budget": null,
-                      "delta_prior_year": 0.31
+                      "delta_prior_year": 0.35000000000000003
                     }
                   },
                   "autres_revenus": {
@@ -707788,10 +707788,10 @@
                   },
                   "profit_departemental": {
                     "budget": 0,
-                    "real": 309024.5,
-                    "delta_budget": 309024.5,
+                    "real": 301622.18,
+                    "delta_budget": 301622.18,
                     "prior_year": 360905.44,
-                    "delta_prior_year": -51880.94
+                    "delta_prior_year": -59283.26
                   },
                   "line_items": [
                     {
@@ -708126,24 +708126,24 @@
                       "is_total": false,
                       "units": {
                         "budget": null,
-                        "real": 0.25,
+                        "real": 0.26,
                         "delta_budget": null,
                         "prior_year": 0.31,
                         "delta_prior_year": null
                       },
                       "money": {
                         "budget": 0,
-                        "real": 41136.25,
-                        "delta_budget": 41136.25,
+                        "real": 42437.87,
+                        "delta_budget": 42437.87,
                         "prior_year": 61855.41,
-                        "delta_prior_year": -20719.16
+                        "delta_prior_year": -19417.54
                       },
                       "pct": {
                         "budget": null,
-                        "real": 520.71,
+                        "real": 537.19,
                         "prior_year": 997.67,
                         "delta_budget": null,
-                        "delta_prior_year": -476.9599999999999
+                        "delta_prior_year": -460.4799999999999
                       }
                     },
                     {
@@ -708319,10 +708319,10 @@
                       "units": null,
                       "money": {
                         "budget": 0,
-                        "real": -76893.91,
-                        "delta_budget": -76893.91,
+                        "real": -75592.29,
+                        "delta_budget": -75592.29,
                         "prior_year": -198993.15,
-                        "delta_prior_year": 122099.24
+                        "delta_prior_year": 123400.86
                       },
                       "pct": {
                         "budget": null,
@@ -708395,10 +708395,10 @@
                       "units": null,
                       "money": {
                         "budget": 0,
-                        "real": 7053.46,
-                        "delta_budget": 7053.46,
+                        "real": 9384.07,
+                        "delta_budget": 9384.07,
                         "prior_year": 13387.36,
-                        "delta_prior_year": -6333.9
+                        "delta_prior_year": -4003.29
                       },
                       "pct": null
                     },
@@ -708423,10 +708423,10 @@
                       "units": null,
                       "money": {
                         "budget": 0,
-                        "real": 802.23,
-                        "delta_budget": 802.23,
+                        "real": 3038.73,
+                        "delta_budget": 3038.73,
                         "prior_year": 4541.75,
-                        "delta_prior_year": -3739.52
+                        "delta_prior_year": -1503.02
                       },
                       "pct": null
                     },
@@ -708451,17 +708451,17 @@
                       "units": null,
                       "money": {
                         "budget": 0,
-                        "real": 49320.98,
-                        "delta_budget": 49320.98,
+                        "real": 53888.09,
+                        "delta_budget": 53888.09,
                         "prior_year": 73562.37,
-                        "delta_prior_year": -24241.39
+                        "delta_prior_year": -19674.28
                       },
                       "pct": {
                         "budget": null,
-                        "real": 0.23,
+                        "real": 0.25,
                         "prior_year": 0.29,
                         "delta_budget": null,
-                        "delta_prior_year": -0.05999999999999997
+                        "delta_prior_year": -0.03999999999999998
                       }
                     },
                     {
@@ -708541,10 +708541,10 @@
                       "units": null,
                       "money": {
                         "budget": 0,
-                        "real": 3332.21,
-                        "delta_budget": 3332.21,
+                        "real": 4676.8,
+                        "delta_budget": 4676.8,
                         "prior_year": 8700.18,
-                        "delta_prior_year": -5367.97
+                        "delta_prior_year": -4023.38
                       },
                       "pct": null
                     },
@@ -708597,10 +708597,10 @@
                       "units": null,
                       "money": {
                         "budget": 0,
-                        "real": 444.19,
-                        "delta_budget": 444.19,
+                        "real": 633.19,
+                        "delta_budget": 633.19,
                         "prior_year": 157.97,
-                        "delta_prior_year": 286.22
+                        "delta_prior_year": 475.22
                       },
                       "pct": null
                     },
@@ -708667,17 +708667,17 @@
                       "units": null,
                       "money": {
                         "budget": 0,
-                        "real": 24028.4,
-                        "delta_budget": 24028.4,
+                        "real": 25561.99,
+                        "delta_budget": 25561.99,
                         "prior_year": 43060.06,
-                        "delta_prior_year": -19031.66
+                        "delta_prior_year": -17498.07
                       },
                       "pct": {
                         "budget": null,
-                        "real": 0.11,
+                        "real": 0.12,
                         "prior_year": 0.17,
                         "delta_budget": null,
-                        "delta_prior_year": -0.06000000000000001
+                        "delta_prior_year": -0.05000000000000002
                       }
                     },
                     {
@@ -708687,17 +708687,17 @@
                       "units": null,
                       "money": {
                         "budget": 0,
-                        "real": -3544.53,
-                        "delta_budget": -3544.53,
+                        "real": 3857.79,
+                        "delta_budget": 3857.79,
                         "prior_year": -82370.72,
-                        "delta_prior_year": 78826.19
+                        "delta_prior_year": 86228.51
                       },
                       "pct": {
                         "budget": null,
-                        "real": -0.02,
+                        "real": 0.02,
                         "prior_year": -0.33,
                         "delta_budget": null,
-                        "delta_prior_year": 0.31
+                        "delta_prior_year": 0.35000000000000003
                       }
                     },
                     {
@@ -708809,10 +708809,10 @@
                       "units": null,
                       "money": {
                         "budget": 0,
-                        "real": 309024.5,
-                        "delta_budget": 309024.5,
+                        "real": 301622.18,
+                        "delta_budget": 301622.18,
                         "prior_year": 360905.44,
-                        "delta_prior_year": -51880.94
+                        "delta_prior_year": -59283.26
                       },
                       "pct": null
                     }
@@ -708835,58 +708835,58 @@
                   },
                   "total_variables": {
                     "budget": 0,
-                    "real": 23845.76,
-                    "delta_budget": 23845.76,
+                    "real": 24125.76,
+                    "delta_budget": 24125.76,
                     "prior_year": 43595.95,
-                    "delta_prior_year": -19750.19,
+                    "delta_prior_year": -19470.19,
                     "pct": {
                       "budget": null,
-                      "real": 0.6,
+                      "real": 0.61,
                       "prior_year": 0.36,
                       "delta_budget": null,
-                      "delta_prior_year": 0.24
+                      "delta_prior_year": 0.25
                     }
                   },
                   "total_personnel": {
                     "budget": 0,
-                    "real": 27561.27,
-                    "delta_budget": 27561.27,
+                    "real": 29929.78,
+                    "delta_budget": 29929.78,
                     "prior_year": 30878.81,
-                    "delta_prior_year": -3317.54,
+                    "delta_prior_year": -949.03,
                     "pct": {
                       "budget": null,
-                      "real": 0.69,
+                      "real": 0.75,
                       "prior_year": 0.25,
                       "delta_budget": null,
-                      "delta_prior_year": 0.43999999999999995
+                      "delta_prior_year": 0.5
                     }
                   },
                   "total_semifixes": {
                     "budget": 0,
-                    "real": 10985.22,
-                    "delta_budget": 10985.22,
+                    "real": 12007.61,
+                    "delta_budget": 12007.61,
                     "prior_year": 22447.01,
-                    "delta_prior_year": -11461.79,
+                    "delta_prior_year": -10439.4,
                     "pct": {
                       "budget": null,
-                      "real": 0.28,
+                      "real": 0.3,
                       "prior_year": 0.18,
                       "delta_budget": null,
-                      "delta_prior_year": 0.10000000000000003
+                      "delta_prior_year": 0.12
                     }
                   },
                   "total_depenses": {
                     "budget": 0,
-                    "real": 62392.25,
-                    "delta_budget": 62392.25,
+                    "real": 66063.15,
+                    "delta_budget": 66063.15,
                     "prior_year": 96921.77,
-                    "delta_prior_year": -34529.52,
+                    "delta_prior_year": -30858.62,
                     "pct": {
                       "budget": null,
-                      "real": 1.57,
+                      "real": 1.66,
                       "prior_year": 0.8,
                       "delta_budget": null,
-                      "delta_prior_year": 0.77
+                      "delta_prior_year": 0.8599999999999999
                     }
                   },
                   "autres_revenus": {
@@ -708898,10 +708898,10 @@
                   },
                   "profit_departemental": {
                     "budget": 0,
-                    "real": -17144.32,
-                    "delta_budget": -17144.32,
+                    "real": -20815.22,
+                    "delta_budget": -20815.22,
                     "prior_year": 24962.73,
-                    "delta_prior_year": -42107.05
+                    "delta_prior_year": -45777.95
                   },
                   "line_items": [
                     {
@@ -709217,17 +709217,17 @@
                       },
                       "money": {
                         "budget": 0,
-                        "real": 8525.91,
-                        "delta_budget": 8525.91,
+                        "real": 8805.91,
+                        "delta_budget": 8805.91,
                         "prior_year": 22985.69,
-                        "delta_prior_year": -14459.78
+                        "delta_prior_year": -14179.78
                       },
                       "pct": {
                         "budget": null,
-                        "real": 387.54,
+                        "real": 400.27,
                         "prior_year": 1641.84,
                         "delta_budget": null,
-                        "delta_prior_year": -1254.3
+                        "delta_prior_year": -1241.57
                       }
                     },
                     {
@@ -709403,17 +709403,17 @@
                       "units": null,
                       "money": {
                         "budget": 0,
-                        "real": 23845.76,
-                        "delta_budget": 23845.76,
+                        "real": 24125.76,
+                        "delta_budget": 24125.76,
                         "prior_year": 43595.95,
-                        "delta_prior_year": -19750.19
+                        "delta_prior_year": -19470.19
                       },
                       "pct": {
                         "budget": null,
-                        "real": 0.6,
+                        "real": 0.61,
                         "prior_year": 0.36,
                         "delta_budget": null,
-                        "delta_prior_year": 0.24
+                        "delta_prior_year": 0.25
                       }
                     },
                     {
@@ -709479,10 +709479,10 @@
                       "units": null,
                       "money": {
                         "budget": 0,
-                        "real": 3777.73,
-                        "delta_budget": 3777.73,
+                        "real": 4655.24,
+                        "delta_budget": 4655.24,
                         "prior_year": 1439.1,
-                        "delta_prior_year": 2338.63
+                        "delta_prior_year": 3216.14
                       },
                       "pct": null
                     },
@@ -709507,10 +709507,10 @@
                       "units": null,
                       "money": {
                         "budget": 0,
-                        "real": 470.68,
-                        "delta_budget": 470.68,
+                        "real": 1961.68,
+                        "delta_budget": 1961.68,
                         "prior_year": 3430.58,
-                        "delta_prior_year": -2959.9
+                        "delta_prior_year": -1468.9
                       },
                       "pct": null
                     },
@@ -709535,17 +709535,17 @@
                       "units": null,
                       "money": {
                         "budget": 0,
-                        "real": 27561.27,
-                        "delta_budget": 27561.27,
+                        "real": 29929.78,
+                        "delta_budget": 29929.78,
                         "prior_year": 30878.81,
-                        "delta_prior_year": -3317.54
+                        "delta_prior_year": -949.03
                       },
                       "pct": {
                         "budget": null,
-                        "real": 0.69,
+                        "real": 0.75,
                         "prior_year": 0.25,
                         "delta_budget": null,
-                        "delta_prior_year": 0.43999999999999995
+                        "delta_prior_year": 0.5
                       }
                     },
                     {
@@ -709625,10 +709625,10 @@
                       "units": null,
                       "money": {
                         "budget": 0,
-                        "real": 1957.02,
-                        "delta_budget": 1957.02,
+                        "real": 2853.41,
+                        "delta_budget": 2853.41,
                         "prior_year": 5700.76,
-                        "delta_prior_year": -3743.74
+                        "delta_prior_year": -2847.35
                       },
                       "pct": null
                     },
@@ -709681,10 +709681,10 @@
                       "units": null,
                       "money": {
                         "budget": 0,
-                        "real": 296.13,
-                        "delta_budget": 296.13,
+                        "real": 422.13,
+                        "delta_budget": 422.13,
                         "prior_year": 105.31,
-                        "delta_prior_year": 190.82
+                        "delta_prior_year": 316.82
                       },
                       "pct": null
                     },
@@ -709751,17 +709751,17 @@
                       "units": null,
                       "money": {
                         "budget": 0,
-                        "real": 10985.22,
-                        "delta_budget": 10985.22,
+                        "real": 12007.61,
+                        "delta_budget": 12007.61,
                         "prior_year": 22447.01,
-                        "delta_prior_year": -11461.79
+                        "delta_prior_year": -10439.4
                       },
                       "pct": {
                         "budget": null,
-                        "real": 0.28,
+                        "real": 0.3,
                         "prior_year": 0.18,
                         "delta_budget": null,
-                        "delta_prior_year": 0.10000000000000003
+                        "delta_prior_year": 0.12
                       }
                     },
                     {
@@ -709771,17 +709771,17 @@
                       "units": null,
                       "money": {
                         "budget": 0,
-                        "real": 62392.25,
-                        "delta_budget": 62392.25,
+                        "real": 66063.15,
+                        "delta_budget": 66063.15,
                         "prior_year": 96921.77,
-                        "delta_prior_year": -34529.52
+                        "delta_prior_year": -30858.62
                       },
                       "pct": {
                         "budget": null,
-                        "real": 1.57,
+                        "real": 1.66,
                         "prior_year": 0.8,
                         "delta_budget": null,
-                        "delta_prior_year": 0.77
+                        "delta_prior_year": 0.8599999999999999
                       }
                     },
                     {
@@ -709873,10 +709873,10 @@
                       "units": null,
                       "money": {
                         "budget": 0,
-                        "real": -17144.32,
-                        "delta_budget": -17144.32,
+                        "real": -20815.22,
+                        "delta_budget": -20815.22,
                         "prior_year": 24962.73,
-                        "delta_prior_year": -42107.05
+                        "delta_prior_year": -45777.95
                       },
                       "pct": null
                     },
@@ -709901,10 +709901,10 @@
                       "units": null,
                       "money": {
                         "budget": null,
-                        "real": -67527.59,
+                        "real": -66029.9,
                         "delta_budget": null,
                         "prior_year": -16373.49,
-                        "delta_prior_year": -51154.1
+                        "delta_prior_year": -49656.41
                       },
                       "pct": null
                     }
@@ -709913,10 +709913,10 @@
                 "Wholesale autres": {
                   "profit_brut": {
                     "budget": null,
-                    "real": -44043.82,
+                    "real": -41843.82,
                     "delta_budget": null,
                     "prior_year": 56234.75,
-                    "delta_prior_year": -100278.57
+                    "delta_prior_year": -98078.57
                   },
                   "total_variables": {
                     "budget": 0,
@@ -709934,16 +709934,16 @@
                   },
                   "total_personnel": {
                     "budget": 0,
-                    "real": 15665.85,
-                    "delta_budget": 15665.85,
+                    "real": 16368.16,
+                    "delta_budget": 16368.16,
                     "prior_year": 68067.85,
-                    "delta_prior_year": -52402.0,
+                    "delta_prior_year": -51699.69,
                     "pct": {
                       "budget": null,
-                      "real": 0.39,
+                      "real": 0.41,
                       "prior_year": 0.56,
                       "delta_budget": null,
-                      "delta_prior_year": -0.17000000000000004
+                      "delta_prior_year": -0.15000000000000008
                     }
                   },
                   "total_semifixes": {
@@ -709962,16 +709962,16 @@
                   },
                   "total_depenses": {
                     "budget": 0,
-                    "real": 23483.77,
-                    "delta_budget": 23483.77,
+                    "real": 24186.08,
+                    "delta_budget": 24186.08,
                     "prior_year": 72608.24,
-                    "delta_prior_year": -49124.47,
+                    "delta_prior_year": -48422.16,
                     "pct": {
                       "budget": null,
-                      "real": 0.59,
+                      "real": 0.61,
                       "prior_year": 0.6,
                       "delta_budget": null,
-                      "delta_prior_year": -0.010000000000000009
+                      "delta_prior_year": 0.010000000000000009
                     }
                   },
                   "line_items": [
@@ -710028,17 +710028,17 @@
                       },
                       "money": {
                         "budget": 0,
-                        "real": 17432.17,
-                        "delta_budget": 17432.17,
+                        "real": 19632.17,
+                        "delta_budget": 19632.17,
                         "prior_year": 0,
-                        "delta_prior_year": 17432.17
+                        "delta_prior_year": 19632.17
                       },
                       "pct": {
                         "budget": 0,
-                        "real": 968.45,
+                        "real": 1090.68,
                         "prior_year": 0,
-                        "delta_budget": 968.45,
-                        "delta_prior_year": 968.45
+                        "delta_budget": 1090.68,
+                        "delta_prior_year": 1090.68
                       }
                     },
                     {
@@ -710080,17 +710080,17 @@
                       },
                       "money": {
                         "budget": null,
-                        "real": -44043.82,
+                        "real": -41843.82,
                         "delta_budget": null,
                         "prior_year": 56234.75,
-                        "delta_prior_year": -100278.57
+                        "delta_prior_year": -98078.57
                       },
                       "pct": {
                         "budget": null,
-                        "real": -1420.77,
+                        "real": -1349.8,
                         "prior_year": 1814.02,
                         "delta_budget": null,
-                        "delta_prior_year": -3234.79
+                        "delta_prior_year": -3163.8199999999997
                       }
                     },
                     {
@@ -710099,7 +710099,7 @@
                       "is_total": false,
                       "units": {
                         "budget": null,
-                        "real": -0.06,
+                        "real": -0.07,
                         "delta_budget": null,
                         "prior_year": 0,
                         "delta_prior_year": null
@@ -710368,10 +710368,10 @@
                       "units": null,
                       "money": {
                         "budget": 0,
-                        "real": 2274.15,
-                        "delta_budget": 2274.15,
+                        "real": 2976.46,
+                        "delta_budget": 2976.46,
                         "prior_year": 2708.37,
-                        "delta_prior_year": -434.22
+                        "delta_prior_year": 268.09
                       },
                       "pct": null
                     },
@@ -710424,17 +710424,17 @@
                       "units": null,
                       "money": {
                         "budget": 0,
-                        "real": 15665.85,
-                        "delta_budget": 15665.85,
+                        "real": 16368.16,
+                        "delta_budget": 16368.16,
                         "prior_year": 68067.85,
-                        "delta_prior_year": -52402.0
+                        "delta_prior_year": -51699.69
                       },
                       "pct": {
                         "budget": null,
-                        "real": 0.39,
+                        "real": 0.41,
                         "prior_year": 0.56,
                         "delta_budget": null,
-                        "delta_prior_year": -0.17000000000000004
+                        "delta_prior_year": -0.15000000000000008
                       }
                     },
                     {
@@ -710660,17 +710660,17 @@
                       "units": null,
                       "money": {
                         "budget": 0,
-                        "real": 23483.77,
-                        "delta_budget": 23483.77,
+                        "real": 24186.08,
+                        "delta_budget": 24186.08,
                         "prior_year": 72608.24,
-                        "delta_prior_year": -49124.47
+                        "delta_prior_year": -48422.16
                       },
                       "pct": {
                         "budget": null,
-                        "real": 0.59,
+                        "real": 0.61,
                         "prior_year": 0.6,
                         "delta_budget": null,
-                        "delta_prior_year": -0.010000000000000009
+                        "delta_prior_year": 0.010000000000000009
                       }
                     },
                     {
@@ -710734,59 +710734,59 @@
                 "Service": {
                   "profit_brut": {
                     "budget": 0,
-                    "real": 107821.07,
-                    "delta_budget": 107821.07,
+                    "real": 107230.82,
+                    "delta_budget": 107230.82,
                     "prior_year": 152404.22,
-                    "delta_prior_year": -44583.15
+                    "delta_prior_year": -45173.4
                   },
                   "total_personnel": {
                     "budget": 0,
-                    "real": 76580.41,
-                    "delta_budget": 76580.41,
+                    "real": 88452.69,
+                    "delta_budget": 88452.69,
                     "prior_year": 103572.63,
-                    "delta_prior_year": -26992.22,
+                    "delta_prior_year": -15119.94,
                     "pct": {
                       "budget": null,
-                      "real": 0.71,
+                      "real": 0.82,
                       "prior_year": 0.68,
                       "delta_budget": null,
-                      "delta_prior_year": 0.029999999999999916
+                      "delta_prior_year": 0.1399999999999999
                     }
                   },
                   "total_semifixes": {
                     "budget": 0,
-                    "real": 41689.99,
-                    "delta_budget": 41689.99,
+                    "real": 43223.58,
+                    "delta_budget": 43223.58,
                     "prior_year": 45785.31,
-                    "delta_prior_year": -4095.32,
+                    "delta_prior_year": -2561.73,
                     "pct": {
                       "budget": null,
-                      "real": 0.39,
+                      "real": 0.4,
                       "prior_year": 0.3,
                       "delta_budget": null,
-                      "delta_prior_year": 0.09000000000000002
+                      "delta_prior_year": 0.10000000000000003
                     }
                   },
                   "total_depenses": {
                     "budget": 0,
-                    "real": 118270.4,
-                    "delta_budget": 118270.4,
+                    "real": 131676.27,
+                    "delta_budget": 131676.27,
                     "prior_year": 149357.94,
-                    "delta_prior_year": -31087.54,
+                    "delta_prior_year": -17681.67,
                     "pct": {
                       "budget": null,
-                      "real": 1.1,
+                      "real": 1.23,
                       "prior_year": 0.98,
                       "delta_budget": null,
-                      "delta_prior_year": 0.1200000000000001
+                      "delta_prior_year": 0.25
                     }
                   },
                   "profit_departemental": {
                     "budget": 0,
-                    "real": -10449.33,
-                    "delta_budget": -10449.33,
+                    "real": -24445.45,
+                    "delta_budget": -24445.45,
                     "prior_year": 3046.28,
-                    "delta_prior_year": -13495.61
+                    "delta_prior_year": -27491.73
                   },
                   "line_items": [
                     {
@@ -710802,10 +710802,10 @@
                       },
                       "money": {
                         "budget": 0,
-                        "real": 39841.95,
-                        "delta_budget": 39841.95,
+                        "real": 39601.12,
+                        "delta_budget": 39601.12,
                         "prior_year": 58839.14,
-                        "delta_prior_year": -18997.19
+                        "delta_prior_year": -19238.02
                       },
                       "pct": {
                         "budget": 0,
@@ -710825,7 +710825,7 @@
                         "real": 0.71,
                         "delta_budget": null,
                         "prior_year": 0.8,
-                        "delta_prior_year": -0.32
+                        "delta_prior_year": -0.33
                       },
                       "pct": null
                     },
@@ -710962,10 +710962,10 @@
                       "units": null,
                       "money": {
                         "budget": 0,
-                        "real": 0,
-                        "delta_budget": 0,
+                        "real": -349.42,
+                        "delta_budget": -349.42,
                         "prior_year": 1668.89,
-                        "delta_prior_year": -1668.89
+                        "delta_prior_year": -2018.31
                       },
                       "pct": null
                     },
@@ -710982,10 +710982,10 @@
                       },
                       "money": {
                         "budget": 0,
-                        "real": 104120.39,
-                        "delta_budget": 104120.39,
+                        "real": 103530.14,
+                        "delta_budget": 103530.14,
                         "prior_year": 146654.89,
-                        "delta_prior_year": -42534.5
+                        "delta_prior_year": -43124.75
                       },
                       "pct": {
                         "budget": 0,
@@ -711002,7 +711002,7 @@
                       "units": null,
                       "money": {
                         "budget": null,
-                        "real": 0.69,
+                        "real": 0.68,
                         "delta_budget": null,
                         "prior_year": 0.74,
                         "delta_prior_year": -0.29
@@ -711102,10 +711102,10 @@
                       "units": null,
                       "money": {
                         "budget": 0,
-                        "real": 107821.07,
-                        "delta_budget": 107821.07,
+                        "real": 107230.82,
+                        "delta_budget": 107230.82,
                         "prior_year": 152404.22,
-                        "delta_prior_year": -44583.15
+                        "delta_prior_year": -45173.4
                       },
                       "pct": {
                         "budget": 0,
@@ -711150,10 +711150,10 @@
                       "units": null,
                       "money": {
                         "budget": 0,
-                        "real": 10231.36,
-                        "delta_budget": 10231.36,
+                        "real": 19247.57,
+                        "delta_budget": 19247.57,
                         "prior_year": 19414.08,
-                        "delta_prior_year": -9182.72
+                        "delta_prior_year": -166.51
                       },
                       "pct": null
                     },
@@ -711178,10 +711178,10 @@
                       "units": null,
                       "money": {
                         "budget": 0,
-                        "real": 11909.17,
-                        "delta_budget": 11909.17,
+                        "real": 12528.74,
+                        "delta_budget": 12528.74,
                         "prior_year": 15591.6,
-                        "delta_prior_year": -3682.43
+                        "delta_prior_year": -3062.86
                       },
                       "pct": null
                     },
@@ -711206,10 +711206,10 @@
                       "units": null,
                       "money": {
                         "budget": 0,
-                        "real": 1774.75,
-                        "delta_budget": 1774.75,
+                        "real": 4011.25,
+                        "delta_budget": 4011.25,
                         "prior_year": 9372.87,
-                        "delta_prior_year": -7598.12
+                        "delta_prior_year": -5361.62
                       },
                       "pct": null
                     },
@@ -711234,17 +711234,17 @@
                       "units": null,
                       "money": {
                         "budget": 0,
-                        "real": 76580.41,
-                        "delta_budget": 76580.41,
+                        "real": 88452.69,
+                        "delta_budget": 88452.69,
                         "prior_year": 103572.63,
-                        "delta_prior_year": -26992.22
+                        "delta_prior_year": -15119.94
                       },
                       "pct": {
                         "budget": null,
-                        "real": 0.71,
+                        "real": 0.82,
                         "prior_year": 0.68,
                         "delta_budget": null,
-                        "delta_prior_year": 0.029999999999999916
+                        "delta_prior_year": 0.1399999999999999
                       }
                     },
                     {
@@ -711324,10 +711324,10 @@
                       "units": null,
                       "money": {
                         "budget": 0,
-                        "real": 9625.28,
-                        "delta_budget": 9625.28,
+                        "real": 10969.87,
+                        "delta_budget": 10969.87,
                         "prior_year": 13965.35,
-                        "delta_prior_year": -4340.07
+                        "delta_prior_year": -2995.48
                       },
                       "pct": null
                     },
@@ -711394,10 +711394,10 @@
                       "units": null,
                       "money": {
                         "budget": 0,
-                        "real": 499.19,
-                        "delta_budget": 499.19,
+                        "real": 688.19,
+                        "delta_budget": 688.19,
                         "prior_year": 212.97,
-                        "delta_prior_year": 286.22
+                        "delta_prior_year": 475.22
                       },
                       "pct": null
                     },
@@ -711464,17 +711464,17 @@
                       "units": null,
                       "money": {
                         "budget": 0,
-                        "real": 41689.99,
-                        "delta_budget": 41689.99,
+                        "real": 43223.58,
+                        "delta_budget": 43223.58,
                         "prior_year": 45785.31,
-                        "delta_prior_year": -4095.32
+                        "delta_prior_year": -2561.73
                       },
                       "pct": {
                         "budget": null,
-                        "real": 0.39,
+                        "real": 0.4,
                         "prior_year": 0.3,
                         "delta_budget": null,
-                        "delta_prior_year": 0.09000000000000002
+                        "delta_prior_year": 0.10000000000000003
                       }
                     },
                     {
@@ -711484,17 +711484,17 @@
                       "units": null,
                       "money": {
                         "budget": 0,
-                        "real": 118270.4,
-                        "delta_budget": 118270.4,
+                        "real": 131676.27,
+                        "delta_budget": 131676.27,
                         "prior_year": 149357.94,
-                        "delta_prior_year": -31087.54
+                        "delta_prior_year": -17681.67
                       },
                       "pct": {
                         "budget": null,
-                        "real": 1.1,
+                        "real": 1.23,
                         "prior_year": 0.98,
                         "delta_budget": null,
-                        "delta_prior_year": 0.1200000000000001
+                        "delta_prior_year": 0.25
                       }
                     },
                     {
@@ -711504,10 +711504,10 @@
                       "units": null,
                       "money": {
                         "budget": 0,
-                        "real": -10449.33,
-                        "delta_budget": -10449.33,
+                        "real": -24445.45,
+                        "delta_budget": -24445.45,
                         "prior_year": 3046.28,
-                        "delta_prior_year": -13495.61
+                        "delta_prior_year": -27491.73
                       },
                       "pct": null
                     }
@@ -711516,59 +711516,59 @@
                 "Carrosserie": {
                   "profit_brut": {
                     "budget": 0,
-                    "real": 90104.36,
-                    "delta_budget": 90104.36,
+                    "real": 89391.05,
+                    "delta_budget": 89391.05,
                     "prior_year": 75487.76,
-                    "delta_prior_year": 14616.6
+                    "delta_prior_year": 13903.29
                   },
                   "total_personnel": {
                     "budget": 0,
-                    "real": 34853.62,
-                    "delta_budget": 34853.62,
+                    "real": 36233.24,
+                    "delta_budget": 36233.24,
                     "prior_year": 39496.21,
-                    "delta_prior_year": -4642.59,
+                    "delta_prior_year": -3262.97,
                     "pct": {
                       "budget": null,
-                      "real": 0.39,
+                      "real": 0.41,
                       "prior_year": 0.52,
                       "delta_budget": null,
-                      "delta_prior_year": -0.13
+                      "delta_prior_year": -0.11000000000000004
                     }
                   },
                   "total_semifixes": {
                     "budget": 0,
-                    "real": 21113.67,
-                    "delta_budget": 21113.67,
+                    "real": 21624.87,
+                    "delta_budget": 21624.87,
                     "prior_year": 25970.38,
-                    "delta_prior_year": -4856.71,
+                    "delta_prior_year": -4345.51,
                     "pct": {
                       "budget": null,
-                      "real": 0.23,
+                      "real": 0.24,
                       "prior_year": 0.34,
                       "delta_budget": null,
-                      "delta_prior_year": -0.11000000000000001
+                      "delta_prior_year": -0.10000000000000003
                     }
                   },
                   "total_depenses": {
                     "budget": 0,
-                    "real": 55967.29,
-                    "delta_budget": 55967.29,
+                    "real": 57858.11,
+                    "delta_budget": 57858.11,
                     "prior_year": 65466.59,
-                    "delta_prior_year": -9499.3,
+                    "delta_prior_year": -7608.48,
                     "pct": {
                       "budget": null,
-                      "real": 0.62,
+                      "real": 0.65,
                       "prior_year": 0.87,
                       "delta_budget": null,
-                      "delta_prior_year": -0.25
+                      "delta_prior_year": -0.21999999999999997
                     }
                   },
                   "profit_departemental": {
                     "budget": 0,
-                    "real": 34137.07,
-                    "delta_budget": 34137.07,
+                    "real": 31532.94,
+                    "delta_budget": 31532.94,
                     "prior_year": 10021.17,
-                    "delta_prior_year": 24115.9
+                    "delta_prior_year": 21511.77
                   },
                   "line_items": [
                     {
@@ -711584,10 +711584,10 @@
                       },
                       "money": {
                         "budget": 0,
-                        "real": 68105.11,
-                        "delta_budget": 68105.11,
+                        "real": 68088.94,
+                        "delta_budget": 68088.94,
                         "prior_year": 69072.86,
-                        "delta_prior_year": -967.75
+                        "delta_prior_year": -983.92
                       },
                       "pct": {
                         "budget": 0,
@@ -711704,10 +711704,10 @@
                       },
                       "money": {
                         "budget": null,
-                        "real": 0,
+                        "real": -697.14,
                         "delta_budget": null,
                         "prior_year": 1697.59,
-                        "delta_prior_year": -1697.59
+                        "delta_prior_year": -2394.73
                       },
                       "pct": null
                     },
@@ -711718,10 +711718,10 @@
                       "units": null,
                       "money": {
                         "budget": 0,
-                        "real": 90104.36,
-                        "delta_budget": 90104.36,
+                        "real": 89391.05,
+                        "delta_budget": 89391.05,
                         "prior_year": 75487.76,
-                        "delta_prior_year": 14616.6
+                        "delta_prior_year": 13903.29
                       },
                       "pct": {
                         "budget": 0,
@@ -711794,10 +711794,10 @@
                       "units": null,
                       "money": {
                         "budget": 0,
-                        "real": 4731.08,
-                        "delta_budget": 4731.08,
+                        "real": 5365.2,
+                        "delta_budget": 5365.2,
                         "prior_year": 4524.42,
-                        "delta_prior_year": 206.66
+                        "delta_prior_year": 840.78
                       },
                       "pct": null
                     },
@@ -711822,10 +711822,10 @@
                       "units": null,
                       "money": {
                         "budget": 0,
-                        "real": 441.36,
-                        "delta_budget": 441.36,
+                        "real": 1186.86,
+                        "delta_budget": 1186.86,
                         "prior_year": 2673.92,
-                        "delta_prior_year": -2232.56
+                        "delta_prior_year": -1487.06
                       },
                       "pct": null
                     },
@@ -711850,17 +711850,17 @@
                       "units": null,
                       "money": {
                         "budget": 0,
-                        "real": 34853.62,
-                        "delta_budget": 34853.62,
+                        "real": 36233.24,
+                        "delta_budget": 36233.24,
                         "prior_year": 39496.21,
-                        "delta_prior_year": -4642.59
+                        "delta_prior_year": -3262.97
                       },
                       "pct": {
                         "budget": null,
-                        "real": 0.39,
+                        "real": 0.41,
                         "prior_year": 0.52,
                         "delta_budget": null,
-                        "delta_prior_year": -0.13
+                        "delta_prior_year": -0.11000000000000004
                       }
                     },
                     {
@@ -711940,10 +711940,10 @@
                       "units": null,
                       "money": {
                         "budget": 0,
-                        "real": 1748.53,
-                        "delta_budget": 1748.53,
+                        "real": 2196.73,
+                        "delta_budget": 2196.73,
                         "prior_year": 3090.19,
-                        "delta_prior_year": -1341.66
+                        "delta_prior_year": -893.46
                       },
                       "pct": null
                     },
@@ -712010,10 +712010,10 @@
                       "units": null,
                       "money": {
                         "budget": 0,
-                        "real": 506.07,
-                        "delta_budget": 506.07,
+                        "real": 569.07,
+                        "delta_budget": 569.07,
                         "prior_year": 52.66,
-                        "delta_prior_year": 453.41
+                        "delta_prior_year": 516.41
                       },
                       "pct": null
                     },
@@ -712094,17 +712094,17 @@
                       "units": null,
                       "money": {
                         "budget": 0,
-                        "real": 21113.67,
-                        "delta_budget": 21113.67,
+                        "real": 21624.87,
+                        "delta_budget": 21624.87,
                         "prior_year": 25970.38,
-                        "delta_prior_year": -4856.71
+                        "delta_prior_year": -4345.51
                       },
                       "pct": {
                         "budget": null,
-                        "real": 0.23,
+                        "real": 0.24,
                         "prior_year": 0.34,
                         "delta_budget": null,
-                        "delta_prior_year": -0.11000000000000001
+                        "delta_prior_year": -0.10000000000000003
                       }
                     },
                     {
@@ -712114,17 +712114,17 @@
                       "units": null,
                       "money": {
                         "budget": 0,
-                        "real": 55967.29,
-                        "delta_budget": 55967.29,
+                        "real": 57858.11,
+                        "delta_budget": 57858.11,
                         "prior_year": 65466.59,
-                        "delta_prior_year": -9499.3
+                        "delta_prior_year": -7608.48
                       },
                       "pct": {
                         "budget": null,
-                        "real": 0.62,
+                        "real": 0.65,
                         "prior_year": 0.87,
                         "delta_budget": null,
-                        "delta_prior_year": -0.25
+                        "delta_prior_year": -0.21999999999999997
                       }
                     },
                     {
@@ -712134,10 +712134,10 @@
                       "units": null,
                       "money": {
                         "budget": 0,
-                        "real": 34137.07,
-                        "delta_budget": 34137.07,
+                        "real": 31532.94,
+                        "delta_budget": 31532.94,
                         "prior_year": 10021.17,
-                        "delta_prior_year": 24115.9
+                        "delta_prior_year": 21511.77
                       },
                       "pct": null
                     }
@@ -712589,7 +712589,7 @@
                       "prior_year": 73555.15000000007
                     },
                     "mo_pb": {
-                      "real": 39841.95000000005,
+                      "real": 39601.120000000046,
                       "budget": 0.0,
                       "prior_year": 58839.14000000006
                     },
@@ -712666,7 +712666,7 @@
                       "real": null
                     },
                     "pb": {
-                      "real": 0.0,
+                      "real": -349.41999999999825,
                       "budget": 0.0,
                       "prior_year": 1668.890000000003
                     }
@@ -712678,7 +712678,7 @@
                       "prior_year": 196879.57000000007
                     },
                     "pb": {
-                      "real": 104120.39000000004,
+                      "real": 103530.14000000003,
                       "budget": 0.0,
                       "prior_year": 146654.89000000007
                     },
@@ -712707,7 +712707,7 @@
                       "prior_year": 217072.67000000004
                     },
                     "pb": {
-                      "real": 107821.07000000002,
+                      "real": 107230.82,
                       "budget": 0.0,
                       "prior_year": 152404.22000000003
                     }
@@ -712795,7 +712795,7 @@
                       "prior_year": 162856.77999999994
                     },
                     "pb": {
-                      "real": 68105.10999999999,
+                      "real": 68088.93999999997,
                       "budget": 0.0,
                       "prior_year": 69072.85999999993
                     }
@@ -712840,7 +712840,7 @@
                       "real": null
                     },
                     "pb": {
-                      "real": 0.0,
+                      "real": -697.140000000003,
                       "prior_year": 1697.5900000000001
                     }
                   },
@@ -712854,7 +712854,7 @@
                       "prior_year": 172621.03999999995
                     },
                     "pb": {
-                      "real": 90104.35999999999,
+                      "real": 89391.04999999997,
                       "budget": 0.0,
                       "prior_year": 75487.75999999992
                     }
@@ -712888,20 +712888,20 @@
                 },
                 "pb_service": {
                   "budget": null,
-                  "real": 1193728.7,
+                  "real": 1193138.45,
                   "delta_budget": null,
                   "prior_year": 1440907.41,
-                  "delta_prior_year": -247178.71,
+                  "delta_prior_year": -247768.96,
                   "label": "Profit brut service",
                   "raw_label": "Service",
                   "group": "profit"
                 },
                 "pb_carrosserie": {
                   "budget": null,
-                  "real": 638893.72,
+                  "real": 638180.41,
                   "delta_budget": null,
                   "prior_year": 593583.27,
-                  "delta_prior_year": 45310.45,
+                  "delta_prior_year": 44597.14,
                   "label": "Profit brut carrosserie",
                   "raw_label": "Carrosserie",
                   "group": "profit"
@@ -712948,10 +712948,10 @@
                 },
                 "pb_total": {
                   "budget": null,
-                  "real": 6791597.0,
+                  "real": 6793005.53,
                   "delta_budget": null,
                   "prior_year": 8042837.43,
-                  "delta_prior_year": -1251240.43,
+                  "delta_prior_year": -1249831.9,
                   "label": "Total profit brut",
                   "raw_label": "Profit brut",
                   "group": "profit"
@@ -712967,21 +712967,21 @@
                   "group": "revenue_expense"
                 },
                 "depenses": {
-                  "real": -5163679.97,
+                  "real": -5117512.8,
                   "budget": null,
                   "prior_year": -5501492.16,
                   "delta_budget": null,
-                  "delta_prior_year": 337812.1900000004,
+                  "delta_prior_year": 383979.36000000034,
                   "label": "Dépenses",
                   "raw_label": "Total des dépenses",
                   "group": "revenue_expense"
                 },
                 "profit_net": {
                   "budget": null,
-                  "real": 1997878.29,
+                  "real": 2045453.99,
                   "delta_budget": null,
                   "prior_year": 3069879.89,
-                  "delta_prior_year": -1072001.6,
+                  "delta_prior_year": -1024425.9,
                   "label": "Profit net",
                   "raw_label": "Profit Net",
                   "group": "net"
@@ -712998,72 +712998,72 @@
                 },
                 "ebitda": {
                   "budget": null,
-                  "real": 2137138.19,
+                  "real": 2184713.89,
                   "delta_budget": null,
                   "prior_year": 3171368.69,
-                  "delta_prior_year": -1034230.5,
+                  "delta_prior_year": -986654.8,
                   "label": "BAIIA (EBITDA)",
                   "raw_label": "BAIIA Opérationnel",
                   "group": "ebitda"
                 },
                 "ebt": {
                   "budget": null,
-                  "real": 1997878.29,
+                  "real": 2045453.99,
                   "delta_budget": null,
                   "prior_year": 3069879.89,
-                  "delta_prior_year": -1072001.6,
+                  "delta_prior_year": -1024425.9,
                   "label": "Profit net avant impôt (EBT)",
                   "raw_label": "Profit Net",
                   "group": "ebitda"
                 },
                 "ebt_pct_profit_brut": {
-                  "real": 0.29416914607860273,
+                  "real": 0.3011117804875392,
                   "budget": null,
                   "prior_year": 0.3816911527453316,
                   "delta_budget": null,
-                  "delta_prior_year": -0.08752200666672888,
+                  "delta_prior_year": -0.08057937225779238,
                   "label": "EBT % du profit brut",
                   "raw_label": "EBT % of Gross Profit",
                   "group": "ebitda",
                   "format": "percent"
                 },
                 "ros": {
-                  "real": 0.011302054795356082,
+                  "real": 0.01157119189495759,
                   "budget": null,
                   "prior_year": 0.01584377462390835,
                   "delta_budget": null,
-                  "delta_prior_year": -0.004541719828552268,
+                  "delta_prior_year": -0.00427258272895076,
                   "label": "EBT % des ventes (ROS)",
                   "raw_label": "EBT % of Sales (ROS)",
                   "group": "ebitda",
                   "format": "percent"
                 },
                 "depenses_variables": {
-                  "real": -235560.15999999997,
+                  "real": -237141.77999999997,
                   "budget": null,
                   "prior_year": 551940.3500000001,
                   "delta_budget": null,
-                  "delta_prior_year": -787500.51,
+                  "delta_prior_year": -789082.1300000001,
                   "label": "Dépenses variables",
                   "raw_label": "Dépenses variables",
                   "group": "revenue_expense"
                 },
                 "depenses_personnel": {
-                  "real": -2037688.87,
+                  "real": -2058578.7000000002,
                   "budget": null,
                   "prior_year": -3027349.42,
                   "delta_budget": null,
-                  "delta_prior_year": 989660.5499999998,
+                  "delta_prior_year": 968770.7199999997,
                   "label": "Dépenses de personnel",
                   "raw_label": "Dépenses de personnel",
                   "group": "revenue_expense"
                 },
                 "depenses_semifixes": {
-                  "real": -1069273.13,
+                  "real": -1073873.9,
                   "budget": null,
                   "prior_year": -884546.87,
                   "delta_budget": null,
-                  "delta_prior_year": -184726.2599999999,
+                  "delta_prior_year": -189327.0299999999,
                   "label": "Dépenses semi-fixes",
                   "raw_label": "Dépenses semi-fixes",
                   "group": "revenue_expense"
@@ -713214,10 +713214,10 @@
                   },
                   "total_variables": {
                     "budget": null,
-                    "real": -577655.65,
+                    "real": -576354.03,
                     "delta_budget": null,
                     "prior_year": -1076932.01,
-                    "delta_prior_year": 499276.36,
+                    "delta_prior_year": 500577.98,
                     "pct": {
                       "budget": null,
                       "real": -0.31,
@@ -713228,10 +713228,10 @@
                   },
                   "total_personnel": {
                     "budget": null,
-                    "real": 552412.95,
+                    "real": 556980.06,
                     "delta_budget": null,
                     "prior_year": 712777.25,
-                    "delta_prior_year": -123194.36,
+                    "delta_prior_year": -118627.25,
                     "pct": {
                       "budget": null,
                       "real": 0.3,
@@ -713242,10 +713242,10 @@
                   },
                   "total_semifixes": {
                     "budget": null,
-                    "real": 299533.16,
+                    "real": 301066.75,
                     "delta_budget": null,
                     "prior_year": 333526.44,
-                    "delta_prior_year": -33993.28,
+                    "delta_prior_year": -32459.69,
                     "pct": {
                       "budget": null,
                       "real": 0.16,
@@ -713256,10 +713256,10 @@
                   },
                   "total_depenses": {
                     "budget": null,
-                    "real": 274290.46,
+                    "real": 281692.78,
                     "delta_budget": null,
                     "prior_year": -30628.32,
-                    "delta_prior_year": 304918.78,
+                    "delta_prior_year": 312321.1,
                     "pct": {
                       "budget": null,
                       "real": 0.15,
@@ -713277,10 +713277,10 @@
                   },
                   "profit_departemental": {
                     "budget": null,
-                    "real": 2000984.24,
+                    "real": 1993581.92,
                     "delta_budget": null,
                     "prior_year": 3020383.34,
-                    "delta_prior_year": -1019399.1
+                    "delta_prior_year": -1026801.42
                   },
                   "line_items": [
                     {
@@ -713615,24 +713615,24 @@
                       "is_total": false,
                       "units": {
                         "budget": null,
-                        "real": 0.24,
+                        "real": 0.25,
                         "delta_budget": null,
                         "prior_year": 0.22,
                         "delta_prior_year": null
                       },
                       "money": {
                         "budget": null,
-                        "real": 356614.73,
+                        "real": 357916.35,
                         "delta_budget": null,
                         "prior_year": 508118.17,
-                        "delta_prior_year": -151503.44
+                        "delta_prior_year": -150201.82
                       },
                       "pct": {
                         "budget": null,
-                        "real": 819.8,
+                        "real": 822.8,
                         "prior_year": 862.68,
                         "delta_budget": null,
-                        "delta_prior_year": -42.879999999999995
+                        "delta_prior_year": -39.879999999999995
                       }
                     },
                     {
@@ -713808,10 +713808,10 @@
                       "units": null,
                       "money": {
                         "budget": null,
-                        "real": -577655.65,
+                        "real": -576354.03,
                         "delta_budget": null,
                         "prior_year": -1076932.01,
-                        "delta_prior_year": 499276.36
+                        "delta_prior_year": 500577.98
                       },
                       "pct": {
                         "budget": null,
@@ -713884,10 +713884,10 @@
                       "units": null,
                       "money": {
                         "budget": null,
-                        "real": 66223.7,
+                        "real": 68554.31,
                         "delta_budget": null,
                         "prior_year": 110342.33,
-                        "delta_prior_year": -44118.63
+                        "delta_prior_year": -41788.02
                       },
                       "pct": null
                     },
@@ -713912,10 +713912,10 @@
                       "units": null,
                       "money": {
                         "budget": null,
-                        "real": 28678.57,
+                        "real": 30915.07,
                         "delta_budget": null,
                         "prior_year": 45602.89,
-                        "delta_prior_year": -16924.32
+                        "delta_prior_year": -14687.82
                       },
                       "pct": null
                     },
@@ -713940,10 +713940,10 @@
                       "units": null,
                       "money": {
                         "budget": null,
-                        "real": 552412.95,
+                        "real": 556980.06,
                         "delta_budget": null,
                         "prior_year": 712777.25,
-                        "delta_prior_year": -123194.36
+                        "delta_prior_year": -118627.25
                       },
                       "pct": {
                         "budget": null,
@@ -714030,10 +714030,10 @@
                       "units": null,
                       "money": {
                         "budget": null,
-                        "real": 56956.08,
+                        "real": 58300.67,
                         "delta_budget": null,
                         "prior_year": 64864.05,
-                        "delta_prior_year": -7907.97
+                        "delta_prior_year": -6563.38
                       },
                       "pct": null
                     },
@@ -714086,10 +714086,10 @@
                       "units": null,
                       "money": {
                         "budget": null,
-                        "real": 5233.81,
+                        "real": 5422.81,
                         "delta_budget": null,
                         "prior_year": 8741.13,
-                        "delta_prior_year": -3507.32
+                        "delta_prior_year": -3318.32
                       },
                       "pct": null
                     },
@@ -714156,10 +714156,10 @@
                       "units": null,
                       "money": {
                         "budget": null,
-                        "real": 299533.16,
+                        "real": 301066.75,
                         "delta_budget": null,
                         "prior_year": 333526.44,
-                        "delta_prior_year": -33993.28
+                        "delta_prior_year": -32459.69
                       },
                       "pct": {
                         "budget": null,
@@ -714176,10 +714176,10 @@
                       "units": null,
                       "money": {
                         "budget": null,
-                        "real": 274290.46,
+                        "real": 281692.78,
                         "delta_budget": null,
                         "prior_year": -30628.32,
-                        "delta_prior_year": 304918.78
+                        "delta_prior_year": 312321.1
                       },
                       "pct": {
                         "budget": null,
@@ -714292,10 +714292,10 @@
                       "units": null,
                       "money": {
                         "budget": null,
-                        "real": 2000984.24,
+                        "real": 1993581.92,
                         "delta_budget": null,
                         "prior_year": 3020383.34,
-                        "delta_prior_year": -1019399.1
+                        "delta_prior_year": -1026801.42
                       },
                       "pct": null
                     }
@@ -714318,10 +714318,10 @@
                   },
                   "total_variables": {
                     "budget": null,
-                    "real": 399941.59,
+                    "real": 400221.59,
                     "delta_budget": null,
                     "prior_year": 358549.16,
-                    "delta_prior_year": 41392.43,
+                    "delta_prior_year": 41672.43,
                     "pct": {
                       "budget": null,
                       "real": 0.77,
@@ -714332,24 +714332,24 @@
                   },
                   "total_personnel": {
                     "budget": null,
-                    "real": 230996.63,
+                    "real": 233365.14,
                     "delta_budget": null,
                     "prior_year": 236105.67,
-                    "delta_prior_year": -5109.04,
+                    "delta_prior_year": -2740.53,
                     "pct": {
                       "budget": null,
-                      "real": 0.44,
+                      "real": 0.45,
                       "prior_year": 0.4,
                       "delta_budget": null,
-                      "delta_prior_year": 0.03999999999999998
+                      "delta_prior_year": 0.04999999999999999
                     }
                   },
                   "total_semifixes": {
                     "budget": null,
-                    "real": 149603.74,
+                    "real": 150626.13,
                     "delta_budget": null,
                     "prior_year": 145252.44,
-                    "delta_prior_year": 4351.3,
+                    "delta_prior_year": 5373.69,
                     "pct": {
                       "budget": null,
                       "real": 0.29,
@@ -714360,16 +714360,16 @@
                   },
                   "total_depenses": {
                     "budget": null,
-                    "real": 780541.96,
+                    "real": 784212.86,
                     "delta_budget": null,
                     "prior_year": 739907.27,
-                    "delta_prior_year": 40634.69,
+                    "delta_prior_year": 44305.59,
                     "pct": {
                       "budget": null,
-                      "real": 1.49,
+                      "real": 1.5,
                       "prior_year": 1.26,
                       "delta_budget": null,
-                      "delta_prior_year": 0.22999999999999998
+                      "delta_prior_year": 0.24
                     }
                   },
                   "autres_revenus": {
@@ -714381,10 +714381,10 @@
                   },
                   "profit_departemental": {
                     "budget": null,
-                    "real": -192128.86,
+                    "real": -195799.76,
                     "delta_budget": null,
                     "prior_year": -153553.45,
-                    "delta_prior_year": -38575.41
+                    "delta_prior_year": -42246.31
                   },
                   "line_items": [
                     {
@@ -714700,17 +714700,17 @@
                       },
                       "money": {
                         "budget": null,
-                        "real": 92292.67,
+                        "real": 92572.67,
                         "delta_budget": null,
                         "prior_year": 113419.52,
-                        "delta_prior_year": -21126.85
+                        "delta_prior_year": -20846.85
                       },
                       "pct": {
                         "budget": null,
-                        "real": 478.2,
+                        "real": 479.65,
                         "prior_year": 1366.5,
                         "delta_budget": null,
-                        "delta_prior_year": -888.3
+                        "delta_prior_year": -886.85
                       }
                     },
                     {
@@ -714886,10 +714886,10 @@
                       "units": null,
                       "money": {
                         "budget": null,
-                        "real": 399941.59,
+                        "real": 400221.59,
                         "delta_budget": null,
                         "prior_year": 358549.16,
-                        "delta_prior_year": 41392.43
+                        "delta_prior_year": 41672.43
                       },
                       "pct": {
                         "budget": null,
@@ -714962,10 +714962,10 @@
                       "units": null,
                       "money": {
                         "budget": null,
-                        "real": 27270.26,
+                        "real": 28147.77,
                         "delta_budget": null,
                         "prior_year": 10188.86,
-                        "delta_prior_year": 17081.4
+                        "delta_prior_year": 17958.91
                       },
                       "pct": null
                     },
@@ -714990,10 +714990,10 @@
                       "units": null,
                       "money": {
                         "budget": null,
-                        "real": 18478.41,
+                        "real": 19969.41,
                         "delta_budget": null,
                         "prior_year": 21863.45,
-                        "delta_prior_year": -3385.04
+                        "delta_prior_year": -1894.04
                       },
                       "pct": null
                     },
@@ -715018,17 +715018,17 @@
                       "units": null,
                       "money": {
                         "budget": null,
-                        "real": 230996.63,
+                        "real": 233365.14,
                         "delta_budget": null,
                         "prior_year": 236105.67,
-                        "delta_prior_year": -5109.04
+                        "delta_prior_year": -2740.53
                       },
                       "pct": {
                         "budget": null,
-                        "real": 0.44,
+                        "real": 0.45,
                         "prior_year": 0.4,
                         "delta_budget": null,
-                        "delta_prior_year": 0.03999999999999998
+                        "delta_prior_year": 0.04999999999999999
                       }
                     },
                     {
@@ -715108,10 +715108,10 @@
                       "units": null,
                       "money": {
                         "budget": null,
-                        "real": 32723.43,
+                        "real": 33619.82,
                         "delta_budget": null,
                         "prior_year": 37780.53,
-                        "delta_prior_year": -5057.1
+                        "delta_prior_year": -4160.71
                       },
                       "pct": null
                     },
@@ -715164,10 +715164,10 @@
                       "units": null,
                       "money": {
                         "budget": null,
-                        "real": 3066.87,
+                        "real": 3192.87,
                         "delta_budget": null,
                         "prior_year": 5555.76,
-                        "delta_prior_year": -2488.89
+                        "delta_prior_year": -2362.89
                       },
                       "pct": null
                     },
@@ -715234,10 +715234,10 @@
                       "units": null,
                       "money": {
                         "budget": null,
-                        "real": 149603.74,
+                        "real": 150626.13,
                         "delta_budget": null,
                         "prior_year": 145252.44,
-                        "delta_prior_year": 4351.3
+                        "delta_prior_year": 5373.69
                       },
                       "pct": {
                         "budget": null,
@@ -715254,17 +715254,17 @@
                       "units": null,
                       "money": {
                         "budget": null,
-                        "real": 780541.96,
+                        "real": 784212.86,
                         "delta_budget": null,
                         "prior_year": 739907.27,
-                        "delta_prior_year": 40634.69
+                        "delta_prior_year": 44305.59
                       },
                       "pct": {
                         "budget": null,
-                        "real": 1.49,
+                        "real": 1.5,
                         "prior_year": 1.26,
                         "delta_budget": null,
-                        "delta_prior_year": 0.22999999999999998
+                        "delta_prior_year": 0.24
                       }
                     },
                     {
@@ -715356,10 +715356,10 @@
                       "units": null,
                       "money": {
                         "budget": null,
-                        "real": -192128.86,
+                        "real": -195799.76,
                         "delta_budget": null,
                         "prior_year": -153553.45,
-                        "delta_prior_year": -38575.41
+                        "delta_prior_year": -42246.31
                       },
                       "pct": null
                     },
@@ -715384,10 +715384,10 @@
                       "units": null,
                       "money": {
                         "budget": null,
-                        "real": 484271.95,
+                        "real": 485769.64,
                         "delta_budget": null,
                         "prior_year": 171088.94,
-                        "delta_prior_year": 313183.01
+                        "delta_prior_year": 314680.7
                       },
                       "pct": null
                     }
@@ -715396,10 +715396,10 @@
                 "Wholesale autres": {
                   "profit_brut": {
                     "budget": null,
-                    "real": 1102528,
+                    "real": 1104728,
                     "delta_budget": null,
                     "prior_year": 1204328.97,
-                    "delta_prior_year": -101800.97
+                    "delta_prior_year": -99600.97
                   },
                   "total_variables": {
                     "budget": null,
@@ -715417,10 +715417,10 @@
                   },
                   "total_personnel": {
                     "budget": null,
-                    "real": 191403.72,
+                    "real": 192106.03,
                     "delta_budget": null,
                     "prior_year": 856186.81,
-                    "delta_prior_year": -664783.09,
+                    "delta_prior_year": -664080.78,
                     "pct": {
                       "budget": null,
                       "real": 0.37,
@@ -715445,16 +715445,16 @@
                   },
                   "total_depenses": {
                     "budget": null,
-                    "real": 618256.05,
+                    "real": 618958.36,
                     "delta_budget": null,
                     "prior_year": 1033240.03,
-                    "delta_prior_year": -414983.98,
+                    "delta_prior_year": -414281.67,
                     "pct": {
                       "budget": null,
-                      "real": 1.18,
+                      "real": 1.19,
                       "prior_year": 1.76,
                       "delta_budget": null,
-                      "delta_prior_year": -0.5800000000000001
+                      "delta_prior_year": -0.5700000000000001
                     }
                   },
                   "line_items": [
@@ -715511,17 +715511,17 @@
                       },
                       "money": {
                         "budget": null,
-                        "real": 340161.45,
+                        "real": 342361.45,
                         "delta_budget": null,
                         "prior_year": 0,
-                        "delta_prior_year": 340161.45
+                        "delta_prior_year": 342361.45
                       },
                       "pct": {
                         "budget": null,
-                        "real": 1037.08,
+                        "real": 1043.78,
                         "prior_year": 0,
                         "delta_budget": null,
-                        "delta_prior_year": 1037.08
+                        "delta_prior_year": 1043.78
                       }
                     },
                     {
@@ -715563,17 +715563,17 @@
                       },
                       "money": {
                         "budget": null,
-                        "real": 1102528,
+                        "real": 1104728,
                         "delta_budget": null,
                         "prior_year": 1204328.97,
-                        "delta_prior_year": -101800.97
+                        "delta_prior_year": -99600.97
                       },
                       "pct": {
                         "budget": null,
-                        "real": 1040.12,
+                        "real": 1042.2,
                         "prior_year": 1737.85,
                         "delta_budget": null,
-                        "delta_prior_year": -697.73
+                        "delta_prior_year": -695.6499999999999
                       }
                     },
                     {
@@ -715851,10 +715851,10 @@
                       "units": null,
                       "money": {
                         "budget": null,
-                        "real": 17973.2,
+                        "real": 18675.51,
                         "delta_budget": null,
                         "prior_year": 23357.18,
-                        "delta_prior_year": -5383.98
+                        "delta_prior_year": -4681.67
                       },
                       "pct": null
                     },
@@ -715907,10 +715907,10 @@
                       "units": null,
                       "money": {
                         "budget": null,
-                        "real": 191403.72,
+                        "real": 192106.03,
                         "delta_budget": null,
                         "prior_year": 856186.81,
-                        "delta_prior_year": -664783.09
+                        "delta_prior_year": -664080.78
                       },
                       "pct": {
                         "budget": null,
@@ -716143,17 +716143,17 @@
                       "units": null,
                       "money": {
                         "budget": null,
-                        "real": 618256.05,
+                        "real": 618958.36,
                         "delta_budget": null,
                         "prior_year": 1033240.03,
-                        "delta_prior_year": -414983.98
+                        "delta_prior_year": -414281.67
                       },
                       "pct": {
                         "budget": null,
-                        "real": 1.18,
+                        "real": 1.19,
                         "prior_year": 1.76,
                         "delta_budget": null,
-                        "delta_prior_year": -0.5800000000000001
+                        "delta_prior_year": -0.5700000000000001
                       }
                     },
                     {
@@ -716217,31 +716217,31 @@
                 "Service": {
                   "profit_brut": {
                     "budget": null,
-                    "real": 1193728.7,
+                    "real": 1193138.45,
                     "delta_budget": null,
                     "prior_year": 1440907.41,
-                    "delta_prior_year": -247178.71
+                    "delta_prior_year": -247768.96
                   },
                   "total_personnel": {
                     "budget": null,
-                    "real": 794444.55,
+                    "real": 806316.83,
                     "delta_budget": null,
                     "prior_year": 968413.56,
-                    "delta_prior_year": -173969.01,
+                    "delta_prior_year": -162096.73,
                     "pct": {
                       "budget": null,
-                      "real": 0.67,
+                      "real": 0.68,
                       "prior_year": 0.67,
                       "delta_budget": null,
-                      "delta_prior_year": 0.0
+                      "delta_prior_year": 0.010000000000000009
                     }
                   },
                   "total_semifixes": {
                     "budget": null,
-                    "real": 378647.09,
+                    "real": 380180.68,
                     "delta_budget": null,
                     "prior_year": 249429.54,
-                    "delta_prior_year": 129217.55,
+                    "delta_prior_year": 130751.14,
                     "pct": {
                       "budget": null,
                       "real": 0.32,
@@ -716252,24 +716252,24 @@
                   },
                   "total_depenses": {
                     "budget": null,
-                    "real": 1173091.64,
+                    "real": 1186497.51,
                     "delta_budget": null,
                     "prior_year": 1217843.1,
-                    "delta_prior_year": -44751.46,
+                    "delta_prior_year": -31345.59,
                     "pct": {
                       "budget": null,
-                      "real": 0.98,
+                      "real": 0.99,
                       "prior_year": 0.85,
                       "delta_budget": null,
-                      "delta_prior_year": 0.13
+                      "delta_prior_year": 0.14
                     }
                   },
                   "profit_departemental": {
                     "budget": null,
-                    "real": 20637.06,
+                    "real": 6640.94,
                     "delta_budget": null,
                     "prior_year": 223064.31,
-                    "delta_prior_year": -202427.25
+                    "delta_prior_year": -216423.37
                   },
                   "line_items": [
                     {
@@ -716285,10 +716285,10 @@
                       },
                       "money": {
                         "budget": null,
-                        "real": 394366.54,
+                        "real": 394125.71,
                         "delta_budget": null,
                         "prior_year": 584156.5,
-                        "delta_prior_year": -189789.96
+                        "delta_prior_year": -190030.79
                       },
                       "pct": {
                         "budget": null,
@@ -716308,7 +716308,7 @@
                         "real": 0.73,
                         "delta_budget": null,
                         "prior_year": 0.78,
-                        "delta_prior_year": -0.32
+                        "delta_prior_year": -0.33
                       },
                       "pct": null
                     },
@@ -716445,10 +716445,10 @@
                       "units": null,
                       "money": {
                         "budget": null,
-                        "real": -14887.04,
+                        "real": -15236.46,
                         "delta_budget": null,
                         "prior_year": 24960.49,
-                        "delta_prior_year": -39847.53
+                        "delta_prior_year": -40196.95
                       },
                       "pct": null
                     },
@@ -716465,10 +716465,10 @@
                       },
                       "money": {
                         "budget": null,
-                        "real": 1156572.28,
+                        "real": 1155982.03,
                         "delta_budget": null,
                         "prior_year": 1396385.96,
-                        "delta_prior_year": -239813.68
+                        "delta_prior_year": -240403.93
                       },
                       "pct": {
                         "budget": null,
@@ -716585,10 +716585,10 @@
                       },
                       "money": {
                         "budget": null,
-                        "real": 1193728.7,
+                        "real": 1193138.45,
                         "delta_budget": null,
                         "prior_year": 1440907.41,
-                        "delta_prior_year": -247178.71
+                        "delta_prior_year": -247768.96
                       },
                       "pct": {
                         "budget": null,
@@ -716633,10 +716633,10 @@
                       "units": null,
                       "money": {
                         "budget": null,
-                        "real": 104884.44,
+                        "real": 113900.65,
                         "delta_budget": null,
                         "prior_year": 243634.88,
-                        "delta_prior_year": -138750.44
+                        "delta_prior_year": -129734.23
                       },
                       "pct": null
                     },
@@ -716661,10 +716661,10 @@
                       "units": null,
                       "money": {
                         "budget": null,
-                        "real": 117850.04,
+                        "real": 118469.61,
                         "delta_budget": null,
                         "prior_year": 143902.31,
-                        "delta_prior_year": -26052.27
+                        "delta_prior_year": -25432.7
                       },
                       "pct": null
                     },
@@ -716689,10 +716689,10 @@
                       "units": null,
                       "money": {
                         "budget": null,
-                        "real": 58039.05,
+                        "real": 60275.55,
                         "delta_budget": null,
                         "prior_year": 94032.66,
-                        "delta_prior_year": -35993.61
+                        "delta_prior_year": -33757.11
                       },
                       "pct": null
                     },
@@ -716717,17 +716717,17 @@
                       "units": null,
                       "money": {
                         "budget": null,
-                        "real": 794444.55,
+                        "real": 806316.83,
                         "delta_budget": null,
                         "prior_year": 968413.56,
-                        "delta_prior_year": -173969.01
+                        "delta_prior_year": -162096.73
                       },
                       "pct": {
                         "budget": null,
-                        "real": 0.67,
+                        "real": 0.68,
                         "prior_year": 0.67,
                         "delta_budget": null,
-                        "delta_prior_year": 0.0
+                        "delta_prior_year": 0.010000000000000009
                       }
                     },
                     {
@@ -716807,10 +716807,10 @@
                       "units": null,
                       "money": {
                         "budget": null,
-                        "real": 110126.47,
+                        "real": 111471.06,
                         "delta_budget": null,
                         "prior_year": 112428.12,
-                        "delta_prior_year": -2301.65
+                        "delta_prior_year": -957.06
                       },
                       "pct": null
                     },
@@ -716877,10 +716877,10 @@
                       "units": null,
                       "money": {
                         "budget": null,
-                        "real": 5010.18,
+                        "real": 5199.18,
                         "delta_budget": null,
                         "prior_year": 9353.54,
-                        "delta_prior_year": -4343.36
+                        "delta_prior_year": -4154.36
                       },
                       "pct": null
                     },
@@ -716947,10 +716947,10 @@
                       "units": null,
                       "money": {
                         "budget": null,
-                        "real": 378647.09,
+                        "real": 380180.68,
                         "delta_budget": null,
                         "prior_year": 249429.54,
-                        "delta_prior_year": 129217.55
+                        "delta_prior_year": 130751.14
                       },
                       "pct": {
                         "budget": null,
@@ -716967,17 +716967,17 @@
                       "units": null,
                       "money": {
                         "budget": null,
-                        "real": 1173091.64,
+                        "real": 1186497.51,
                         "delta_budget": null,
                         "prior_year": 1217843.1,
-                        "delta_prior_year": -44751.46
+                        "delta_prior_year": -31345.59
                       },
                       "pct": {
                         "budget": null,
-                        "real": 0.98,
+                        "real": 0.99,
                         "prior_year": 0.85,
                         "delta_budget": null,
-                        "delta_prior_year": 0.13
+                        "delta_prior_year": 0.14
                       }
                     },
                     {
@@ -716987,10 +716987,10 @@
                       "units": null,
                       "money": {
                         "budget": null,
-                        "real": 20637.06,
+                        "real": 6640.94,
                         "delta_budget": null,
                         "prior_year": 223064.31,
-                        "delta_prior_year": -202427.25
+                        "delta_prior_year": -216423.37
                       },
                       "pct": null
                     }
@@ -716999,31 +716999,31 @@
                 "Carrosserie": {
                   "profit_brut": {
                     "budget": null,
-                    "real": 638893.72,
+                    "real": 638180.41,
                     "delta_budget": null,
                     "prior_year": 593583.27,
-                    "delta_prior_year": 45310.45
+                    "delta_prior_year": 44597.14
                   },
                   "total_personnel": {
                     "budget": null,
-                    "real": 268431.02,
+                    "real": 269810.64,
                     "delta_budget": null,
                     "prior_year": 253866.13,
-                    "delta_prior_year": 14564.89,
+                    "delta_prior_year": 15944.51,
                     "pct": {
                       "budget": null,
-                      "real": 9.91,
+                      "real": 9.96,
                       "prior_year": 7.9,
                       "delta_budget": null,
-                      "delta_prior_year": 2.01
+                      "delta_prior_year": 2.0600000000000005
                     }
                   },
                   "total_semifixes": {
                     "budget": null,
-                    "real": 227911.03,
+                    "real": 228422.23,
                     "delta_budget": null,
                     "prior_year": 145727.73,
-                    "delta_prior_year": 82183.3,
+                    "delta_prior_year": 82694.5,
                     "pct": {
                       "budget": null,
                       "real": 0.45,
@@ -717034,24 +717034,24 @@
                   },
                   "total_depenses": {
                     "budget": null,
-                    "real": 496342.05,
+                    "real": 498232.87,
                     "delta_budget": null,
                     "prior_year": 399593.86,
-                    "delta_prior_year": 96748.19,
+                    "delta_prior_year": 98639.01,
                     "pct": {
                       "budget": null,
-                      "real": 18.32,
+                      "real": 18.39,
                       "prior_year": 0.67,
                       "delta_budget": null,
-                      "delta_prior_year": 17.65
+                      "delta_prior_year": 17.72
                     }
                   },
                   "profit_departemental": {
                     "budget": null,
-                    "real": 142551.67,
+                    "real": 139947.54,
                     "delta_budget": null,
                     "prior_year": 193989.41,
-                    "delta_prior_year": -51437.74
+                    "delta_prior_year": -54041.87
                   },
                   "line_items": [
                     {
@@ -717067,10 +717067,10 @@
                       },
                       "money": {
                         "budget": null,
-                        "real": 510771.31,
+                        "real": 510755.14,
                         "delta_budget": null,
                         "prior_year": 554103.72,
-                        "delta_prior_year": -43332.41
+                        "delta_prior_year": -43348.58
                       },
                       "pct": {
                         "budget": null,
@@ -717187,10 +717187,10 @@
                       },
                       "money": {
                         "budget": null,
-                        "real": -17178.51,
+                        "real": -17875.65,
                         "delta_budget": null,
                         "prior_year": 7326.93,
-                        "delta_prior_year": -24505.44
+                        "delta_prior_year": -25202.58
                       },
                       "pct": null
                     },
@@ -717201,10 +717201,10 @@
                       "units": null,
                       "money": {
                         "budget": null,
-                        "real": 638893.72,
+                        "real": 638180.41,
                         "delta_budget": null,
                         "prior_year": 593583.27,
-                        "delta_prior_year": 45310.45
+                        "delta_prior_year": 44597.14
                       },
                       "pct": {
                         "budget": null,
@@ -717277,10 +717277,10 @@
                       "units": null,
                       "money": {
                         "budget": null,
-                        "real": 39108.64,
+                        "real": 39742.76,
                         "delta_budget": null,
                         "prior_year": 30921.54,
-                        "delta_prior_year": 8187.1
+                        "delta_prior_year": 8821.22
                       },
                       "pct": null
                     },
@@ -717305,10 +717305,10 @@
                       "units": null,
                       "money": {
                         "budget": null,
-                        "real": 14685.82,
+                        "real": 15431.32,
                         "delta_budget": null,
                         "prior_year": 23810.55,
-                        "delta_prior_year": -9124.73
+                        "delta_prior_year": -8379.23
                       },
                       "pct": null
                     },
@@ -717333,17 +717333,17 @@
                       "units": null,
                       "money": {
                         "budget": null,
-                        "real": 268431.02,
+                        "real": 269810.64,
                         "delta_budget": null,
                         "prior_year": 253866.13,
-                        "delta_prior_year": 14564.89
+                        "delta_prior_year": 15944.51
                       },
                       "pct": {
                         "budget": null,
-                        "real": 9.91,
+                        "real": 9.96,
                         "prior_year": 7.9,
                         "delta_budget": null,
-                        "delta_prior_year": 2.01
+                        "delta_prior_year": 2.0600000000000005
                       }
                     },
                     {
@@ -717423,10 +717423,10 @@
                       "units": null,
                       "money": {
                         "budget": null,
-                        "real": 28482.5,
+                        "real": 28930.7,
                         "delta_budget": null,
                         "prior_year": 41712.04,
-                        "delta_prior_year": -13229.54
+                        "delta_prior_year": -12781.34
                       },
                       "pct": null
                     },
@@ -717493,10 +717493,10 @@
                       "units": null,
                       "money": {
                         "budget": null,
-                        "real": 1891.46,
+                        "real": 1954.46,
                         "delta_budget": null,
                         "prior_year": 2777.89,
-                        "delta_prior_year": -886.43
+                        "delta_prior_year": -823.43
                       },
                       "pct": null
                     },
@@ -717577,10 +717577,10 @@
                       "units": null,
                       "money": {
                         "budget": null,
-                        "real": 227911.03,
+                        "real": 228422.23,
                         "delta_budget": null,
                         "prior_year": 145727.73,
-                        "delta_prior_year": 82183.3
+                        "delta_prior_year": 82694.5
                       },
                       "pct": {
                         "budget": null,
@@ -717597,17 +717597,17 @@
                       "units": null,
                       "money": {
                         "budget": null,
-                        "real": 496342.05,
+                        "real": 498232.87,
                         "delta_budget": null,
                         "prior_year": 399593.86,
-                        "delta_prior_year": 96748.19
+                        "delta_prior_year": 98639.01
                       },
                       "pct": {
                         "budget": null,
-                        "real": 18.32,
+                        "real": 18.39,
                         "prior_year": 0.67,
                         "delta_budget": null,
-                        "delta_prior_year": 17.65
+                        "delta_prior_year": 17.72
                       }
                     },
                     {
@@ -717617,10 +717617,10 @@
                       "units": null,
                       "money": {
                         "budget": null,
-                        "real": 142551.67,
+                        "real": 139947.54,
                         "delta_budget": null,
                         "prior_year": 193989.41,
-                        "delta_prior_year": -51437.74
+                        "delta_prior_year": -54041.87
                       },
                       "pct": null
                     }
@@ -718070,7 +718070,7 @@
                       "prior_year": 749323.63
                     },
                     "mo_pb": {
-                      "real": 394366.54000000004,
+                      "real": 394125.71,
                       "prior_year": 584156.5
                     },
                     "pc_ventes": {
@@ -718134,7 +718134,7 @@
                       "real": null
                     },
                     "pb": {
-                      "real": -14887.04,
+                      "real": -15236.46,
                       "prior_year": 24960.49
                     }
                   },
@@ -718144,7 +718144,7 @@
                       "prior_year": 1859790.8
                     },
                     "pb": {
-                      "real": 1156572.28,
+                      "real": 1155982.03,
                       "prior_year": 1396385.96
                     },
                     "bt": {
@@ -718168,7 +718168,7 @@
                       "prior_year": 2071077.28
                     },
                     "pb": {
-                      "real": 1193728.7,
+                      "real": 1193138.45,
                       "prior_year": 1440907.41
                     }
                   }
@@ -718252,7 +718252,7 @@
                       "prior_year": 1370942.3499999999
                     },
                     "pb": {
-                      "real": 510771.3100000003,
+                      "real": 510755.14000000013,
                       "prior_year": 554103.7199999997
                     }
                   },
@@ -718290,7 +718290,7 @@
                       "real": null
                     },
                     "pb": {
-                      "real": -17178.51,
+                      "real": -17875.65,
                       "prior_year": 7326.93
                     }
                   },
@@ -718303,7 +718303,7 @@
                       "prior_year": 1413113.5099999998
                     },
                     "pb": {
-                      "real": 638893.7200000003,
+                      "real": 638180.4100000001,
                       "prior_year": 593583.2699999998
                     }
                   }

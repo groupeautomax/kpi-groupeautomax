@@ -62,6 +62,15 @@ PDF_MIME_TYPE = "application/pdf"
 COMPOSITE_NAME_RE = re.compile(r"composite|report ?card|scorecard|dealer ?report|(?<![a-z])[ée][\W_]{0,2}f(?![a-z])[\W_]{0,4}sommaire",
                                re.IGNORECASE)
 COMPOSITES_DIR = os.path.join(SOURCES_DIR, "composites")
+# Exports Excel de l'eComposite Hyundai (« eComposite - P&P.xlsx », « … analyse des revenus », « … mémo_stats »,
+# déposés par Mustafa Bhaloo le 22 octobre 2026) et états financiers standard du groupe de volume VW
+# (« Financial Statement_Volume Group_A - ≥675_Standard statement_202609_….xlsx », 23 octobre 2026) : traités
+# comme les PDF de composite (seuls les chiffres sont gardés dans sources/composites/), jamais comme un rapport mensuel.
+ECOMPOSITE_XLSX_RE = re.compile(r"e[\W_]?composite|volume[\W_]*group|standard[\W_]*statement", re.IGNORECASE)
+
+
+def is_composite(f):
+    return f["mimeType"] == PDF_MIME_TYPE or (f["mimeType"] in ACCEPTED_MIME_TYPES and bool(ECOMPOSITE_XLSX_RE.search(f["name"])))
 
 # Un dossier Drive racine par concessionnaire. Chaque racine est parcourue
 # récursivement (sous-dossiers compris, ex: BMW/STM organisent leurs
@@ -197,14 +206,14 @@ def composites_version():
 
 
 def sync_composite(service, dealer, f, manifest):
-    """PDF de composite : téléchargé dans un fichier temporaire, lu, puis
-    effacé ; les chiffres vont dans sources/composites/<concession>_<mois>_<type>.json.
+    """Composite (PDF, ou export Excel de l'eComposite) : téléchargé dans un fichier
+    temporaire, lu, puis effacé ; les chiffres vont dans sources/composites/<concession>_<mois>_<type>.json.
     Renvoie le chemin du JSON écrit, ou None."""
     import tempfile
     sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
     import composites
     version = composites.PARSER_VERSION
-    fd, tmp = tempfile.mkstemp(suffix=".pdf")
+    fd, tmp = tempfile.mkstemp(suffix="." + ACCEPTED_MIME_TYPES.get(f["mimeType"], "pdf"))
     os.close(fd)
     try:
         download_file(service, f["id"], tmp)
@@ -217,7 +226,7 @@ def sync_composite(service, dealer, f, manifest):
     except Exception as exc:  # noqa: BLE001 - PDF qui n'est pas un composite reconnu
         manifest[f["id"]] = {"dealer": dealer["key"], "name": f["name"], "modifiedTime": f["modifiedTime"],
                              "local_path": None, "composite_error": str(exc)[:200], "parser_version": version}
-        print(f"[{dealer['label']}] PDF ignoré (pas un composite reconnu) : {f['name']} -- {exc}")
+        print(f"[{dealer['label']}] fichier ignoré (pas un composite reconnu) : {f['name']} -- {exc}")
         return None
     finally:
         if os.path.exists(tmp):
@@ -301,7 +310,7 @@ def main():
             for f in files:
                 file_id = f["id"]
                 entry = manifest.get(file_id)
-                if f["mimeType"] == PDF_MIME_TYPE:
+                if is_composite(f):
                     # relu si le PDF a changé, si le JSON manque, ou si la lecture
                     # a été améliorée depuis (PARSER_VERSION de src/composites.py)
                     if entry and entry.get("modifiedTime") == f["modifiedTime"] \
@@ -309,7 +318,13 @@ def main():
                             entry.get("composite_error") or os.path.exists(entry.get("composite_json") or "")):
                         unchanged += 1
                         continue
+                    old = (entry or {}).get("local_path")
                     out = sync_composite(service, dealer, f, manifest)
+                    # ancien téléchargement comme rapport mensuel (avant la lecture des exports Excel) : retiré
+                    if old and old.lower().endswith((".xlsx", ".xlsm")) and os.path.exists(old) \
+                            and not any(e.get("local_path") == old for e in manifest.values()):
+                        os.remove(old)
+                        print(f"[{dealer['label']}] retiré de sources/ (lu comme composite) : {old}")
                     if out:
                         downloaded.append(out)
                     continue

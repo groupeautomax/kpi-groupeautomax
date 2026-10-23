@@ -16,6 +16,10 @@ Formats lus :
   - Volkswagen Canada, « Dealer Report Card » : chiffres de la concession
     (2026 YTD, 2025 YTD, mois, 3 mois), moyennes nationale et Québec (Geo
     Local), objectifs, points et rangs.
+  - Volkswagen Canada, états financiers standard d'un groupe de volume (Excel,
+    « Financial Statement_Volume Group_A - ≥675_Standard statement ») : le
+    concessionnaire moyen du groupe, au gabarit de l'état de la concession
+    (voir vw_statement_lines, qui lit aussi l'état de VW Brossard).
 
 Le PDF n'est jamais déposé dans le dépôt (public) : seuls les chiffres, en
 JSON, vont dans sources/composites/ (voir drive_sync.py et write_json).
@@ -40,7 +44,7 @@ MONTHS_EN = {m: i for i, m in enumerate(
 
 # Version des lecteurs : drive_sync.py relit un PDF déjà refusé quand elle
 # change (nouveau format pris en charge, ex. BMW ou GM).
-PARSER_VERSION = 3
+PARSER_VERSION = 5   # 4 : exports Excel de l'eComposite Hyundai ; 5 : états standard du groupe de volume VW
 
 PAREN_OPEN = "(\ufd3e"      # « ﴾ » dans les PDF eComposite
 PAREN_CLOSE = ")\ufd3f"     # « ﴿ »
@@ -428,6 +432,159 @@ def read_hyundai_ar(path, lines=None):
             "pages": pages}
 
 
+# ------------------------------------------------ eComposite Hyundai (Excel)
+# Les mêmes rapports que les PDF, exportés en Excel par Mustafa Bhaloo (22 octobre
+# 2026) : une feuille par page (« 1-Neuf - P&P », « 1-F et A Neuf »…), titre en B1,
+# « De: » / « À: » en ligne 2, le groupe « Est A (850+) (16 / 16) » en colonne B des
+# en-têtes de section, libellés en colonne A (postes de tête en gras, sous-lignes
+# non grasses), colonnes Moy. MAD, Moy. MMAP, % d'écart MAD, Moy. PAD, MPAD moy.,
+# % d'écart PAD. Le mémo stats n'a que Moy. MAD (et l'écart).
+XL_GROUP_RE = re.compile(r"^(.*?)\s*\((\d+)\s*/\s*(\d+)\)\s*$")
+
+
+def _xl_num(v):
+    if isinstance(v, bool) or v is None:
+        return None
+    if isinstance(v, (int, float)):
+        return float(v)
+    t = str(v).strip().replace("\u00a0", "").replace(" ", "")
+    if not t or t.upper() == "N/A":
+        return None
+    try:
+        return float(t.replace(",", "."))
+    except ValueError:
+        return None
+
+
+def _xl_label(v):
+    """Libellé au format des PDF : « Neuf - Ventes » → « Neuf ‐ Ventes »."""
+    t = re.sub(r"\s+", " ", str(v).replace("\u00a0", " ")).strip()
+    return re.sub(r" - ", " \u2010 ", t)
+
+
+def _xl_head(ws):
+    """(titre, début (a, m), fin (a, m), groupe, n, n_total) d'une feuille."""
+    import datetime as dt
+    title = ws.cell(row=1, column=2).value or ws.title
+    debut = fin = None
+    grp = n = n_tot = None
+    for r in range(1, min(ws.max_row, 12) + 1):
+        a, b = ws.cell(row=r, column=2).value, ws.cell(row=r, column=3).value
+        if isinstance(a, str) and a.strip().lower().startswith("de"):
+            d0, d1 = ws.cell(row=r, column=3).value, ws.cell(row=r, column=5).value
+            if isinstance(d0, dt.datetime):
+                debut = (d0.year, d0.month)
+            if isinstance(d1, dt.datetime):
+                fin = (d1.year, d1.month)
+        if isinstance(a, str) and grp is None:
+            m = XL_GROUP_RE.match(a.strip())
+            if m:
+                grp, n, n_tot = m.group(1), int(m.group(2)), int(m.group(3))
+    return _xl_label(title), debut, fin, grp, n, n_tot
+
+
+def _xl_lignes(ws):
+    """[(libellé, gras, [valeurs B…G], en-tête de section)] après les lignes de titre."""
+    out = []
+    for r in range(4, ws.max_row + 1):
+        c = ws.cell(row=r, column=1)
+        if c.value is None:
+            continue
+        b = ws.cell(row=r, column=2).value
+        section = isinstance(b, str) and XL_GROUP_RE.match(b.strip()) is not None
+        if norm(str(c.value)) == "description":
+            continue
+        vals = [_xl_num(ws.cell(row=r, column=k).value) for k in range(2, 8)]
+        out.append((str(c.value), bool(c.font and c.font.b), vals, section))
+    return out
+
+
+def read_hyundai_xlsx(path):
+    """Export Excel d'un rapport eComposite Hyundai → même JSON que la lecture du
+    PDF (hyundai_pp, hyundai_ar) ou, pour le mémo stats, {"kind": "hyundai_memo",
+    "sections": {feuille: {section: {libellé: Moy. MAD}}}}."""
+    import openpyxl
+    wb = openpyxl.load_workbook(path, data_only=True)
+    try:
+        names = [norm(re.sub(r"^\d+-", "", n)) for n in wb.sheetnames]
+        if any(n.endswith("p&p") for n in names):
+            kind = "hyundai_pp"
+        elif any(n.startswith("inventaire neufs") or n.startswith("employes") for n in names):
+            kind = "hyundai_memo"
+        elif any(n.startswith("neuf - ventes") or n.startswith("service - vente") for n in names):
+            kind = "hyundai_ar"
+        else:
+            raise ValueError("classeur Excel non reconnu (ni P&P, ni analyse des revenus, ni mémo stats de l'eComposite)")
+        pages, head = {}, None
+        for ws in wb.worksheets:
+            title, debut, fin, grp, n, n_tot = _xl_head(ws)
+            if head is None and fin:
+                head = (debut, fin, grp, n, n_tot)
+            rows = _xl_lignes(ws)
+            if kind == "hyundai_pp":
+                t = re.sub(r"\s*[-\u2010]?\s*p&p$", "", norm(title)).strip()
+                dept = HY_PP_PAGES.get(t)
+                if not dept:
+                    continue
+                bloc, out = None, []
+                for lab, _, v, section in rows:
+                    nl = norm(lab)
+                    b = next((x for k, x in HY_PP_BLOCKS.items() if nl.startswith(k)), None)
+                    if section or b:
+                        bloc = b or bloc
+                        if section:
+                            continue
+                    if v[0] is None and v[3] is None:
+                        continue
+                    out.append({"bloc": bloc, "label": _xl_label(lab), "unit": "%" if nl.startswith("%") else "$",
+                                "mad": v[0], "mmap": v[1], "pad": v[3], "mpad": v[4]})
+                pages[dept] = out
+            elif kind == "hyundai_ar":
+                items, cur = [], None
+                for lab, gras, v, section in rows:
+                    q = {"mad": v[0], "mmap": v[1], "pad": v[3], "mpad": v[4]}
+                    has = any(x is not None for x in (v[0], v[1], v[3], v[4]))
+                    if section or (gras and not has):
+                        cur = {"label": _xl_label(lab), "tete": None, "sous": {}}
+                        items.append(cur)
+                    elif cur is None or (gras and not AR_SUB_RE.match(norm(lab))) or \
+                            (not gras and cur["tete"] is None and not cur["sous"] and not AR_SUB_RE.match(norm(lab))):
+                        # « Ventes », « PB », « $PB par contrat »… sont des sous-lignes même en gras (total du
+                        # bureau commercial) ; sous une simple en-tête de section (« Sommaire » des autres
+                        # revenus), une ligne non grasse est un poste (« Retenue », « Incitatif HACC »)
+                        cur = {"label": _xl_label(lab), "tete": q, "sous": {}}
+                        items.append(cur)
+                        if not gras:
+                            cur["_simple"] = True
+                    elif cur.get("_simple") and not AR_SUB_RE.match(norm(lab)):
+                        cur = {"label": _xl_label(lab), "tete": q, "sous": {}, "_simple": True}
+                        items.append(cur)
+                    else:
+                        cur["sous"][_xl_label(lab)] = q
+                for it in items:
+                    it.pop("_simple", None)
+                pages[title] = [it for it in items if it["tete"] or it["sous"]]
+            else:
+                sec, cur = {}, None
+                for lab, _, v, section in rows:
+                    if section:
+                        cur = sec.setdefault(_xl_label(lab), {})
+                        continue
+                    if cur is not None and v[0] is not None:
+                        cur[_xl_label(lab)] = v[0]
+                pages[title] = sec
+        if not head or not any(pages.values()):
+            raise ValueError("eComposite Excel : période ou chiffres introuvables")
+        (y0, m0), (y1, m1), grp, n, n_tot = head
+        src = {"hyundai_pp": "P&P", "hyundai_ar": "Analyse des revenus", "hyundai_memo": "Mémo stats"}[kind]
+        d = {"kind": kind, "source": f"eComposite Hyundai Canada — {src} (Excel)", "period": f"{y1}-{m1:02d}",
+             "debut": f"{y0}-{m0:02d}", "groupe": grp, "n": n, "n_total": n_tot}
+        d["sections" if kind == "hyundai_memo" else "pages"] = pages
+        return d
+    finally:
+        wb.close()
+
+
 # ------------------------------------------------------- bulletin VW Canada
 VW_DEALERS = {"volkswagen brossard": "vw"}
 
@@ -630,6 +787,228 @@ def read_vw_report_card(path, text=None):
     return out
 
 
+# ------------------------------------------ états financiers VW Canada (Excel)
+# Un seul gabarit pour l'état de la concession (VWBROSSARD092026.xlsm : en
+# anglais depuis 2026, en français avant) et pour les « états financiers
+# standard » du groupe de volume (« Financial Statement_Volume Group_A - ≥675_
+# Standard statement_AAAAMM_….xlsx » : concessionnaire moyen du groupe A).
+# Les chiffres sont repérés par le numéro de ligne officiel (pages 2 à 6), le
+# même en 2025 et en 2026, et les colonnes par leurs en-têtes (anglais ou
+# français). Demande de Maxime Allard (23 octobre 2026) : comparer VW Brossard
+# au groupe A comme dans le rapport de Mustafa Bhaloo.
+VW_P2_LIGNES = (1, 2, 4, 7, 15, 27, 47, 62, 63, 64, 73, 74, 75, 76, 80, 81)
+VW_P3_LIGNES = (1, 2, 4, 15, 27, 47, 62, 63, 64, 73)
+VW_P4_LIGNES = (21, 22, 27, 28, 29, 31, 32, 34, 35, 37, 38, 40, 45, 46, 50)
+VW_P5_LIGNES = (1, 3, 4, 13, 18, 22, 29, 41, 52, 53, 54, 62, 63, 64)
+VW_FEUILLES = ("Page 1", "Page 2", "Page 3", "Page 4", "Page 5", "Page 6")
+VW_MOIS_CLES = ("currentmonth", "moisencours", "moiscourant")
+VW_CUMUL_CLES = ("yeartodate", "cumulannuel")
+
+
+def _vw_cle(v):
+    """« CURRENT MONTH » → « currentmonth », « N° LIGNE » → « nligne »."""
+    return re.sub(r"[^a-z0-9%&]", "", norm(v)) if isinstance(v, str) else ""
+
+
+def _vw_cells(ws):
+    """{ligne Excel: {colonne: valeur}} (cellules non vides), lu une seule fois."""
+    out = {}
+    for r, row in enumerate(ws.iter_rows(values_only=True), start=1):
+        d = {c: v for c, v in enumerate(row, start=1) if v not in (None, "")}
+        if d:
+            out[r] = d
+    return out
+
+
+def _vw_nombre(v):
+    return float(v) if isinstance(v, (int, float)) and not isinstance(v, bool) else None
+
+
+def _vw_lignes(cells, max_r=9):
+    """{numéro de ligne officiel: ligne Excel}, d'après la colonne « Line No. » la plus à gauche."""
+    cols = [c for r in range(1, max_r + 1) for c, v in (cells.get(r) or {}).items()
+            if _vw_cle(v) in VW_LIGNE_CLES and _vw_cle(v) != "nli"]
+    if not cols:
+        raise ValueError("colonne des numéros de ligne introuvable")
+    lc = min(cols)
+    out = {}
+    for r, d in sorted(cells.items()):
+        v = d.get(lc)
+        if isinstance(v, (int, float)) and not isinstance(v, bool) and float(v).is_integer():
+            out.setdefault(int(v), r)
+    return out
+
+
+VW_LIGNE_CLES = ("line", "lineno", "ligne", "nligne", "noligne", "nli")
+
+
+def _vw_blocs(cells):
+    """Pages 2 et 3 : [(colonnes du mois, colonnes du cumul)] de gauche à droite (un bloc par département)."""
+    # colonnes « Line No. » (à gauche et à droite du tableau) : jamais lues comme des montants
+    bornes = sorted({c for r in range(1, 10) for c, v in (cells.get(r) or {}).items() if _vw_cle(v) in VW_LIGNE_CLES})
+    for r in range(1, 10):
+        d = cells.get(r) or {}
+        heads = sorted((c, k) for c, v in d.items() for k in [_vw_cle(v)]
+                       if k in VW_MOIS_CLES or k in VW_CUMUL_CLES or k == "%")
+        if sum(1 for _, k in heads if k in VW_MOIS_CLES) < 2:
+            continue
+        def plage(c, meme=()):
+            # jusqu'au prochain en-tête ; l'état 2025 répète « CUMUL ANNUEL » sur deux colonnes (pièces) :
+            # pour le cumul, on lit les deux
+            nxt = min([x for x, kk in heads if x > c and kk not in meme] + [x for x in bornes if x > c] + [c + 9])
+            return list(range(c, nxt))
+        blocs = []
+        for c, k in heads:
+            if k in VW_MOIS_CLES:
+                y = next((x for x, kk in heads if x > c and kk in VW_CUMUL_CLES), None)
+                if y:
+                    blocs.append((plage(c), plage(y, VW_CUMUL_CLES)))
+        return blocs
+    raise ValueError("en-têtes « mois / cumul » introuvables")
+
+
+def _vw_premier(d, cols):
+    for c in cols:
+        v = _vw_nombre(d.get(c))
+        if v is not None:
+            return v
+    return None
+
+
+def _vw_colonnes(cells, groupes):
+    """Pages 4 et 5 : {clé: (colonne du mois, colonne du cumul)} d'après la ligne d'en-tête (UNITS, SALES…)."""
+    for r in range(1, 10):
+        d = cells.get(r) or {}
+        trouve = {}
+        for cle, noms in groupes.items():
+            cs = sorted(c for c, v in d.items() if _vw_cle(v) in noms)
+            if len(cs) >= 2:
+                trouve[cle] = (cs[0], cs[1])
+        if len(trouve) == len(groupes):
+            return trouve
+    raise ValueError("en-têtes des colonnes introuvables (" + ", ".join(groupes) + ")")
+
+
+def _vw_periode(cells1):
+    """Mois de l'état (« STATEMENT PERIOD » de la page 1) : la date la plus tardive, ou « Sep 2026 »."""
+    dates = [v for r in range(1, 10) for v in (cells1.get(r) or {}).values() if isinstance(v, _dt.datetime)]
+    if dates:
+        d = max(dates)
+        return f"{d.year}-{d.month:02d}"
+    for r in range(1, 10):
+        for v in (cells1.get(r) or {}).values():
+            if not isinstance(v, str):
+                continue
+            m = re.match(r"^\s*([A-Za-zéû]{3,5})[a-zéû]*\.?\s+(\d{4})\s*$", v)
+            if m:
+                k = norm(m.group(1))[:4]
+                mo = MONTHS_EN.get(k[:3]) or MOIS_FR.get(k) or MOIS_FR.get(k[:3])
+                if mo:
+                    return f"{m.group(2)}-{mo:02d}"
+    raise ValueError("période de l'état VW introuvable (page 1)")
+
+
+def _vw_groupe(cells1):
+    """« Groupe A (≥675) » pour l'état standard d'un groupe de volume, sinon None (état d'une concession)."""
+    code = nom = None
+    for r in range(3, 9):
+        for c, v in sorted((cells1.get(r) or {}).items()):
+            if isinstance(v, str) and re.fullmatch(r"\s*[A-E]\s*", v):
+                code = v.strip()
+            elif isinstance(v, str) and re.search(r"[≥>]\s*\d", v):
+                nom = re.sub(r"\s+", "", v)
+    return f"Groupe {code} ({nom})" if code and nom else (f"Groupe {code}" if code else None)
+
+
+def vw_statement_lines(path):
+    """État financier VW Canada (concession ou groupe de volume) → chiffres du mois et du cumul :
+    p2 {ligne: [total, neuf, occasion]}, p3 {ligne: [service, carrosserie, pièces]},
+    p4 {ligne: [unités, ventes, PB]}, p5 {ligne: [BR, ventes, PB]}, p6 (heures),
+    plus l'inventaire (unités en stock), les techniciens et les employés aux pièces."""
+    import openpyxl
+    wb = openpyxl.load_workbook(path, data_only=True, read_only=True)
+    try:
+        if not all(n in wb.sheetnames for n in VW_FEUILLES):
+            raise ValueError("pas un état financier VW Canada (pages 1 à 6)")
+        P = {n: _vw_cells(wb[n]) for n in VW_FEUILLES}
+    finally:
+        wb.close()
+    out = {"period": _vw_periode(P["Page 1"]), "groupe": _vw_groupe(P["Page 1"]), "month": {}, "ytd": {}}
+
+    for page, lignes, cle in (("Page 2", VW_P2_LIGNES, "p2"), ("Page 3", VW_P3_LIGNES, "p3")):
+        cells = P[page]
+        rows, blocs = _vw_lignes(cells), _vw_blocs(cells)
+        if len(blocs) < 3:
+            raise ValueError(f"{page} : trois départements attendus, {len(blocs)} trouvés")
+        for i, mode in enumerate(("month", "ytd")):
+            out[mode][cle] = {str(n): [_vw_premier(cells.get(rows[n]) or {}, b[i]) for b in blocs[:3]]
+                              for n in lignes if n in rows}
+    for page, lignes, cle, groupes in (
+            ("Page 4", VW_P4_LIGNES, "p4", {"u": ("units", "unites"), "v": ("sales", "ventes"), "pb": ("grossprofit", "profitbrut")}),
+            ("Page 5", VW_P5_LIGNES, "p5", {"u": ("ros", "br"), "v": ("sales", "ventes"), "pb": ("grossprofit", "profitbrut")})):
+        cells = P[page]
+        rows, cols = _vw_lignes(cells), _vw_colonnes(cells, groupes)
+        for i, mode in enumerate(("month", "ytd")):
+            out[mode][cle] = {str(n): [_vw_nombre((cells.get(rows[n]) or {}).get(cols[k][i])) for k in ("u", "v", "pb")]
+                              for n in lignes if n in rows}
+
+    # Page 6 : heures (service), techniciens et employés
+    c6 = P["Page 6"]
+    rows6 = _vw_lignes(c6)
+    d4 = c6.get(rows6.get(4)) or {}
+    hc = {"month": [], "ytd": []}
+    for c, v in sorted(d4.items()):
+        k = _vw_cle(v)
+        if "mtd" in k or "mois" in k:
+            hc["month"].append(c)
+        elif "ytd" in k or "cumul" in k:
+            hc["ytd"].append(c)
+    d5 = c6.get(rows6.get(5)) or {}
+    for mode in ("month", "ytd"):
+        # heures vendues client VW : moteur à combustion (1re colonne), puis électriques (2e)
+        cs = hc[mode] + [None, None]
+        out[mode]["p6"] = {"heures_client": _vw_nombre(d5.get(cs[0])), "heures_client_bev": _vw_nombre(d5.get(cs[1]))}
+    for n, cle in ((13, "heures_dispo"), (14, "heures_prod"), (15, "heures_vendues"), (16, "heures_om")):
+        d = c6.get(rows6.get(n)) or {}
+        txt = min([c for c, v in d.items() if isinstance(v, str) and c > 3] or [10 ** 6])
+        nums = [_vw_nombre(v) for c, v in sorted(d.items()) if 2 < c < txt and _vw_nombre(v) is not None]
+        for i, mode in enumerate(("month", "ytd")):
+            out[mode]["p6"][cle] = nums[i] if len(nums) > i else None
+    hdr = c6.get(rows6.get(3)) or {}
+    col_serv = next((c for c, v in hdr.items() if _vw_cle(v) == "service"), None)
+    col_pa = next((c for c, v in hdr.items() if _vw_cle(v) == "p&a"), None)
+    lab = next((c for r in range(1, 12) for c, v in (c6.get(r) or {}).items()
+                if _vw_cle(v).startswith(("totalpersonnel", "nombretotal"))), None)
+    for r, d in c6.items():
+        k = _vw_cle(d.get(lab)) if lab else ""
+        if k in ("vwtechnicians", "techniciensvw") and col_serv:
+            out["techniciens"] = _vw_nombre(d.get(col_serv))
+        if k == "total" and col_pa:
+            out["employes_pieces"] = _vw_nombre(d.get(col_pa))
+
+    # Page 1 : unités en stock (neufs VW, occasion au total)
+    c1 = P["Page 1"]
+    ucol = None
+    for r, d in sorted(c1.items()):
+        items = sorted(d.items())
+        ks = [_vw_cle(v) for c, v in items if isinstance(v, str)]
+        if any(k.startswith(("newvehiclesvw1402", "vehiculesneufsvw1402")) for k in ks):
+            u = next((c for c, v in items if _vw_cle(v) in ("units", "unites")), None)
+            ucol = next((c for c, v in items if u and c > u and _vw_nombre(v) is not None), None)
+            out["stock_neuf"] = _vw_nombre(d.get(ucol)) if ucol else None
+        elif ucol and any(k.startswith(("totalused", "totaldoccasion")) for k in ks):
+            out["stock_occ"] = _vw_nombre(d.get(ucol))
+    return out
+
+
+def read_vw_groupe_xlsx(path):
+    """États financiers standard d'un groupe de volume VW (concessionnaire moyen du groupe)."""
+    lignes = vw_statement_lines(path)
+    if not lignes.get("groupe"):
+        raise ValueError("état VW d'une concession, pas d'un groupe de volume")
+    return {"kind": "vw_groupe", "period": lignes["period"], "groupe": lignes["groupe"], "lignes": lignes}
+
+
 # ------------------------------------------------------------- détection
 def detect(path):
     """(type, extrait) du PDF, ou (None, None)."""
@@ -650,8 +1029,21 @@ def detect(path):
 
 
 def read_any(path, dealer=None):
-    """Lit un PDF de composite. dealer : concession du dossier Drive d'où
-    vient le fichier (le composite Hyundai ne nomme pas la concession)."""
+    """Lit un composite (PDF, ou export Excel de l'eComposite Hyundai). dealer :
+    concession du dossier Drive d'où vient le fichier (le composite Hyundai ne
+    nomme pas la concession)."""
+    if path.lower().endswith((".xlsx", ".xlsm")):
+        import openpyxl
+        wb = openpyxl.load_workbook(path, read_only=True)
+        feuilles = set(wb.sheetnames)
+        wb.close()
+        if set(VW_FEUILLES) <= feuilles:
+            d = read_vw_groupe_xlsx(path)
+            d["dealer"] = dealer or "vw"
+            return d
+        d = read_hyundai_xlsx(path)
+        d["dealer"] = dealer or "hyundai"
+        return d
     kind, _ = detect(path)
     if kind == "vw_report_card":
         d = read_vw_report_card(path)
@@ -911,6 +1303,7 @@ def hyundai_statement_lines(path):
         sp = g2("salaire - proprietaires", r_po or 0)
         bp = g2("bonis - proprietaires", r_po or 0)
         t["pn_avant_bonis"] = pn + sp + bp
+        t["remuneration_proprietaires"] = sp + bp   # profit net avant impôts = pn_avant_bonis − ce montant
         t["pn_pct_pb"] = t["pn_avant_bonis"] / t["pb"] if t["pb"] else None
         pub_v = g2("publicite et promotion des ventes")
         r_dir = find(r2, "frais directs")
@@ -939,9 +1332,68 @@ def hyundai_statement_lines(path):
             if r is None:
                 continue
             ar[key] = {"n": num(ws4, r, cc["units"]), "ventes": num(ws4, r, cc["ventes"]), "pb": num(ws4, r, cc["pb"])}
-        out[mode] = {"ef": ef, "pp": pp, "ar": ar}
+        out[mode] = {"ef": ef, "pp": pp, "ar": ar, "x": ffs_extra(wb, r4, cc, mode, num, find)}
     wb.close()
     return out
+
+
+def ffs_extra(wb, r4, cc, mode, num, find):
+    """Lignes de l'état FFS utilisées par l'analyse au composite (format du
+    rapport de Mustafa Bhaloo, demande de Maxime Allard du 22 octobre 2026) :
+      - Page 4 : unités du département neuf (flotte comprise, sans les échanges
+        entre concessionnaires), détail et gros d'occasion ;
+      - Page 5 : retenue et incitatifs HACC (autres revenus), total des autres
+        revenus et des autres dépenses ;
+      - Page 6 : heures de l'atelier, bons de réparation, personnel.
+    Vérifié sur l'état de septembre 2026 contre le rapport de Mustafa : 76 unités
+    neuves, retenue 79 360 $ + HACC 11 250 $ = 90,6 k$, 16 unités au détail,
+    38 en gros, 600 BT client, 10 techniciens, 3 employés aux pièces."""
+    ws4 = wb["Page 4"]
+    cols4 = {"n": cc["units"], "ventes": cc["ventes"], "pb": cc["pb"]}
+
+    def p4(prefix, champ="pb"):
+        return num(ws4, find(r4, prefix), cols4[champ])
+
+    x = {"u_neuf": p4("total depart. veh. neufs", "n"), "u_flotte": p4("flotte national", "n"),
+         "u_occ_det": p4("total ventes au detail", "n"), "ventes_occ_det": p4("total ventes au detail", "ventes"),
+         "pb_occ_det": p4("total ventes au detail"),
+         "u_gros": p4("ventes en gros", "n"), "pb_gros": p4("ventes en gros")}
+
+    def lignes(ws, col):
+        out = []
+        for r in range(1, ws.max_row + 1):
+            lab = ws.cell(row=r, column=col).value
+            if isinstance(lab, str) and lab.strip():
+                out.append((r, norm(lab)))
+        return out
+
+    if "Page 5" in wb.sheetnames:
+        ws5 = wb["Page 5"]
+        rev, dep = lignes(ws5, 2), lignes(ws5, 42)
+        c_rev, c_dep = (25, 66) if mode == "month" else (34, 75)
+        v5 = lambda rows, prefix, c: num(ws5, find(rows, prefix), c)
+        x.update({"retenue": v5(rev, "retenue", c_rev) or 0.0, "hacc": v5(rev, "incitatif hacc", c_rev) or 0.0,
+                  "autres_revenus": v5(rev, "total autres revenus", c_rev), "autres_depenses": v5(dep, "total autres depenses", c_dep)})
+        # Inventaire par âge à la fin du mois (1-30, 31-60, 61-90, plus de 90 jours) : unités neuves en
+        # colonne 11, d'occasion en colonne 43 (septembre 2026 : 180 et 55 — mois d'inventaire 2,4 et 3,4 chez Mustafa)
+        ages = [r for r, lab in rev if re.match(r"^(1 ?- ?30|31 ?- ?60|61 ?- ?90|plus de 90) jours", lab)]
+        if len(ages) >= 4:
+            x["stock_neuf"] = sum(num(ws5, r, 11) or 0.0 for r in ages[:4])
+            x["stock_occ"] = sum(num(ws5, r, 43) or 0.0 for r in ages[:4])
+    if "Page 6" in wb.sheetnames:
+        ws6 = wb["Page 6"]
+        st = lignes(ws6, 49)
+        c6 = 60 if mode == "month" else 66
+        v6 = lambda prefix: num(ws6, find(st, prefix), c6)
+        x.update({"heures_dispo": v6("temps disponible"), "heures_pointees": v6("heures poinconnees"),
+                  "heures_facturees": v6("temps facture"), "heures_client": v6("temps facture - client"),
+                  "br_client": v6("bons de reparation - client"), "br_total": v6("total des bons de reparation")})
+        pers = lignes(ws6, 2)
+        rt = find(pers, "techniciens")
+        x["techniciens"] = num(ws6, rt, 17)
+        r_tot = next((r for r, lab in pers if lab == "total" and r > (rt or 0)), None)
+        x["employes_pieces"] = num(ws6, r_tot, 48)
+    return x
 
 
 def main(argv=None):

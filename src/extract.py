@@ -2086,11 +2086,42 @@ def load_composites(store, candidates, comp_dir):
                 print(f"Composite Hyundai {pk} : état {st.get('source_file')} illisible ({exc})", file=sys.stderr)
         if "concession" not in entry:
             print(f"Composite Hyundai {pk} : aucun état Hyundai Canada du même mois (comparaison impossible)")
+        # Même mois l'an passé (colonnes 2025 de l'analyse au composite, format de Mustafa Bhaloo, 22 octobre 2026) :
+        # le composite donne déjà la moyenne du groupe l'an passé (MMAP, MPAD) ; la concession vient de son état
+        # Hyundai Canada du même mois l'an passé.
+        prev = f"{int(pk[:4]) - 1}{pk[4:]}"
+        for _, _, st in sorted(candidates.get(("hyundai", prev), []), key=lambda t: t[0], reverse=True):
+            if st.get("source_format") != "etat_hyundai":
+                continue
+            try:
+                entry["concession_prec"] = composites.rounded(composites.hyundai_statement_lines(st["_path"]))
+                entry["concession_prec_source"] = st.get("source_file")
+                break
+            except Exception as exc:  # noqa: BLE001
+                print(f"Composite Hyundai {pk} : état {st.get('source_file')} de {prev} illisible ({exc})", file=sys.stderr)
+    # VW (23 octobre 2026) : l'état standard du groupe de volume A donne le concessionnaire moyen du groupe ;
+    # VW Brossard aux mêmes lignes vient de son état VW Canada du mois et du même mois l'an passé.
+    for pk, entry in comps.get("vw", {}).items():
+        if "vw_groupe" not in entry:
+            continue
+        prev = f"{int(pk[:4]) - 1}{pk[4:]}"
+        for cle, per in (("concession", pk), ("concession_prec", prev)):
+            for _, _, st in sorted(candidates.get(("vw", per), []), key=lambda t: t[0], reverse=True):
+                if st.get("source_format") != "etat_vw":
+                    continue
+                try:
+                    entry[cle] = composites.rounded(composites.vw_statement_lines(st["_path"]))
+                    entry[cle + "_source"] = st.get("source_file")
+                    break
+                except Exception as exc:  # noqa: BLE001
+                    print(f"Composite VW {pk} : état {st.get('source_file')} de {per} illisible ({exc})", file=sys.stderr)
+        if "concession" not in entry:
+            print(f"Composite VW {pk} : aucun état VW Canada du même mois (comparaison impossible)")
     if comps or "composites" in store:
         store["composites"] = comps
     for dk, periods in sorted(comps.items()):
         for pk, entry in sorted(periods.items()):
-            print(f"Composite {dk} {pk} : {', '.join(sorted(k for k in entry if k != 'concession_source'))}")
+            print(f"Composite {dk} {pk} : {', '.join(sorted(k for k in entry if not k.endswith('_source')))}")
 
 
 def main(paths, store_path=None, extract_fn=None):

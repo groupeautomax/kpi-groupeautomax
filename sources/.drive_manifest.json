@@ -354,10 +354,12 @@
     "name": "2025-12_MANUF_BMW_Sher.xlsm"
   },
   "17TNHhi7Qeo0BsImS2S_etglDmKhS3fuW": {
+    "composite_json": "sources/composites/hyundai_2025-09_hyundai_pp.json",
     "dealer": "hyundai",
-    "local_path": "sources/hyundai_eComposite_-_P_P_1_.xlsx",
+    "local_path": null,
     "modifiedTime": "2026-10-22T13:42:55.587Z",
-    "name": "eComposite - P&P (1).xlsx"
+    "name": "eComposite - P&P (1).xlsx",
+    "parser_version": 5
   },
   "17cpnQwnIG64ZHn6Wj25K2w2ShIEFd4TU": {
     "dealer": "vw",
@@ -401,7 +403,7 @@
     "local_path": null,
     "modifiedTime": "2025-10-09T19:15:47.000Z",
     "name": "Dealer report card septembre 25.pdf",
-    "parser_version": 3
+    "parser_version": 5
   },
   "18EjQQXYezAMbF6LUi7AAFg5z7wG_jBwi": {
     "dealer": "vw",
@@ -488,10 +490,12 @@
     "name": "VW réalisé Q3-2021.xlsx"
   },
   "19eQCGCcZeRGckhOsSurHRTcgQhbUjgxP": {
+    "composite_json": "sources/composites/hyundai_2025-09_hyundai_memo.json",
     "dealer": "hyundai",
-    "local_path": "sources/hyundai_eComposite_-_m_mo_stats_1_.xlsx",
+    "local_path": null,
     "modifiedTime": "2026-10-22T13:39:08.365Z",
-    "name": "eComposite - mémo_stats (1).xlsx"
+    "name": "eComposite - mémo_stats (1).xlsx",
+    "parser_version": 5
   },
   "19fUF89wYgDsqi-QVQVTaq49djCcP4oO4": {
     "dealer": "hyundai",
@@ -553,7 +557,7 @@
     "local_path": null,
     "modifiedTime": "2026-03-12T19:52:49.000Z",
     "name": "dealer report card février 26.pdf",
-    "parser_version": 3
+    "parser_version": 5
   },
   "1AaWPJ9aJb6NFT5ATLyc94auiwyiXScRU": {
     "composite_json": "sources/composites/vw_2026-07_vw_report_card.json",
@@ -561,7 +565,7 @@
     "local_path": null,
     "modifiedTime": "2026-08-13T17:39:18.000Z",
     "name": "Dealer report card juillet 2026.pdf",
-    "parser_version": 3
+    "parser_version": 5
   },
   "1AbE7ZOgwwcT--6W6q7LM1ntMLPQ2WDzR": {
     "dealer": "vw",
@@ -611,7 +615,7 @@
     "local_path": null,
     "modifiedTime": "2026-07-10T20:02:28.000Z",
     "name": "Dealer report card juin 26 VWB.pdf",
-    "parser_version": 3
+    "parser_version": 5
   },
   "1B8reLMWUboCE-t7rRSENMPWoFChTiCQ9": {
     "dealer": "hyundai",
@@ -626,10 +630,12 @@
     "name": "VWBROSSARD062026.xlsm"
   },
   "1BEt2mfSZ05_BZhVVfXY9j9-eQGr-4ZKL": {
+    "composite_json": "sources/composites/hyundai_2026-09_hyundai_pp.json",
     "dealer": "hyundai",
-    "local_path": "sources/hyundai_eComposite_-_P_P.xlsx",
+    "local_path": null,
     "modifiedTime": "2026-10-22T13:34:05.102Z",
-    "name": "eComposite - P&P.xlsx"
+    "name": "eComposite - P&P.xlsx",
+    "parser_version": 5
   },
   "1B_9i7gmVBgpEvWi6fzkmsrjsLBDrOW3T": {
     "dealer": "vw",
@@ -872,10 +878,12 @@
     "name": "2026-04_Réalisé_VW.xlsx"
   },
   "1GlrhS6PqSyuwBh6rttvOVAyAI4fGTcA7": {
+    "composite_json": "sources/composites/hyundai_2026-09_hyundai_memo.json",
     "dealer": "hyundai",
-    "local_path": "sources/hyundai_eComposite_-_m_mo_stats.xlsx",
+    "local_path": null,
     "modifiedTime": "2026-10-22T13:37:48.062Z",
-    "name": "eComposite - mémo_stats.xlsx"
+    "name": "eComposite - mémo_stats.xlsx",
+    "parser_version": 5
   },
   "1GtJ4sYy-FliZgl2-e3ypuBBlhBVfKNna": {
     "dealer": "vw",
@@ -1027,7 +1035,7 @@
     "local_path": null,
     "modifiedTime": "2025-05-12T21:00:28.000Z",
     "name": "Dealer report card Avril 2025.pdf",
-    "parser_version": 3
+    "parser_version": 5
   },
   "1JpBK8Ym9qhPJPlTzw6IbAteQlrTwTwGs": {
     "dealer": "vw",
@@ -1036,10 +1044,12 @@
     "name": "Etat financier VW 10 2021.xlsm"
   },
   "1JxoIDOL27TNADOz2OcYTLOluc_B8Lvub": {
+    "composite_json": "sources/composites/vw_2026-09_vw_groupe.json",
     "dealer": "vw",
-    "local_path": "sources/vw_Financial_Statement_Volume_Group_A_-_675_Standard_statement_202609_20261021_133136.xlsx",
+    "local_path": null,
     "modifiedTime": "2026-10-21T13:31:38.857Z",
-    "name": "Financial Statement_Volume Group_A - ≥675_Standard statement_202609_20261021_133136.xlsx"
+    "name": "Financial Statement_Volume Group_A - ≥675_Standard statement_202609_20261021_133136.xlsx",
+    "parser_version": 5
   },
   "1Jz-8Yu6cSJ_7AmesdbcG-yZqTf4rhXS-": {
     "dealer": "vw",
@@ -1173,7 +1183,7 @@
     "local_path": null,
     "modifiedTime": "2026-04-10T21:41:06.000Z",
     "name": "Dealer Report Card Mars 2026.pdf",
-    "parser_version": 3
+    "parser_version": 5
   },
   "1NNP0BX9PlF87mSlVKrMEAHRWwhlI2zZW": {
     "dealer": "vw",
@@ -1235,7 +1245,7 @@
     "local_path": null,
     "modifiedTime": "2025-06-11T16:15:19.000Z",
     "name": "Dealer report card mai 2025.pdf",
-    "parser_version": 3
+    "parser_version": 5
   },
   "1Oo82NQg5GW331Or1yInjzzd9nWp4bwsh": {
     "dealer": "stm",
@@ -1879,7 +1889,7 @@
     "local_path": null,
     "modifiedTime": "2026-05-14T10:11:31.000Z",
     "name": "Dealer report card avril 2025.pdf",
-    "parser_version": 3
+    "parser_version": 5
   },
   "1agTnQD9oAsHRzeyMpvkvgU6ja8pN13om": {
     "dealer": "hyundai",
@@ -1893,7 +1903,7 @@
     "local_path": null,
     "modifiedTime": "2025-11-13T20:09:39.000Z",
     "name": "Dealer report card octobre 2025.pdf",
-    "parser_version": 3
+    "parser_version": 5
   },
   "1avP5uGX2gIv8HJkSjzDqdqRLM5FhoJc2": {
     "dealer": "stm",
@@ -2015,7 +2025,7 @@
     "local_path": null,
     "modifiedTime": "2025-03-18T15:25:43.000Z",
     "name": "Dealer report card.pdf",
-    "parser_version": 3
+    "parser_version": 5
   },
   "1cPz6aq6S6Huk_j_P3kOmJYdMgqitRKqO": {
     "dealer": "hawks",
@@ -2119,7 +2129,7 @@
     "local_path": null,
     "modifiedTime": "2025-09-12T19:22:06.000Z",
     "name": "Dealer report card aout 25.pdf",
-    "parser_version": 3
+    "parser_version": 5
   },
   "1e5-3HC7ZVPtC8TrWvQ2ITRBN3i4Yz86j": {
     "dealer": "vw",
@@ -2133,7 +2143,7 @@
     "local_path": null,
     "modifiedTime": "2026-06-10T12:57:17.000Z",
     "name": "Dealer report card Mai 2026.pdf",
-    "parser_version": 3
+    "parser_version": 5
   },
   "1eJjUazq3zUs7y1zHBNBL5G9KZ5kbmtSQ": {
     "dealer": "vw",
@@ -2375,7 +2385,7 @@
     "local_path": null,
     "modifiedTime": "2025-10-22T14:07:55.000Z",
     "name": "Dealer report card septembre 25 V2.pdf",
-    "parser_version": 3
+    "parser_version": 5
   },
   "1jRf6WiP9ZZN1RnuOX3AVAUnlOPG1EXLJ": {
     "dealer": "stm",
@@ -2437,7 +2447,7 @@
     "local_path": null,
     "modifiedTime": "2026-09-29T20:54:13.000Z",
     "name": "Dealer report card aout 2026.pdf",
-    "parser_version": 3
+    "parser_version": 5
   },
   "1kfimvlxN1y91Fi5Kg8-3SfAqiZegdp8N": {
     "dealer": "vw",
@@ -2583,7 +2593,7 @@
     "local_path": null,
     "modifiedTime": "2025-12-09T21:07:47.000Z",
     "name": "Dealer report card novembre 2025.pdf",
-    "parser_version": 3
+    "parser_version": 5
   },
   "1nLTAjODPydOhHLOJ7CTIxmbd9uW38xVt": {
     "dealer": "vw",
@@ -2675,7 +2685,7 @@
     "local_path": null,
     "modifiedTime": "2025-04-29T15:45:40.000Z",
     "name": "Dealer report card mars 2025.pdf",
-    "parser_version": 3
+    "parser_version": 5
   },
   "1oBRwTjIjhtyAgUTLIZvfst0EmK-qW-on": {
     "composite_json": "sources/composites/hyundai_2026-08_hyundai_ar.json",
@@ -2848,10 +2858,12 @@
     "name": "2025_02_28_EF_HAWKS.xlsm"
   },
   "1rGgohsoqX3MVJaV9MNQ-OEsZAwthluEk": {
+    "composite_json": "sources/composites/hyundai_2025-09_hyundai_ar.json",
     "dealer": "hyundai",
-    "local_path": "sources/hyundai_eComposite_-_analyse_des_revenus._1_.xlsx",
+    "local_path": null,
     "modifiedTime": "2026-10-22T13:40:47.598Z",
-    "name": "eComposite - analyse des revenus. (1).xlsx"
+    "name": "eComposite - analyse des revenus. (1).xlsx",
+    "parser_version": 5
   },
   "1rHYFab6r2w1rjNnONn9MsF4kvDyuFh8h": {
     "dealer": "bmw",
@@ -2896,10 +2908,12 @@
     "name": "2024-13_Réalisé_VW.xlsx"
   },
   "1rqk4U017ZTdUmlwOkmCHxfNwFJnaYKTi": {
+    "composite_json": "sources/composites/vw_2025-09_vw_groupe.json",
     "dealer": "vw",
-    "local_path": "sources/vw_Financial_Statement_Volume_Group_A_-_675_Standard_statement_202509_20261021_133225.xlsx",
+    "local_path": null,
     "modifiedTime": "2026-10-21T13:32:27.049Z",
-    "name": "Financial Statement_Volume Group_A - ≥675_Standard statement_202509_20261021_133225.xlsx"
+    "name": "Financial Statement_Volume Group_A - ≥675_Standard statement_202509_20261021_133225.xlsx",
+    "parser_version": 5
   },
   "1s-gm7e5y-BZn1K60KXP4sj2EwwvhmmMe": {
     "dealer": "hawks",
@@ -2925,7 +2939,7 @@
     "local_path": null,
     "modifiedTime": "2025-07-14T07:28:50.000Z",
     "name": "Dealer Report Card Juin 2025.pdf",
-    "parser_version": 3
+    "parser_version": 5
   },
   "1sOYMva-JEI5vyIF2V3rw8X_JorqgUoe4": {
     "dealer": "vw",
@@ -2969,7 +2983,7 @@
     "local_path": null,
     "modifiedTime": "2026-02-19T16:11:55.000Z",
     "name": "Dealer report card janvier 26.pdf",
-    "parser_version": 3
+    "parser_version": 5
   },
   "1sxixcoLi_cQkYgl0IH23yyKNtSQAvfFi": {
     "dealer": "vw",
@@ -3152,10 +3166,12 @@
     "name": "Etat financier VW 09 2021.xlsm"
   },
   "1w71tJfJvOrJOT-HycKLj2eeQIGCxmG42": {
+    "composite_json": "sources/composites/hyundai_2026-09_hyundai_ar.json",
     "dealer": "hyundai",
-    "local_path": "sources/hyundai_eComposite_-_analyse_des_revenus..xlsx",
+    "local_path": null,
     "modifiedTime": "2026-10-22T13:36:46.213Z",
-    "name": "eComposite - analyse des revenus..xlsx"
+    "name": "eComposite - analyse des revenus..xlsx",
+    "parser_version": 5
   },
   "1wCu4OYH2_ThIKHsXLzPoQQHShx7slvys": {
     "dealer": "bmw",
@@ -3207,7 +3223,7 @@
     "local_path": null,
     "modifiedTime": "2025-08-13T21:25:33.000Z",
     "name": "Dealer report card Juillet 2025.pdf",
-    "parser_version": 3
+    "parser_version": 5
   },
   "1xWz7bTbpFHqued9fGTrPThV-FKvqGihP": {
     "dealer": "bmw",
@@ -3269,7 +3285,7 @@
     "local_path": null,
     "modifiedTime": "2026-01-27T17:37:51.000Z",
     "name": "Dealer report card décembre 2025.pdf",
-    "parser_version": 3
+    "parser_version": 5
   },
   "1ylYz6omIc6PvVR8VLJnhM10LDEPWk5Ql": {
     "dealer": "bmw",

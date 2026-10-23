@@ -1095,13 +1095,25 @@ def pages_concession(s, P, d):
     e = comp_of(s, d, P)
     out = []
     if d == "hyundai":
+        # 22 octobre 2026 (Maxime Allard) : les pages au format de l'analyse de Mustafa Bhaloo (un département par page,
+        # mois et cumul, an passé, indicateurs, constats chiffrés) remplacent le sommaire et les dépenses.
+        import analyse_composite as ac
+        pages = ac.pages_hyundai(s, P, e, comp_of(s, d, f"{int(P[:4]) - 1}{P[4:]}"))
+        if pages:
+            return pages
         H = HyComp(e)
         if H.ok and H.ef:
             out += hy_page_sommaire(s, P, d, H)
         if H.ok and H.pp:
             out += hy_page_depenses(s, P, d, H)
-    elif d == "vw" and e.get("vw_report_card"):
-        out += vw_page_bulletin(s, P, d, e["vw_report_card"]) + [vw_page_ventes(s, P, d, e["vw_report_card"])]
+    elif d == "vw":
+        # 23 octobre 2026 : comparaison au groupe de volume A (états financiers standard), même format que
+        # l'analyse de Mustafa Bhaloo ; le bulletin VW (moyenne nationale), quand il est là, suit.
+        if e.get("vw_groupe"):
+            import analyse_composite as ac
+            out += ac.pages_vw(s, P, e, comp_of(s, d, f"{int(P[:4]) - 1}{P[4:]}"))
+        if e.get("vw_report_card"):
+            out += vw_page_bulletin(s, P, d, e["vw_report_card"]) + [vw_page_ventes(s, P, d, e["vw_report_card"])]
     return out
 
 
@@ -1122,7 +1134,7 @@ def _status_line(s, P):
     got, wait = [], []
     for d, src in ATTENDUS:
         e = comp_of(s, d, P)
-        (got if any(k in e for k in ("hyundai_ef", "hyundai_pp", "hyundai_ar", "vw_report_card")) else wait).append(DEALERS.get(d, d))
+        (got if any(k in e for k in ("hyundai_ef", "hyundai_pp", "hyundai_ar", "vw_report_card", "vw_groupe")) else wait).append(DEALERS.get(d, d))
     y, m = split(P)
     t = f"<b>Composites de {MOIS[m]} {y} reçus :</b> {', '.join(got) or 'aucun'}"
     if wait:

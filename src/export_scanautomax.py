@@ -69,6 +69,112 @@ COMPOSITE_DEPTS = {"neuf": "Véhicules neufs", "occasion": "Véhicules usagés",
 COMPOSITE_UNITES = {"neuf": "u_neuf", "occasion": "u_occ"}
 
 
+# Indicateurs par unité et par bon de travail (24 octobre 2026, Maxime : « ne pas oublier les indicateurs clés par
+# unité, par exemple par $ de vente de bon de travail »). Calculés ici à partir de sections.<mode>.apres_vente
+# (src/apres_vente.py) et des indicateurs du mois, pour le réel, le budget et l'année précédente. Les sommes « cachées »
+# (groupe « cache ») servent au site à recalculer les ratios du groupe : numérateurs ÷ dénominateurs, jamais une moyenne.
+# Mêmes règles que l'onglet Opérations fixes du tableau de bord (src/fo_dashboard.js) : seuls les types de BT qui ont un
+# nombre de BT entrent dans les ratios « par BT » ; heures : seulement les types qui en ont.
+TYPES_BT = ("client", "garantie", "entretien", "interne", "esthetique")
+INDICATEURS_UNITE = [
+    # clé, libellé, groupe, format, (numérateur, dénominateur) ou None
+    ("u_total", "Unités vendues (neuf + usagé)", "unite", "volume", None),
+    ("pb_unite_total", "Profit brut par unité vendue (neuf + usagé, avec F&I et gros)", "unite", None, ("vh_pb", "u_total")),
+    ("pn_unite", "Profit net par unité vendue", "unite", None, ("profit_net", "u_total")),
+    ("dep_unite", "Dépenses par unité vendue", "unite", None, ("dep_abs", "u_total")),
+    ("av_bt", "Bons de travail (tous types)", "apv", "volume", None),
+    ("av_mo", "Ventes M-O sur les BT", "apv", None, None),
+    ("av_pc", "Ventes de pièces sur les BT", "apv", None, None),
+    ("av_tot_bt", "Vente par BT (M-O + pièces)", "apv", None, ("av_tot", "av_bt")),
+    ("av_mo_bt", "Main-d'œuvre par BT", "apv", None, ("av_mo", "av_bt")),
+    ("av_pc_bt", "Pièces par BT", "apv", None, ("av_pc", "av_bt")),
+    ("av_pb_bt", "Profit brut par BT", "apv", None, ("av_pb", "av_bt")),
+    ("av_pb_dollar", "Profit brut par $ de vente de BT", "apv", "percent", ("av_pb", "av_tot")),
+    ("av_marge_mo", "Marge brute M-O", "apv", "percent", ("av_mopb", "av_mo")),
+    ("av_pc_mo", "Pièces vendues par $ de M-O", "apv", "dec2", ("av_pc", "av_mo")),
+    ("av_bt_client", "Bons de travail client", "apv", "volume", None),
+    ("av_tot_bt_client", "Vente par BT client (M-O + pièces)", "apv", None, ("av_tot_client", "av_bt_client")),
+    ("av_mo_bt_client", "Main-d'œuvre par BT client", "apv", None, ("av_mo_client", "av_bt_client")),
+    ("av_pb_bt_client", "Profit brut par BT client", "apv", None, ("av_pb_client", "av_bt_client")),
+    ("av_h", "Heures vendues sur les BT", "apv", "volume", None),
+    ("av_h_bt", "Heures vendues par BT", "apv", "dec2", ("av_h", "av_h_n")),
+    ("av_elr", "Taux effectif (M-O ÷ heure vendue)", "apv", None, ("av_h_mo", "av_h")),
+    ("av_marge_pieces", "Marge brute du département Pièces", "apv", "percent", ("av_pieces_pb", "av_pieces_v")),
+    ("av_carr_bt", "Vente carrosserie par BT", "apv", None, ("av_carr_v", "av_carr_n")),
+]
+CACHES_UNITE = ("vh_pb", "dep_abs", "av_tot", "av_pb", "av_mopb", "av_tot_client", "av_mo_client", "av_pb_client",
+                "av_h_n", "av_h_mo", "av_pieces_v", "av_pieces_pb", "av_carr_v", "av_carr_n")
+
+
+def _champ(kv, f):
+    if not isinstance(kv, dict):
+        return None
+    v = kv.get(f)
+    return float(v) if isinstance(v, (int, float)) and not isinstance(v, bool) and v == v else None
+
+
+def _somme(*vals):
+    v = [x for x in vals if x is not None]
+    return sum(v) if v else None
+
+
+def par_unite(sec, f):
+    """{ clé: valeur } pour un champ (real | budget | prior_year) d'une section (mois ou cumul)."""
+    k = sec.get("kpis") or {}
+    av = sec.get("apres_vente") or {}
+    o = {}
+    un, uu = _champ(k.get("unites_neuf"), f), _champ(k.get("unites_usage"), f)
+    if un is not None or uu is not None:
+        o["u_total"] = (un or 0) + (uu or 0)
+    o["vh_pb"] = _somme(_champ(k.get("pb_neuf"), f), _champ(k.get("pb_usage"), f))
+    dep = _champ(k.get("depenses"), f)
+    o["dep_abs"] = abs(dep) if dep is not None else None
+    o["profit_net"] = _champ(k.get("profit_net"), f)
+    acc = {"bt": None, "mo": None, "pc": None, "mopb": None, "pcpb": None, "h": None, "h_n": None, "h_mo": None}
+    cli = {}
+    for typ in TYPES_BT:
+        t = (av.get("types") or {}).get(typ) or {}
+        bt = _champ(t.get("bt"), f)
+        if not bt:
+            continue
+        mo, pc = _champ(t.get("mo_ventes"), f), _champ(t.get("pc_ventes"), f)
+        mopb, pcpb = _champ(t.get("mo_pb"), f), _champ(t.get("pc_pb"), f)
+        for cle, v in (("bt", bt), ("mo", mo), ("pc", pc), ("mopb", mopb), ("pcpb", pcpb)):
+            acc[cle] = _somme(acc[cle], v)
+        h = _champ(t.get("heures"), f)
+        if h:
+            acc["h"], acc["h_n"], acc["h_mo"] = _somme(acc["h"], h), _somme(acc["h_n"], bt), _somme(acc["h_mo"], mo)
+        if typ == "client":
+            cli = {"bt": bt, "mo": mo, "tot": _somme(mo, pc), "pb": _somme(mopb, pcpb)}
+    o.update({"av_bt": acc["bt"], "av_mo": acc["mo"], "av_pc": acc["pc"], "av_mopb": acc["mopb"],
+              "av_tot": _somme(acc["mo"], acc["pc"]), "av_pb": _somme(acc["mopb"], acc["pcpb"]),
+              "av_h": acc["h"], "av_h_n": acc["h_n"], "av_h_mo": acc["h_mo"],
+              "av_bt_client": cli.get("bt"), "av_mo_client": cli.get("mo"), "av_tot_client": cli.get("tot"), "av_pb_client": cli.get("pb")})
+    pt = (av.get("pieces") or {}).get("total") or {}
+    o["av_pieces_v"], o["av_pieces_pb"] = _champ(pt.get("ventes"), f), _champ(pt.get("pb"), f)
+    ct = (av.get("carrosserie") or {}).get("total") or {}
+    o["av_carr_v"], o["av_carr_n"] = _champ(ct.get("ventes"), f), _champ(ct.get("bt"), f)
+    for cle, _l, _g, _f, rat in INDICATEURS_UNITE:
+        if rat:
+            o[cle] = _div(o.get(rat[0]), o.get(rat[1]))
+    return o
+
+
+def ajouter_par_unite(sec, k, libelles):
+    """Ajoute à k (indicateurs compacts d'une section) les indicateurs par unité et par BT, avec leurs sommes cachées."""
+    vals = [par_unite(sec, f) for f in CHAMPS]
+    for cle, lib, grp, fmt, _rat in INDICATEURS_UNITE:
+        t = [arrondi(v.get(cle)) for v in vals]
+        if any(x is not None for x in t):
+            k[cle] = t
+            libelles.setdefault(cle, {"l": lib, "g": grp, "f": fmt})
+    for cle in CACHES_UNITE:
+        t = [arrondi(v.get(cle)) for v in vals]
+        if any(x is not None for x in t) and cle not in k:
+            k[cle] = t
+            libelles.setdefault(cle, {"l": cle, "g": "cache", "f": None})
+
+
 def arrondi(v):
     if not isinstance(v, (int, float)) or isinstance(v, bool) or v != v:
         return None
@@ -212,6 +318,10 @@ def compacter(data, drive=None, comp=None):
                     k[key] = t
                     if key not in libelles and isinstance(kv, dict):
                         libelles[key] = {"l": kv.get("label") or key, "g": kv.get("group") or "other", "f": kv.get("format")}
+                try:
+                    ajouter_par_unite(sec, k, libelles)
+                except Exception as e:                       # un mois illisible n'empêche pas l'envoi
+                    print(f"Indicateurs par unité {cle} {pk} {mode} ignorés : {e!r}")
                 if k:
                     out[court] = k
                 deps = {}

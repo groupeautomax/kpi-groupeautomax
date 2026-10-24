@@ -10,6 +10,16 @@ POSTE au script Apps Script de ScanAutomax (action kpiImporter). ScanAutomax
 le garde derrière sa connexion : le site l'affiche dans Vente › KPI, avec la
 portée de chaque compte (un directeur ne voit que sa concession).
 
+Composite (24 octobre 2026, demande de Maxime : « les comparables avec le
+composite du groupe comme dans le rapport de Mustafa doivent être dans les KPI,
+comme le budget et l'année précédente ») : pour VW Brossard et Hyundai
+Longueuil, chaque mois dont l'état du groupe constructeur est dans le Drive
+reçoit un bloc « x » : la concession et le concessionnaire moyen de son groupe
+(VW Canada groupe A, Hyundai Canada Est A), lus aux mêmes lignes de l'état
+financier constructeur par reports/mensuel/analyse_composite.py — les chiffres
+du rapport de Mustafa. Sans ce module (ou en cas d'erreur), l'envoi part sans
+composite.
+
 Rien n'est écrit dans le dépôt (il est public) : le fichier compact n'existe
 que le temps de l'envoi.
 
@@ -39,6 +49,24 @@ NOMS = {"BMW": "BMW Sherbrooke", "STM": "Ste Marie Automobiles Ltée", "HAWKS": 
 DEPT_METRIQUES = ["units", "units_flottes", "profit_brut", "total_variables", "total_personnel",
                   "total_semifixes", "total_depenses", "autres_revenus", "profit_departemental"]
 CHAMPS = ("real", "budget", "prior_year")
+
+# Composite : indicateur du tableau de bord → valeur d'analyse_composite (mêmes définitions pour la
+# concession et le groupe). Les ratios sont recalculés ici comme sur le site (numérateur ÷ dénominateur).
+COMPOSITE_INDICATEURS = {
+    "pb_neuf": "pb_neuf", "pb_usage": "pb_occasion", "pb_service": "pb_service", "pb_pieces": "pb_pieces",
+    "unites_neuf": "u_neuf", "unites_usage": "u_occ", "pb_total": "pb_total", "depenses": "frais_total",
+    "profit_net": "pn", "ebt": "pn", "ventes_nettes": "ventes_total",
+    "pbv_neuf": "pbav_neuf", "fi_neuf": "fi_neuf", "pbv_usage": "pbdet_occ", "fi_usage": "fi_occ", "gros_usage": "pb_gros",
+}
+COMPOSITE_RATIOS = {
+    "ros": ("profit_net", "ventes_nettes"), "ebt_pct_profit_brut": ("profit_net", "pb_total"),
+    "gpa_neuf": ("pb_neuf", "unites_neuf"), "gpa_usage": ("pb_usage", "unites_usage"),
+    "pbv_unite_neuf": ("pbv_neuf", "unites_neuf"), "fi_unite_neuf": ("fi_neuf", "unites_neuf"),
+    "pbv_unite_usage": ("pbv_usage", "unites_usage"), "fi_unite_usage": ("fi_usage", "unites_usage"),
+}
+COMPOSITE_NEGATIFS = {"depenses"}          # gardées négatives, comme dans le tableau de bord
+COMPOSITE_DEPTS = {"neuf": "Véhicules neufs", "occasion": "Véhicules usagés", "service": "Service", "pieces": "Pièces"}
+COMPOSITE_UNITES = {"neuf": "u_neuf", "occasion": "u_occ"}
 
 
 def arrondi(v):
@@ -77,8 +105,89 @@ def index_drive(chemin_manifeste):
     return idx
 
 
-def compacter(data, drive=None):
+def _paire(c, g):
+    c, g = arrondi(c), arrondi(g)
+    return None if c is None and g is None else [c, g]
+
+
+def _div(a, b):
+    return a / b if isinstance(a, (int, float)) and isinstance(b, (int, float)) and b else None
+
+
+def composites(data, racine):
+    """{ cle du tableau de bord: { période: bloc } } — la concession et la moyenne de son groupe constructeur,
+    comme dans l'analyse au composite du rapport mensuel. {} si le module du rapport n'est pas lisible."""
+    comp = data.get("composites") or {}
+    if not comp:
+        return {}
+    try:
+        for d in (os.path.join(racine, "reports", "mensuel"), os.path.join(racine, "src")):
+            if d not in sys.path:
+                sys.path.insert(0, d)
+        import analyse_composite as A
+    except Exception as e:                                   # le KPI part quand même, sans composite
+        print("Composite non exporté (analyse_composite illisible) : " + repr(e))
+        return {}
+    classes = {"vw": A.VW, "hyundai": A.Hyundai}
+    out = {}
+    for cle, Cls in classes.items():
+        mois = comp.get(cle) or {}
+        for per, entree in sorted(mois.items()):
+            if not isinstance(entree, dict):
+                continue
+            try:
+                prec = mois.get(f"{int(per[:4]) - 1}-{per[5:]}")
+                S = Cls(entree, prec)
+                if not S.ok:
+                    continue
+                bloc = {"g": S.groupe, "gl": S.grp_long, "src": S.source, "f": entree.get("concession_source") or ""}
+                if S.n:
+                    bloc["n"] = S.n
+                for mode, court in (("month", "m"), ("ytd", "c")):
+                    k = {}
+                    for dk, ck in COMPOSITE_INDICATEURS.items():
+                        c, g = S.v("c", ck, 0, mode), S.v("g", ck, 0, mode)
+                        if dk in COMPOSITE_NEGATIFS:
+                            c, g = (-c if c is not None else None), (-g if g is not None else None)
+                        t = _paire(c, g)
+                        if t:
+                            k[dk] = t
+                    for rk, (a, b) in COMPOSITE_RATIOS.items():
+                        na, nb_ = k.get(a) or [None, None], k.get(b) or [None, None]
+                        t = _paire(_div(na[0], nb_[0]), _div(na[1], nb_[1]))
+                        if t:
+                            k[rk] = t
+                    if k:
+                        bloc[court] = k
+                    deps, libs = {}, {}
+                    for dept, nom in COMPOSITE_DEPTS.items():
+                        m = {}
+                        u = COMPOSITE_UNITES.get(dept)
+                        prof, lib = (S.RETENIR.get(dept) or (None, None))
+                        for met, ck in (("units", u), ("profit_brut", "pb_" + dept), ("total_depenses", "frais_" + dept),
+                                        ("profit_departemental", prof)):
+                            if not ck:
+                                continue
+                            t = _paire(S.v("c", ck, 0, mode), S.v("g", ck, 0, mode))
+                            if t:
+                                m[met] = t
+                        if m:
+                            deps[nom] = m
+                            if lib:
+                                libs[nom] = lib
+                    if deps:
+                        bloc["d" + court] = deps
+                        bloc["pl"] = libs
+                if "m" in bloc or "c" in bloc:
+                    out.setdefault(cle, {})[per] = bloc
+            except Exception as e:                           # un mois illisible n'arrête pas les autres
+                print(f"Composite {cle} {per} ignoré : {e!r}")
+    return out
+
+
+def compacter(data, drive=None, comp=None):
     drive = drive or {}
+    comp = comp or {}
     libelles = {}
     concessions = {}
     for cle, dv in (data.get("dealers") or {}).items():
@@ -116,6 +225,8 @@ def compacter(data, drive=None):
                         deps[nom] = m
                 if deps:
                     out["d" + court] = deps
+            if (comp.get(cle) or {}).get(pk):
+                out["x"] = comp[cle][pk]                 # composite du groupe constructeur
             if "m" in out or "c" in out:
                 periodes[pk] = out
         if periodes:
@@ -154,7 +265,11 @@ def main(argv):
         data = json.load(f)
     manifeste = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(chemin))), "sources", ".drive_manifest.json")
     drive = index_drive(manifeste)
-    compact = compacter(data, drive)
+    racine = os.path.dirname(os.path.dirname(os.path.abspath(chemin)))
+    comp = composites(data, racine)
+    compact = compacter(data, drive, comp)
+    avec = [f"{c} {p}" for c, v in compact["concessions"].items() for p, x in sorted(v["periodes"].items()) if "x" in x]
+    print("Composite : " + (", ".join(avec) if avec else "aucun mois"))
     hors = [f"{c} {p}" for c, v in compact["concessions"].items() for p, x in v["periodes"].items() if "di" not in x]
     if drive and hors:
         print("Mois dont le fichier n'est pas dans le Drive (déposé à la main) : " + ", ".join(hors))

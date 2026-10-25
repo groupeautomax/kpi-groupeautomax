@@ -20,6 +20,25 @@ financier constructeur par reports/mensuel/analyse_composite.py — les chiffres
 du rapport de Mustafa. Sans ce module (ou en cas d'erreur), l'envoi part sans
 composite.
 
+Tout le composite (25 octobre 2026, Maxime : « assure-toi que tu scannes toutes
+les données des composites car il semble en manquer ») :
+  - les états du groupe donnent aussi, aux mêmes définitions que le tableau de
+    bord : les dépenses variables / de personnel / semi-fixes (total et par
+    département), le département Carrosserie (VW), et l'après-vente « client »
+    (BT client, M-O, pièces et profit brut par BT client, M-O et pièces sur les
+    BT, marges M-O et Pièces ; VW : BT, heures vendues et ratios par BT) ;
+  - les mois sans état du groupe VW reçoivent le bulletin du concessionnaire VW
+    Canada (Dealer Report Card) : VW Brossard contre la moyenne de la région
+    Québec, au cumul seulement (le bulletin ne donne que l'année à date) — les
+    unités neuves vendues (bulletin du mois) et le F&I par véhicule d'occasion au
+    détail (bulletin du mois SUIVANT : ses chiffres financiers ont un mois de
+    retard ; ils égalent ceux du Réalisé du mois). Un mois qui a l'état du
+    groupe A garde l'état du groupe (rien n'est mélangé). Le reste du bulletin
+    (parts de marché, CEM, F&I par véhicule neuf, absorption…) n'a pas
+    d'indicateur au même sens dans le tableau de bord : il n'est pas envoyé.
+  - le mémo stats Hyundai (techniciens, employés, jours d'inventaire) n'a pas
+    d'indicateur correspondant non plus.
+
 Rien n'est écrit dans le dépôt (il est public) : le fichier compact n'existe
 que le temps de l'envoi.
 
@@ -64,9 +83,28 @@ COMPOSITE_RATIOS = {
     "pbv_unite_neuf": ("pbv_neuf", "unites_neuf"), "fi_unite_neuf": ("fi_neuf", "unites_neuf"),
     "pbv_unite_usage": ("pbv_usage", "unites_usage"), "fi_unite_usage": ("fi_usage", "unites_usage"),
 }
-COMPOSITE_NEGATIFS = {"depenses"}          # gardées négatives, comme dans le tableau de bord
+COMPOSITE_NEGATIFS = {"depenses", "depenses_variables", "depenses_personnel", "depenses_semifixes"}   # gardées négatives
 COMPOSITE_DEPTS = {"neuf": "Véhicules neufs", "occasion": "Véhicules usagés", "service": "Service", "pieces": "Pièces"}
 COMPOSITE_UNITES = {"neuf": "u_neuf", "occasion": "u_occ"}
+# 25 oct. : départements et ratios en plus (mêmes définitions que src/extract.py pour l'état du constructeur :
+# VW lignes 15 / 27 / 47 / 63 / 73 ; Hyundai frais de vente − salaires des gérants, frais d'emploi + salaires des
+# gérants, frais directs − frais d'emploi). Carrosserie : la colonne de l'état (VW ; Hyundai Longueuil n'en a pas).
+COMPOSITE_DEPTS_PLUS = {"carrosserie": "Carrosserie"}
+COMPOSITE_RATIOS_PLUS = {
+    "av_mo_bt_client": ("av_mo_client", "av_bt_client"), "av_tot_bt_client": ("av_tot_client", "av_bt_client"),
+    "av_pb_bt_client": ("av_pb_client", "av_bt_client"), "av_pc_mo": ("av_pc", "av_mo"), "av_marge_mo": ("av_mopb", "av_mo"),
+    "av_marge_pieces": ("av_pieces_pb", "av_pieces_v"),
+    # VW seulement (le nombre de BT et les heures de l'état Hyundai n'ont pas la définition du tableau de bord)
+    "av_mo_bt": ("av_mo", "av_bt"), "av_pc_bt": ("av_pc", "av_bt"), "av_tot_bt": ("av_tot", "av_bt"), "av_h_bt": ("av_h", "av_h_n"),
+}
+# Bulletin du concessionnaire VW Canada (Dealer Report Card) : (section, indicateur du bulletin, clé du tableau de bord,
+# décalage en mois entre le bulletin et le mois des chiffres). Comparé à la moyenne de la région (« Geo Local »).
+BULLETIN_VW = [
+    ("new", "nv_sales", "unites_neuf", 0),        # ventes de véhicules neufs de l'année (unités) — mois du bulletin
+    ("used", "fi_puvr", "fi_unite_usage", 1),     # F&I par véhicule d'occasion au détail — chiffres du mois précédent
+]
+MOIS_FR = ("janvier", "février", "mars", "avril", "mai", "juin", "juillet", "août", "septembre", "octobre", "novembre",
+           "décembre")
 
 
 # Indicateurs par unité et par bon de travail (24 octobre 2026, Maxime : « ne pas oublier les indicateurs clés par
@@ -220,6 +258,134 @@ def _div(a, b):
     return a / b if isinstance(a, (int, float)) and isinstance(b, (int, float)) and b else None
 
 
+def _tous(*vals):
+    """Somme si toutes les valeurs sont des nombres, sinon None (une ligne manquante ne vaut pas 0)."""
+    return sum(vals) if vals and all(isinstance(v, (int, float)) and not isinstance(v, bool) for v in vals) else None
+
+
+def _moins(a, b):
+    return _tous(a, -b) if isinstance(b, (int, float)) else None
+
+
+def _vw_ligne(S, who, mode, page, ligne, i):
+    """Une case de l'état VW (concession « c » ou groupe « g », année en cours), comme VW.base."""
+    m = (S.L.get((who, 0)) or {}).get(mode) or {}
+    row = (m.get(page) or {}).get(str(ligne))
+    v = row[i] if row and len(row) > i else None
+    return v if isinstance(v, (int, float)) and not isinstance(v, bool) else None
+
+
+# Colonnes de l'état VW par département : (page, indice) — p2 [total, neuf, occasion], p3 [service, carrosserie, pièces]
+VW_COLONNES = {"total": ("p2", 0), "neuf": ("p2", 1), "occasion": ("p2", 2), "service": ("p3", 0), "carrosserie": ("p3", 1),
+               "pieces": ("p3", 2)}
+
+
+def _repartition(S, cle, who, dept, mode):
+    """{ total_variables, total_personnel, total_semifixes, total_depenses } d'un département (ou « total ») — positifs."""
+    if cle == "vw":
+        page, i = VW_COLONNES[dept]
+        L = lambda n: _vw_ligne(S, who, mode, page, n, i)
+        return {"total_variables": L(15), "total_personnel": L(27), "total_semifixes": L(47), "total_depenses": L(63)}
+    if who == "c":
+        t = (((S.conc.get(0) or {}).get(mode) or {}).get("pp") or {}).get(dept) or {}
+        P = lambda cid: t.get(cid)
+    else:
+        P = lambda cid: S._pp_row(dept, 0, mode, cid=cid)
+    sal = P("sal_directeurs") or 0          # salaires des gérants : du personnel, pas des frais variables
+    tv, em, td = P("total_vente"), P("emploi"), P("total_directs")
+    return {"total_variables": _moins(tv, sal), "total_personnel": _tous(em, sal) if em is not None else None,
+            "total_semifixes": _moins(td, em), "total_depenses": P("total_frais")}
+
+
+def _extras(S, cle, who, mode):
+    """Indicateurs du tableau de bord en plus de COMPOSITE_INDICATEURS, aux mêmes définitions pour la concession et le
+    groupe (vérifiées contre le tableau de bord sur les mois lus dans l'état Hyundai Canada)."""
+    V = lambda k: S.v(who, k, 0, mode)
+    o = {}
+    r = _repartition(S, cle, who, "total", mode)
+    o["depenses_variables"], o["depenses_personnel"], o["depenses_semifixes"] = (
+        r["total_variables"], r["total_personnel"], r["total_semifixes"])
+    o["av_bt_client"] = V("br_client")
+    o["av_mo_client"] = V("mo_client")
+    o["av_tot_client"] = _tous(V("mo_client"), V("pc_client"))
+    o["av_pb_client"] = _tous(V("pb_mo_client"), V("pb_pc_client"))
+    o["av_mo"] = _tous(V("mo_client"), V("mo_garantie"), V("mo_interne"))
+    o["av_pc"] = V("pc_br")
+    o["av_pieces_v"], o["av_pieces_pb"] = V("ventes_pieces"), V("pb_pieces")
+    if cle == "vw":
+        o["av_mopb"] = _tous(*[_vw_ligne(S, who, mode, "p5", n, 2) for n in (1, 3, 4)])
+        o["av_bt"] = V("br_total")
+        o["av_tot"] = _tous(o["av_mo"], o["av_pc"])
+        o["av_h"], o["av_h_n"] = V("heures_vendues"), V("br_total")
+        o["pb_carrosserie"] = _vw_ligne(S, who, mode, "p3", 2, 1)
+    else:
+        o["av_mopb"] = _tous(V("pb_mo_client"), V("pb_mo_garantie"), V("pb_mo_interne"))
+    return o
+
+
+def _depts_plus(S, cle, who, mode):
+    """{ nom du département: { mesure: valeur } } : la répartition des dépenses des quatre départements, et la Carrosserie."""
+    out = {}
+    for dept, nom in list(COMPOSITE_DEPTS.items()) + list(COMPOSITE_DEPTS_PLUS.items()):
+        r = _repartition(S, cle, who, dept, mode)
+        m = {k: r[k] for k in ("total_variables", "total_personnel", "total_semifixes")}
+        if dept in COMPOSITE_DEPTS_PLUS:
+            m["total_depenses"] = r["total_depenses"]
+            if cle == "vw":
+                m["profit_brut"] = _vw_ligne(S, who, mode, "p3", 2, 1)
+                m["profit_departemental"] = _vw_ligne(S, who, mode, "p3", 73, 1)
+            else:
+                ef = (((S.conc.get(0) or {}).get(mode) or {}).get("ef") or {}).get("carrosserie") or {}
+                m["profit_brut"] = ef.get("pb") if who == "c" else S._pp_row("carrosserie", 0, mode, idx=1)
+                m["profit_departemental"] = S.v(who, "po_carrosserie", 0, mode)
+        out[nom] = m
+    return out
+
+
+def _mois_moins(per, n):
+    y, m = int(per[:4]), int(per[5:7]) - n
+    while m < 1:
+        m += 12
+        y -= 1
+    return f"{y}-{m:02d}"
+
+
+def _mois_lib(per):
+    nom = MOIS_FR[int(per[5:7]) - 1]
+    return ("d'" if nom[0] in "aeiouyéèêàâîô" else "de ") + nom + " " + per[:4]
+
+
+def bulletins_vw(mois_vw, deja):
+    """Blocs « x » tirés des bulletins du concessionnaire VW Canada, pour les mois qui n'ont pas l'état du groupe A
+    (`deja`). Cumul seulement : VW Brossard contre la moyenne de la région Québec (« Geo Local »)."""
+    out = {}
+    for per, entree in sorted((mois_vw or {}).items()):
+        b = (entree or {}).get("vw_report_card") if isinstance(entree, dict) else None
+        if not isinstance(b, dict):
+            continue
+        geo = ((b.get("classement") or {}).get("geo") or {})
+        for section, ind, cle, decalage in BULLETIN_VW:
+            x = ((b.get("comparateurs") or {}).get(section) or {}).get(ind) or {}
+            t = _paire(x.get("ytd"), x.get("geo"))
+            if not t or t[0] is None or t[1] is None:
+                continue
+            cible = _mois_moins(per, decalage)
+            if cible in deja:
+                continue                                   # l'état du groupe A l'emporte : on ne mélange pas
+            bloc = out.setdefault(cible, {"g": "Région Québec", "gl": "Région Québec (bulletin VW)", "t": "bulletin",
+                                          "src": "bulletin du concessionnaire VW Canada (Dealer Report Card), moyenne des "
+                                                 "concessions de la région Québec, cumul de l'année", "lus": []})
+            if geo.get("n"):
+                bloc["n"] = geo["n"]
+            bloc.setdefault("c", {})[cle] = t
+            note = "bulletin " + _mois_lib(per) + (" (chiffres " + _mois_lib(cible) + ")" if decalage else "")
+            if note not in bloc["lus"]:
+                bloc["lus"].append(note)
+    for bloc in out.values():
+        bloc["f"] = " · ".join(bloc.pop("lus"))
+    return out
+
+
 def composites(data, racine):
     """{ cle du tableau de bord: { période: bloc } } — la concession et la moyenne de son groupe constructeur,
     comme dans l'analyse au composite du rapport mensuel. {} si le module du rapport n'est pas lisible."""
@@ -233,8 +399,8 @@ def composites(data, racine):
         import analyse_composite as A
     except Exception as e:                                   # le KPI part quand même, sans composite
         print("Composite non exporté (analyse_composite illisible) : " + repr(e))
-        return {}
-    classes = {"vw": A.VW, "hyundai": A.Hyundai}
+        A = None
+    classes = {"vw": A.VW, "hyundai": A.Hyundai} if A else {}
     out = {}
     for cle, Cls in classes.items():
         mois = comp.get(cle) or {}
@@ -258,7 +424,15 @@ def composites(data, racine):
                         t = _paire(c, g)
                         if t:
                             k[dk] = t
-                    for rk, (a, b) in COMPOSITE_RATIOS.items():
+                    xc, xg = _extras(S, cle, "c", mode), _extras(S, cle, "g", mode)
+                    for dk in xc:
+                        c, g = xc.get(dk), xg.get(dk)
+                        if dk in COMPOSITE_NEGATIFS:
+                            c, g = (-c if c is not None else None), (-g if g is not None else None)
+                        t = _paire(c, g)
+                        if t and dk not in k:
+                            k[dk] = t
+                    for rk, (a, b) in list(COMPOSITE_RATIOS.items()) + list(COMPOSITE_RATIOS_PLUS.items()):
                         na, nb_ = k.get(a) or [None, None], k.get(b) or [None, None]
                         t = _paire(_div(na[0], nb_[0]), _div(na[1], nb_[1]))
                         if t:
@@ -281,6 +455,16 @@ def composites(data, racine):
                             deps[nom] = m
                             if lib:
                                 libs[nom] = lib
+                    dc, dg = _depts_plus(S, cle, "c", mode), _depts_plus(S, cle, "g", mode)
+                    for nom, mc in dc.items():
+                        if nom in COMPOSITE_DEPTS_PLUS.values() and not mc.get("profit_brut"):
+                            continue                         # pas d'atelier de carrosserie (Hyundai Longueuil)
+                        for met, c in mc.items():
+                            t = _paire(c, (dg.get(nom) or {}).get(met))
+                            if t and met not in (deps.get(nom) or {}):
+                                deps.setdefault(nom, {})[met] = t
+                                if nom == "Carrosserie" and met == "profit_departemental":
+                                    libs.setdefault(nom, "Profit net" if cle == "vw" else "Profit d'opération net")
                     if deps:
                         bloc["d" + court] = deps
                         bloc["pl"] = libs
@@ -288,6 +472,13 @@ def composites(data, racine):
                     out.setdefault(cle, {})[per] = bloc
             except Exception as e:                           # un mois illisible n'arrête pas les autres
                 print(f"Composite {cle} {per} ignoré : {e!r}")
+    # Bulletins VW : les mois sans l'état du groupe A (cumul seulement)
+    try:
+        bul = bulletins_vw(comp.get("vw"), set((out.get("vw") or {}).keys()))
+        for per, bloc in bul.items():
+            out.setdefault("vw", {})[per] = bloc
+    except Exception as e:
+        print(f"Bulletins VW ignorés : {e!r}")
     return out
 
 
@@ -378,8 +569,20 @@ def main(argv):
     racine = os.path.dirname(os.path.dirname(os.path.abspath(chemin)))
     comp = composites(data, racine)
     compact = compacter(data, drive, comp)
-    avec = [f"{c} {p}" for c, v in compact["concessions"].items() for p, x in sorted(v["periodes"].items()) if "x" in x]
-    print("Composite : " + (", ".join(avec) if avec else "aucun mois"))
+    print("Composite :" + ("" if any("x" in x for v in compact["concessions"].values() for x in v["periodes"].values())
+                           else " aucun mois"))
+    for c, v in compact["concessions"].items():
+        lignes = []
+        for p, x in sorted(v["periodes"].items()):
+            b = x.get("x")
+            if not b:
+                continue
+            nb_ = lambda d: sum(1 for t in (d or {}).values() if t[0] is not None and t[1] is not None)
+            nd = lambda d: sum(1 for dd in (d or {}).values() for t in dd.values() if t[0] is not None and t[1] is not None)
+            lignes.append(f"{p} [{'bulletin' if b.get('t') == 'bulletin' else 'état du groupe'}] mois {nb_(b.get('m'))}"
+                          f" · cumul {nb_(b.get('c'))} indicateurs · départements {nd(b.get('dm'))}/{nd(b.get('dc'))}")
+        if lignes:
+            print(f"  {c} ({len(lignes)} mois) : " + " ; ".join(lignes))
     hors = [f"{c} {p}" for c, v in compact["concessions"].items() for p, x in v["periodes"].items() if "di" not in x]
     if drive and hors:
         print("Mois dont le fichier n'est pas dans le Drive (déposé à la main) : " + ", ".join(hors))

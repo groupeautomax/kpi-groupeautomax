@@ -325084,80 +325084,11 @@
               },
               "apres_vente": {
                 "types": {
-                  "client": {
-                    "mo_ventes": {
-                      "real": 804322.0,
-                      "budget": 799000.0
-                    },
-                    "bt": {
-                      "real": 2433.0,
-                      "budget": 2350.0000000000005
-                    },
-                    "mo_pb": {
-                      "real": 635274.0,
-                      "budget": 626416.0
-                    },
-                    "pc_pb": {
-                      "real": 275473.0,
-                      "budget": 308565.99999999994
-                    },
-                    "pc_ventes": {
-                      "real": 685101.0,
-                      "budget": 752599.9999999999
-                    }
-                  },
-                  "entretien": {
-                    "mo_ventes": {
-                      "real": 120622.0
-                    },
-                    "bt": {
-                      "real": 1034.0
-                    },
-                    "mo_pb": {
-                      "real": 87736.0
-                    },
-                    "pc_pb": {
-                      "real": 27831.0
-                    },
-                    "pc_ventes": {
-                      "real": 97447.0
-                    }
-                  },
-                  "garantie": {
-                    "mo_ventes": {
-                      "real": 312319.0
-                    },
-                    "bt": {
-                      "real": 1257.0
-                    },
-                    "mo_pb": {
-                      "real": 199948.0
-                    },
-                    "pc_pb": {
-                      "real": 187611.0
-                    },
-                    "pc_ventes": {
-                      "real": 680846.0
-                    }
-                  },
-                  "interne": {
-                    "mo_ventes": {
-                      "real": 624332.0
-                    },
-                    "bt": {
-                      "real": 1576.0
-                    },
-                    "mo_pb": {
-                      "real": 470396.0
-                    },
-                    "pc_pb": {
-                      "real": 84439.0
-                    },
-                    "pc_ventes": {
-                      "real": 249559.0
-                    }
-                  },
                   "esthetique": {
+                    "mo_pb": {
+                      "real": 80379.0,
+                      "budget": 56000.000000000015
+                    },
                     "mo_ventes": {
                       "real": 112228.0,
                       "budget": 140000.0
@@ -325165,10 +325096,79 @@
                     "bt": {
                       "real": 528.0,
                       "budget": 700.0000000000001
+                    }
+                  },
+                  "garantie": {
+                    "pc_ventes": {
+                      "real": 680846.0
+                    },
+                    "pc_pb": {
+                      "real": 187611.0
                     },
                     "mo_pb": {
-                      "real": 80379.0,
-                      "budget": 56000.000000000015
+                      "real": 199948.0
+                    },
+                    "mo_ventes": {
+                      "real": 312319.0
+                    },
+                    "bt": {
+                      "real": 1257.0
+                    }
+                  },
+                  "entretien": {
+                    "pc_ventes": {
+                      "real": 97447.0
+                    },
+                    "pc_pb": {
+                      "real": 27831.0
+                    },
+                    "mo_pb": {
+                      "real": 87736.0
+                    },
+                    "mo_ventes": {
+                      "real": 120622.0
+                    },
+                    "bt": {
+                      "real": 1034.0
+                    }
+                  },
+                  "client": {
+                    "pc_ventes": {
+                      "real": 685101.0,
+                      "budget": 752599.9999999999
+                    },
+                    "pc_pb": {
+                      "real": 275473.0,
+                      "budget": 308565.99999999994
+                    },
+                    "mo_pb": {
+                      "real": 635274.0,
+                      "budget": 626416.0
+                    },
+                    "mo_ventes": {
+                      "real": 804322.0,
+                      "budget": 799000.0
+                    },
+                    "bt": {
+                      "real": 2433.0,
+                      "budget": 2350.0000000000005
+                    }
+                  },
+                  "interne": {
+                    "pc_ventes": {
+                      "real": 249559.0
+                    },
+                    "pc_pb": {
+                      "real": 84439.0
+                    },
+                    "mo_pb": {
+                      "real": 470396.0
+                    },
+                    "mo_ventes": {
+                      "real": 624332.0
+                    },
+                    "bt": {
+                      "real": 1576.0
                     }
                   }
                 },

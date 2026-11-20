@@ -921,6 +921,12 @@
     "modifiedTime": "2025-11-19T20:26:24.000Z",
     "name": "Rapport VENTE PRIVÉE FIDGI novembre 2025.xlsx"
   },
+  "1HpFIEsOEfDzONH8EHog6jYBiK58dZBbL": {
+    "dealer": "stm",
+    "local_path": "sources/stm_2026-10_EF_STM.xlsm",
+    "modifiedTime": "2026-11-20T17:50:38.269Z",
+    "name": "2026-10 EF STM.xlsm"
+  },
   "1HtK7z26raf7zyRxB9j5Nc45jiX2B578O": {
     "dealer": "vw",
     "local_path": "sources/vw_2022-12_R_alis_VW__1HtK7z26.xlsx",

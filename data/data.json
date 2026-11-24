@@ -5311,8 +5311,8 @@
                     "ventes": null,
                     "pb": {
                       "prior_year": 4225.65,
-                      "budget": 10186.254967635654,
-                      "real": 1956.73
+                      "real": 1956.73,
+                      "budget": 10186.254967635654
                     }
                   },
                   "pneus": {
@@ -10684,8 +10684,8 @@
                     "ventes": null,
                     "pb": {
                       "prior_year": 56884.810000000005,
-                      "budget": 57091.6824845072,
-                      "real": 31020.07
+                      "real": 31020.07,
+                      "budget": 57091.6824845072
                     }
                   },
                   "pneus": {
@@ -16190,8 +16190,8 @@
                     "ventes": null,
                     "pb": {
                       "prior_year": 3265.21,
-                      "budget": 11192.181764773542,
-                      "real": 27763.54
+                      "real": 27763.54,
+                      "budget": 11192.181764773542
                     }
                   },
                   "pneus": {
@@ -21581,8 +21581,8 @@
                     "ventes": null,
                     "pb": {
                       "prior_year": 60150.020000000004,
-                      "budget": 68283.86424928074,
-                      "real": 58783.61
+                      "real": 58783.61,
+                      "budget": 68283.86424928074
                     }
                   },
                   "pneus": {
@@ -27087,8 +27087,8 @@
                     "ventes": null,
                     "pb": {
                       "prior_year": 14000.68,
-                      "budget": 8645.95253869209,
-                      "real": 6340.76
+                      "real": 6340.76,
+                      "budget": 8645.95253869209
                     }
                   },
                   "pneus": {
@@ -32442,8 +32442,8 @@
                     "ventes": null,
                     "pb": {
                       "prior_year": 14000.68,
-                      "budget": 8645.95253869209,
-                      "real": 6340.76
+                      "real": 6340.76,
+                      "budget": 8645.95253869209
                     }
                   },
                   "pneus": {
@@ -37915,8 +37915,8 @@
                     "ventes": null,
                     "pb": {
                       "prior_year": 3172.85,
-                      "budget": 9856.904444875767,
-                      "real": 2666.21
+                      "real": 2666.21,
+                      "budget": 9856.904444875767
                     }
                   },
                   "pneus": {
@@ -43282,8 +43282,8 @@
                     "ventes": null,
                     "pb": {
                       "prior_year": 27235.1,
-                      "budget": 26496.637183283026,
-                      "real": 11389.87
+                      "real": 11389.87,
+                      "budget": 26496.637183283026
                     }
                   },
                   "pneus": {
@@ -48773,8 +48773,8 @@
                     "ventes": null,
                     "pb": {
                       "prior_year": 20142.95,
-                      "budget": 9181.820860244507,
-                      "real": 11447.36
+                      "real": 11447.36,
+                      "budget": 9181.820860244507
                     }
                   },
                   "pneus": {
@@ -54140,8 +54140,8 @@
                     "ventes": null,
                     "pb": {
                       "prior_year": 47378.05,
-                      "budget": 35678.458043527535,
-                      "real": 22837.23
+                      "real": 22837.23,
+                      "budget": 35678.458043527535
                     }
                   },
                   "pneus": {
@@ -59649,8 +59649,8 @@
                     "ventes": null,
                     "pb": {
                       "prior_year": 5281.11,
-                      "budget": 11226.969473344014,
-                      "real": 6226.11
+                      "real": 6226.11,
+                      "budget": 11226.969473344014
                     }
                   },
                   "pneus": {
@@ -65055,8 +65055,8 @@
                     "ventes": null,
                     "pb": {
                       "prior_year": 52659.16,
-                      "budget": 46905.42751687155,
-                      "real": 29063.34
+                      "real": 29063.34,
+                      "budget": 46905.42751687155
                     }
                   },
                   "pneus": {
@@ -70609,8 +70609,8 @@
                     "ventes": null,
                     "pb": {
                       "prior_year": 665.22,
-                      "budget": 4276.9169166852835,
-                      "real": 1037.5
+                      "real": 1037.5,
+                      "budget": 4276.9169166852835
                     }
                   },
                   "pneus": {
@@ -76011,8 +76011,8 @@
                     "ventes": null,
                     "pb": {
                       "prior_year": 665.22,
-                      "budget": 4276.9169166852835,
-                      "real": 1037.5
+                      "real": 1037.5,
+                      "budget": 4276.9169166852835
                     }
                   },
                   "pneus": {
@@ -81446,8 +81446,8 @@
                     "ventes": null,
                     "pb": {
                       "prior_year": 5955.37,
-                      "budget": 4257.217493501202,
-                      "real": 940.37
+                      "real": 940.37,
+                      "budget": 4257.217493501202
                     }
                   },
                   "pneus": {
@@ -86848,8 +86848,8 @@
                     "ventes": null,
                     "pb": {
                       "prior_year": 6620.59,
-                      "budget": 8534.134410186485,
-                      "real": 1977.87
+                      "real": 1977.87,
+                      "budget": 8534.134410186485
                     }
                   },
                   "pneus": {
@@ -92277,8 +92277,8 @@
                     "ventes": null,
                     "pb": {
                       "prior_year": 10339.23,
-                      "budget": 6388.756589308663,
-                      "real": 20936.03
+                      "real": 20936.03,
+                      "budget": 6388.756589308663
                     }
                   },
                   "pneus": {
@@ -97679,8 +97679,8 @@
                     "ventes": null,
                     "pb": {
                       "prior_year": 16959.82,
-                      "budget": 14922.890999495148,
-                      "real": 22913.9
+                      "real": 22913.9,
+                      "budget": 14922.890999495148
                     }
                   },
                   "pneus": {
@@ -103096,8 +103096,8 @@
                     "ventes": null,
                     "pb": {
                       "prior_year": 9062.1,
-                      "budget": 5087.892561245577,
-                      "real": 1524.55
+                      "real": 1524.55,
+                      "budget": 5087.892561245577
                     }
                   },
                   "pneus": {
@@ -108498,8 +108498,8 @@
                     "ventes": null,
                     "pb": {
                       "prior_year": 26021.92,
-                      "budget": 20010.783560740725,
-                      "real": 24438.45
+                      "real": 24438.45,
+                      "budget": 20010.783560740725
                     }
                   },
                   "pneus": {
@@ -113915,8 +113915,8 @@
                     "ventes": null,
                     "pb": {
                       "prior_year": 4693.11,
-                      "budget": 7248.444529198718,
-                      "real": 7049.22
+                      "real": 7049.22,
+                      "budget": 7248.444529198718
                     }
                   },
                   "pneus": {
@@ -119317,8 +119317,8 @@
                     "ventes": null,
                     "pb": {
                       "prior_year": 30715.03,
-                      "budget": 27259.228089939443,
-                      "real": 31487.67
+                      "real": 31487.67,
+                      "budget": 27259.228089939443
                     }
                   },
                   "pneus": {
@@ -124722,8 +124722,8 @@
                     "ventes": null,
                     "pb": {
                       "prior_year": 6506.23,
-                      "budget": 5987.146361133848,
-                      "real": 3795.3
+                      "real": 3795.3,
+                      "budget": 5987.146361133848
                     }
                   },
                   "pneus": {
@@ -130124,8 +130124,8 @@
                     "ventes": null,
                     "pb": {
                       "prior_year": 37221.259999999995,
-                      "budget": 33246.374451073294,
-                      "real": 35282.97
+                      "real": 35282.97,
+                      "budget": 33246.374451073294
                     }
                   },
                   "pneus": {
@@ -135529,8 +135529,8 @@
                     "ventes": null,
                     "pb": {
                       "prior_year": 3489.82,
-                      "budget": 5589.3389192326995,
-                      "real": -500.91
+                      "real": -500.91,
+                      "budget": 5589.3389192326995
                     }
                   },
                   "pneus": {
@@ -140931,8 +140931,8 @@
                     "ventes": null,
                     "pb": {
                       "prior_year": 40711.079999999994,
-                      "budget": 38835.713370305995,
-                      "real": 34782.06
+                      "real": 34782.06,
+                      "budget": 38835.713370305995
                     }
                   },
                   "pneus": {
@@ -146336,8 +146336,8 @@
                     "ventes": null,
                     "pb": {
                       "prior_year": 1115.68,
-                      "budget": 5932.959248541782,
-                      "real": 6306.81
+                      "real": 6306.81,
+                      "budget": 5932.959248541782
                     }
                   },
                   "pneus": {
@@ -151738,8 +151738,8 @@
                     "ventes": null,
                     "pb": {
                       "prior_year": 41826.759999999995,
-                      "budget": 44768.67261884778,
-                      "real": 41088.87
+                      "real": 41088.87,
+                      "budget": 44768.67261884778
                     }
                   },
                   "pneus": {
@@ -157143,8 +157143,8 @@
                     "ventes": null,
                     "pb": {
                       "prior_year": 6195.4,
-                      "budget": 6671.252084036768,
-                      "real": 115.66
+                      "real": 115.66,
+                      "budget": 6671.252084036768
                     }
                   },
                   "pneus": {
@@ -162545,8 +162545,8 @@
                     "ventes": null,
                     "pb": {
                       "prior_year": 48022.159999999996,
-                      "budget": 51439.92470288454,
-                      "real": 41204.53
+                      "real": 41204.53,
+                      "budget": 51439.92470288454
                     }
                   },
                   "pneus": {
@@ -167950,8 +167950,8 @@
                     "ventes": null,
                     "pb": {
                       "prior_year": 12810.07,
-                      "budget": 5783.069950878144,
-                      "real": 9632.99
+                      "real": 9632.99,
+                      "budget": 5783.069950878144
                     }
                   },
                   "pneus": {
@@ -173352,8 +173352,8 @@
                     "ventes": null,
                     "pb": {
                       "prior_year": 60832.229999999996,
-                      "budget": 57222.99465376268,
-                      "real": 50837.52
+                      "real": 50837.52,
+                      "budget": 57222.99465376268
                     }
                   },
                   "pneus": {
@@ -178757,8 +178757,8 @@
                     "ventes": null,
                     "pb": {
                       "prior_year": 3151.76,
-                      "budget": 6440.36311713941,
-                      "real": 2545.65
+                      "real": 2545.65,
+                      "budget": 6440.36311713941
                     }
                   },
                   "pneus": {
@@ -184159,8 +184159,8 @@
                     "ventes": null,
                     "pb": {
                       "prior_year": 63983.99,
-                      "budget": 63663.35777090209,
-                      "real": 53383.17
+                      "real": 53383.17,
+                      "budget": 63663.35777090209
                     }
                   },
                   "pneus": {
@@ -189564,8 +189564,8 @@
                     "ventes": null,
                     "pb": {
                       "prior_year": 21333.94,
-                      "budget": 4336.642229097905,
-                      "real": 22066.66
+                      "real": 22066.66,
+                      "budget": 4336.642229097905
                     }
                   },
                   "pneus": {
@@ -194966,8 +194966,8 @@
                     "ventes": null,
                     "pb": {
                       "prior_year": 85317.93,
-                      "budget": 68000.0,
-                      "real": 75449.83
+                      "real": 75449.83,
+                      "budget": 68000.0
                     }
                   },
                   "pneus": {
@@ -200359,8 +200359,8 @@
                     "ventes": null,
                     "pb": {
                       "prior_year": 1037.5,
-                      "budget": 4919.00125557464,
-                      "real": 14000.68
+                      "real": 14000.68,
+                      "budget": 4919.00125557464
                     }
                   },
                   "pneus": {
@@ -205749,8 +205749,8 @@
                     "ventes": null,
                     "pb": {
                       "prior_year": 1037.5,
-                      "budget": 4919.00125557464,
-                      "real": 14000.68
+                      "real": 14000.68,
+                      "budget": 4919.00125557464
                     }
                   },
                   "pneus": {
@@ -211154,8 +211154,8 @@
                     "ventes": null,
                     "pb": {
                       "prior_year": 940.37,
-                      "budget": 4123.415431250259,
-                      "real": 10061.57
+                      "real": 10061.57,
+                      "budget": 4123.415431250259
                     }
                   },
                   "pneus": {
@@ -216556,8 +216556,8 @@
                     "ventes": null,
                     "pb": {
                       "prior_year": 1977.87,
-                      "budget": 9042.416686824898,
-                      "real": 24062.25
+                      "real": 24062.25,
+                      "budget": 9042.416686824898
                     }
                   },
                   "pneus": {
@@ -221949,8 +221949,8 @@
                     "ventes": null,
                     "pb": {
                       "prior_year": 20936.03,
-                      "budget": 5808.441337222515,
-                      "real": 3172.85
+                      "real": 3172.85,
+                      "budget": 5808.441337222515
                     }
                   },
                   "pneus": {
@@ -227351,8 +227351,8 @@
                     "ventes": null,
                     "pb": {
                       "prior_year": 22913.899999999998,
-                      "budget": 14850.858024047413,
-                      "real": 27235.1
+                      "real": 27235.1,
+                      "budget": 14850.858024047413
                     }
                   },
                   "pneus": {
@@ -232756,8 +232756,8 @@
                     "ventes": null,
                     "pb": {
                       "prior_year": 1524.55,
-                      "budget": 4772.0470732692775,
-                      "real": 20142.95
+                      "real": 20142.95,
+                      "budget": 4772.0470732692775
                     }
                   },
                   "pneus": {
@@ -238158,8 +238158,8 @@
                     "ventes": null,
                     "pb": {
                       "prior_year": 24438.449999999997,
-                      "budget": 19622.90509731669,
-                      "real": 47378.05
+                      "real": 47378.05,
+                      "budget": 19622.90509731669
                     }
                   },
                   "pneus": {
@@ -243563,8 +243563,8 @@
                     "ventes": null,
                     "pb": {
                       "prior_year": 7049.22,
-                      "budget": 6924.1589126328845,
-                      "real": 5281.11
+                      "real": 5281.11,
+                      "budget": 6924.1589126328845
                     }
                   },
                   "pneus": {
@@ -248965,8 +248965,8 @@
                     "ventes": null,
                     "pb": {
                       "prior_year": 31487.67,
-                      "budget": 26547.064009949572,
-                      "real": 52659.16
+                      "real": 52659.16,
+                      "budget": 26547.064009949572
                     }
                   },
                   "pneus": {
@@ -254370,8 +254370,8 @@
                     "ventes": null,
                     "pb": {
                       "prior_year": 3795.3,
-                      "budget": 5939.24920776688,
-                      "real": 4225.65
+                      "real": 4225.65,
+                      "budget": 5939.24920776688
                     }
                   },
                   "pneus": {
@@ -259772,8 +259772,8 @@
                     "ventes": null,
                     "pb": {
                       "prior_year": 35282.97,
-                      "budget": 32486.31321771645,
-                      "real": 56884.81
+                      "real": 56884.81,
+                      "budget": 32486.31321771645
                     }
                   },
                   "pneus": {
@@ -265280,8 +265280,8 @@
                     "ventes": null,
                     "pb": {
                       "prior_year": -500.91,
-                      "budget": 5845.239297019404,
-                      "real": 3265.21
+                      "real": 3265.21,
+                      "budget": 5845.239297019404
                     }
                   },
                   "pneus": {
@@ -270683,8 +270683,8 @@
                     "ventes": null,
                     "pb": {
                       "prior_year": 34782.06,
-                      "budget": 38331.55251473586,
-                      "real": 60150.02
+                      "real": 60150.02,
+                      "budget": 38331.55251473586
                     }
                   },
                   "pneus": {
@@ -276192,8 +276192,8 @@
                     "ventes": null,
                     "pb": {
                       "prior_year": 6306.81,
-                      "budget": 4839.489799078207,
-                      "real": 951.0
+                      "real": 951.0,
+                      "budget": 4839.489799078207
                     }
                   },
                   "pneus": {
@@ -281595,8 +281595,8 @@
                     "ventes": null,
                     "pb": {
                       "prior_year": 41088.869999999995,
-                      "budget": 43171.04231381406,
-                      "real": 61101.02
+                      "real": 61101.02,
+                      "budget": 43171.04231381406
                     }
                   },
                   "pneus": {
@@ -287104,8 +287104,8 @@
                     "ventes": null,
                     "pb": {
                       "prior_year": 115.66,
-                      "budget": 5695.029245255731,
-                      "real": 6663.95
+                      "real": 6663.95,
+                      "budget": 5695.029245255731
                     }
                   },
                   "pneus": {
@@ -292507,8 +292507,8 @@
                     "ventes": null,
                     "pb": {
                       "prior_year": 41204.53,
-                      "budget": 48866.071559069795,
-                      "real": 67764.97
+                      "real": 67764.97,
+                      "budget": 48866.071559069795
                     }
                   },
                   "pneus": {
@@ -298028,8 +298028,8 @@
                     "ventes": null,
                     "pb": {
                       "prior_year": 9632.99,
-                      "budget": 5215.897366801027,
-                      "real": 20561.64
+                      "real": 20561.64,
+                      "budget": 5215.897366801027
                     }
                   },
                   "pneus": {
@@ -303431,8 +303431,8 @@
                     "ventes": null,
                     "pb": {
                       "prior_year": 50837.52,
-                      "budget": 54081.968925870824,
-                      "real": 88326.61
+                      "real": 88326.61,
+                      "budget": 54081.968925870824
                     }
                   },
                   "pneus": {
@@ -308952,8 +308952,8 @@
                     "ventes": null,
                     "pb": {
                       "prior_year": 2545.65,
-                      "budget": 6304.625066420144,
-                      "real": 28239.93
+                      "real": 28239.93,
+                      "budget": 6304.625066420144
                     }
                   },
                   "pneus": {
@@ -314355,8 +314355,8 @@
                     "ventes": null,
                     "pb": {
                       "prior_year": 53383.17,
-                      "budget": 60386.59399229097,
-                      "real": 116566.54
+                      "real": 116566.54,
+                      "budget": 60386.59399229097
                     }
                   },
                   "pneus": {
@@ -319864,8 +319864,8 @@
                     "ventes": null,
                     "pb": {
                       "prior_year": 22066.66,
-                      "budget": 4613.406007709032,
-                      "real": 179.03
+                      "real": 179.03,
+                      "budget": 4613.406007709032
                     }
                   },
                   "pneus": {
@@ -325084,55 +325084,35 @@
               },
               "apres_vente": {
                 "types": {
-                  "entretien": {
-                    "pc_pb": {
-                      "real": 27831.0
-                    },
-                    "mo_pb": {
-                      "real": 87736.0
-                    },
-                    "bt": {
-                      "real": 1034.0
-                    },
-                    "pc_ventes": {
-                      "real": 97447.0
-                    },
-                    "mo_ventes": {
-                      "real": 120622.0
-                    }
-                  },
                   "garantie": {
                     "pc_pb": {
                       "real": 187611.0
                     },
-                    "mo_pb": {
-                      "real": 199948.0
-                    },
-                    "bt": {
-                      "real": 1257.0
-                    },
                     "pc_ventes": {
                       "real": 680846.0
                     },
+                    "mo_pb": {
+                      "real": 199948.0
+                    },
                     "mo_ventes": {
                       "real": 312319.0
-                    }
-                  },
-                  "interne": {
-                    "pc_pb": {
-                      "real": 84439.0
-                    },
-                    "mo_pb": {
-                      "real": 470396.0
                     },
                     "bt": {
-                      "real": 1576.0
-                    },
-                    "pc_ventes": {
-                      "real": 249559.0
+                      "real": 1257.0
+                    }
+                  },
+                  "esthetique": {
+                    "mo_pb": {
+                      "real": 80379.0,
+                      "budget": 56000.000000000015
                     },
                     "mo_ventes": {
-                      "real": 624332.0
+                      "real": 112228.0,
+                      "budget": 140000.0
+                    },
+                    "bt": {
+                      "real": 528.0,
+                      "budget": 700.0000000000001
                     }
                   },
                   "client": {
@@ -325140,35 +325120,55 @@
                       "real": 275473.0,
                       "budget": 308565.99999999994
                     },
-                    "mo_pb": {
-                      "real": 635274.0,
-                      "budget": 626416.0
-                    },
-                    "bt": {
-                      "real": 2433.0,
-                      "budget": 2350.0000000000005
-                    },
                     "pc_ventes": {
                       "real": 685101.0,
                       "budget": 752599.9999999999
                     },
+                    "mo_pb": {
+                      "real": 635274.0,
+                      "budget": 626416.0
+                    },
                     "mo_ventes": {
                       "real": 804322.0,
                       "budget": 799000.0
+                    },
+                    "bt": {
+                      "real": 2433.0,
+                      "budget": 2350.0000000000005
                     }
                   },
-                  "esthetique": {
-                    "bt": {
-                      "real": 528.0,
-                      "budget": 700.0000000000001
+                  "entretien": {
+                    "pc_pb": {
+                      "real": 27831.0
                     },
-                    "mo_ventes": {
-                      "real": 112228.0,
-                      "budget": 140000.0
+                    "pc_ventes": {
+                      "real": 97447.0
                     },
                     "mo_pb": {
-                      "real": 80379.0,
-                      "budget": 56000.000000000015
+                      "real": 87736.0
+                    },
+                    "mo_ventes": {
+                      "real": 120622.0
+                    },
+                    "bt": {
+                      "real": 1034.0
+                    }
+                  },
+                  "interne": {
+                    "pc_pb": {
+                      "real": 84439.0
+                    },
+                    "pc_ventes": {
+                      "real": 249559.0
+                    },
+                    "mo_pb": {
+                      "real": 470396.0
+                    },
+                    "mo_ventes": {
+                      "real": 624332.0
+                    },
+                    "bt": {
+                      "real": 1576.0
                     }
                   }
                 },
@@ -325267,8 +325267,8 @@
                     "ventes": null,
                     "pb": {
                       "prior_year": 75449.83,
-                      "budget": 65000.0,
-                      "real": 179.03
+                      "real": 179.03,
+                      "budget": 65000.0
                     }
                   },
                   "pneus": {
@@ -330782,8 +330782,8 @@
                     "ventes": null,
                     "pb": {
                       "prior_year": 10061.57,
-                      "budget": 7993.780199715169,
-                      "real": 2382.9
+                      "real": 2382.9,
+                      "budget": 7993.780199715169
                     }
                   },
                   "pneus": {
@@ -336167,8 +336167,8 @@
                     "ventes": null,
                     "pb": {
                       "prior_year": 24062.25,
-                      "budget": 16639.73273840726,
-                      "real": 8723.66
+                      "real": 8723.66,
+                      "budget": 16639.73273840726
                     }
                   },
                   "pneus": {
@@ -341658,8 +341658,8 @@
                     "ventes": null,
                     "pb": {
                       "prior_year": 951.0,
-                      "budget": 10253.301485612896,
-                      "real": 2499.32
+                      "real": 2499.32,
+                      "budget": 10253.301485612896
                     }
                   },
                   "pneus": {
@@ -347031,8 +347031,8 @@
                     "ventes": null,
                     "pb": {
                       "prior_year": 61101.020000000004,
-                      "budget": 78537.16573489364,
-                      "real": 61282.93
+                      "real": 61282.93,
+                      "budget": 78537.16573489364
                     }
                   },
                   "pneus": {
@@ -352537,8 +352537,8 @@
                     "ventes": null,
                     "pb": {
                       "prior_year": 6663.95,
-                      "budget": 11033.039040358095,
-                      "real": 31735.52
+                      "real": 31735.52,
+                      "budget": 11033.039040358095
                     }
                   },
                   "pneus": {
@@ -357910,8 +357910,8 @@
                     "ventes": null,
                     "pb": {
                       "prior_year": 67764.97,
-                      "budget": 89570.20477525174,
-                      "real": 93018.45
+                      "real": 93018.45,
+                      "budget": 89570.20477525174
                     }
                   },
                   "pneus": {
@@ -363416,8 +363416,8 @@
                     "ventes": null,
                     "pb": {
                       "prior_year": 20561.64,
-                      "budget": 10965.094439974178,
-                      "real": 27751.88
+                      "real": 27751.88,
+                      "budget": 10965.094439974178
                     }
                   },
                   "pneus": {
@@ -368789,8 +368789,8 @@
                     "ventes": null,
                     "pb": {
                       "prior_year": 88326.61,
-                      "budget": 100535.29921522591,
-                      "real": 120770.33
+                      "real": 120770.33,
+                      "budget": 100535.29921522591
                     }
                   },
                   "pneus": {
@@ -504819,8 +504819,8 @@
                     "ventes": null,
                     "pb": {
                       "prior_year": 0,
-                      "budget": 0,
-                      "real": 15116.04999999999
+                      "real": 15116.04999999999,
+                      "budget": 0
                     }
                   },
                   "pneus": {
@@ -510128,8 +510128,8 @@
                     "ventes": null,
                     "pb": {
                       "prior_year": 0,
-                      "budget": 0,
-                      "real": 108558.79
+                      "real": 108558.79,
+                      "budget": 0
                     }
                   },
                   "pneus": {
@@ -727979,7 +727979,7 @@
                   "group": "revenue_expense"
                 },
                 "depenses_semifixes": {
-                  "real": -169763,
+                  "real": -169963,
                   "budget": null,
                   "prior_year": null,
                   "delta_budget": null,
@@ -729984,21 +729984,21 @@
                     "delta_prior_year": null
                   },
                   "total_semifixes": {
-                    "real": 88726,
+                    "real": 88926,
                     "budget": null,
                     "delta_budget": null,
                     "prior_year": null,
                     "delta_prior_year": null
                   },
                   "total_depenses": {
-                    "real": 199919,
+                    "real": 200119,
                     "budget": null,
                     "delta_budget": null,
                     "prior_year": null,
                     "delta_prior_year": null
                   },
                   "profit_departemental": {
-                    "real": 12156,
+                    "real": 11956,
                     "budget": null,
                     "delta_budget": null,
                     "prior_year": null,
@@ -730438,7 +730438,7 @@
                       "is_total": false,
                       "units": null,
                       "money": {
-                        "real": 2504,
+                        "real": 2704,
                         "budget": null,
                         "delta_budget": null,
                         "prior_year": null,
@@ -730452,7 +730452,7 @@
                       "is_total": true,
                       "units": null,
                       "money": {
-                        "real": 43604,
+                        "real": 43804,
                         "budget": null,
                         "delta_budget": null,
                         "prior_year": null,
@@ -730676,7 +730676,7 @@
                       "is_total": false,
                       "units": null,
                       "money": {
-                        "real": 3362,
+                        "real": 3162,
                         "budget": null,
                         "delta_budget": null,
                         "prior_year": null,
@@ -730718,7 +730718,7 @@
                       "is_total": true,
                       "units": null,
                       "money": {
-                        "real": 12156,
+                        "real": 11956,
                         "budget": null,
                         "delta_budget": null,
                         "prior_year": null,
@@ -732742,7 +732742,7 @@
                   "group": "revenue_expense"
                 },
                 "depenses_semifixes": {
-                  "real": -1570077,
+                  "real": -1570352,
                   "budget": null,
                   "prior_year": null,
                   "delta_budget": null,
@@ -734747,21 +734747,21 @@
                     "delta_prior_year": null
                   },
                   "total_semifixes": {
-                    "real": 839031,
+                    "real": 839306,
                     "budget": null,
                     "delta_budget": null,
                     "prior_year": null,
                     "delta_prior_year": null
                   },
                   "total_depenses": {
-                    "real": 1882689,
+                    "real": 1882964,
                     "budget": null,
                     "delta_budget": null,
                     "prior_year": null,
                     "delta_prior_year": null
                   },
                   "profit_departemental": {
-                    "real": 220763,
+                    "real": 220488,
                     "budget": null,
                     "delta_budget": null,
                     "prior_year": null,
@@ -735201,7 +735201,7 @@
                       "is_total": false,
                       "units": null,
                       "money": {
-                        "real": 24022,
+                        "real": 24297,
                         "budget": null,
                         "delta_budget": null,
                         "prior_year": null,
@@ -735215,7 +735215,7 @@
                       "is_total": true,
                       "units": null,
                       "money": {
-                        "real": 407899,
+                        "real": 408174,
                         "budget": null,
                         "delta_budget": null,
                         "prior_year": null,
@@ -735439,7 +735439,7 @@
                       "is_total": false,
                       "units": null,
                       "money": {
-                        "real": 142195,
+                        "real": 141920,
                         "budget": null,
                         "delta_budget": null,
                         "prior_year": null,
@@ -735481,7 +735481,7 @@
                       "is_total": true,
                       "units": null,
                       "money": {
-                        "real": 220763,
+                        "real": 220488,
                         "budget": null,
                         "delta_budget": null,
                         "prior_year": null,
@@ -744553,8 +744553,8 @@
                     "ventes": null,
                     "pb": {
                       "prior_year": 4672.69,
-                      "budget": 6600.125347857168,
-                      "real": 4302.36
+                      "real": 4302.36,
+                      "budget": 6600.125347857168
                     }
                   },
                   "pneus": {
@@ -749953,8 +749953,8 @@
                     "ventes": null,
                     "pb": {
                       "prior_year": 58484.47999999998,
-                      "budget": 94933.45981539841,
-                      "real": 75891.91
+                      "real": 75891.91,
+                      "budget": 94933.45981539841
                     }
                   },
                   "pneus": {
@@ -755440,8 +755440,8 @@
                     "ventes": null,
                     "pb": {
                       "prior_year": 4347.88999999999,
-                      "budget": 9397.767495306669,
-                      "real": 6625.76
+                      "real": 6625.76,
+                      "budget": 9397.767495306669
                     }
                   },
                   "pneus": {
@@ -760866,8 +760866,8 @@
                     "ventes": null,
                     "pb": {
                       "prior_year": 4347.88999999999,
-                      "budget": 9397.767495306669,
-                      "real": 6625.76
+                      "real": 6625.76,
+                      "budget": 9397.767495306669
                     }
                   },
                   "pneus": {
@@ -766353,8 +766353,8 @@
                     "ventes": null,
                     "pb": {
                       "prior_year": 4787.86,
-                      "budget": 8473.6781326651,
-                      "real": 5644.3099999999995
+                      "real": 5644.3099999999995,
+                      "budget": 8473.6781326651
                     }
                   },
                   "pneus": {
@@ -771779,8 +771779,8 @@
                     "ventes": null,
                     "pb": {
                       "prior_year": 9135.749999999989,
-                      "budget": 17871.44562797177,
-                      "real": 12270.07
+                      "real": 12270.07,
+                      "budget": 17871.44562797177
                     }
                   },
                   "pneus": {
@@ -777266,8 +777266,8 @@
                     "ventes": null,
                     "pb": {
                       "prior_year": 31809.05,
-                      "budget": 8535.40804421261,
-                      "real": 4948.08
+                      "real": 4948.08,
+                      "budget": 8535.40804421261
                     }
                   },
                   "pneus": {
@@ -782692,8 +782692,8 @@
                     "ventes": null,
                     "pb": {
                       "prior_year": 40944.79999999999,
-                      "budget": 26406.85367218438,
-                      "real": 17218.15
+                      "real": 17218.15,
+                      "budget": 26406.85367218438
                     }
                   },
                   "pneus": {
@@ -788176,8 +788176,8 @@
                     "ventes": null,
                     "pb": {
                       "prior_year": 17862.83,
-                      "budget": 11672.617495226517,
-                      "real": 8155.129999999999
+                      "real": 8155.129999999999,
+                      "budget": 11672.617495226517
                     }
                   },
                   "pneus": {
@@ -793585,8 +793585,8 @@
                     "ventes": null,
                     "pb": {
                       "prior_year": 58807.62999999999,
-                      "budget": 38079.4711674109,
-                      "real": 25373.280000000002
+                      "real": 25373.280000000002,
+                      "budget": 38079.4711674109
                     }
                   },
                   "pneus": {
@@ -799070,8 +799070,8 @@
                     "ventes": null,
                     "pb": {
                       "prior_year": 12321.78,
-                      "budget": 11344.05113638264,
-                      "real": 22987.82
+                      "real": 22987.82,
+                      "budget": 11344.05113638264
                     }
                   },
                   "pneus": {
@@ -804496,8 +804496,8 @@
                     "ventes": null,
                     "pb": {
                       "prior_year": 71129.40999999999,
-                      "budget": 49423.522303793536,
-                      "real": 48361.1
+                      "real": 48361.1,
+                      "budget": 49423.522303793536
                     }
                   },
                   "pneus": {
@@ -809989,8 +809989,8 @@
                     "ventes": null,
                     "pb": {
                       "prior_year": 5300.27,
-                      "budget": 10228.056302312993,
-                      "real": 5450.6900000000005
+                      "real": 5450.6900000000005,
+                      "budget": 10228.056302312993
                     }
                   },
                   "pneus": {
@@ -815415,8 +815415,8 @@
                     "ventes": null,
                     "pb": {
                       "prior_year": 76429.68,
-                      "budget": 59651.57860610653,
-                      "real": 53811.79
+                      "real": 53811.79,
+                      "budget": 59651.57860610653
                     }
                   },
                   "pneus": {
@@ -820908,8 +820908,8 @@
                     "ventes": null,
                     "pb": {
                       "prior_year": 3691.28,
-                      "budget": 10456.478287315782,
-                      "real": 4672.69
+                      "real": 4672.69,
+                      "budget": 10456.478287315782
                     }
                   },
                   "pneus": {
@@ -826334,8 +826334,8 @@
                     "ventes": null,
                     "pb": {
                       "prior_year": 80120.95999999999,
-                      "budget": 70108.05689342231,
-                      "real": 58484.48
+                      "real": 58484.48,
+                      "budget": 70108.05689342231
                     }
                   },
                   "pneus": {
@@ -831827,8 +831827,8 @@
                     "ventes": null,
                     "pb": {
                       "prior_year": 3470.01,
-                      "budget": 11379.257020077523,
-                      "real": 75917.24
+                      "real": 75917.24,
+                      "budget": 11379.257020077523
                     }
                   },
                   "pneus": {
@@ -837259,8 +837259,8 @@
                     "ventes": null,
                     "pb": {
                       "prior_year": 83590.96999999999,
-                      "budget": 81487.31391349983,
-                      "real": 134401.72
+                      "real": 134401.72,
+                      "budget": 81487.31391349983
                     }
                   },
                   "pneus": {
@@ -842752,8 +842752,8 @@
                     "ventes": null,
                     "pb": {
                       "prior_year": 9003.5,
-                      "budget": 10647.307480648535,
-                      "real": 6967.79
+                      "real": 6967.79,
+                      "budget": 10647.307480648535
                     }
                   },
                   "pneus": {
@@ -848178,8 +848178,8 @@
                     "ventes": null,
                     "pb": {
                       "prior_year": 92594.46999999999,
-                      "budget": 92134.62139414837,
-                      "real": 141369.51
+                      "real": 141369.51,
+                      "budget": 92134.62139414837
                     }
                   },
                   "pneus": {
@@ -853671,8 +853671,8 @@
                     "ventes": null,
                     "pb": {
                       "prior_year": 9631.32,
-                      "budget": 13507.969846561695,
-                      "real": 12626.59
+                      "real": 12626.59,
+                      "budget": 13507.969846561695
                     }
                   },
                   "pneus": {
@@ -859097,8 +859097,8 @@
                     "ventes": null,
                     "pb": {
                       "prior_year": 102225.78999999998,
-                      "budget": 105642.59124071007,
-                      "real": 153996.1
+                      "real": 153996.1,
+                      "budget": 105642.59124071007
                     }
                   },
                   "pneus": {
@@ -864590,8 +864590,8 @@
                     "ventes": null,
                     "pb": {
                       "prior_year": 14951.3,
-                      "budget": 13853.049361178608,
-                      "real": 34531.65
+                      "real": 34531.65,
+                      "budget": 13853.049361178608
                     }
                   },
                   "pneus": {
@@ -870016,8 +870016,8 @@
                     "ventes": null,
                     "pb": {
                       "prior_year": 117177.08999999998,
-                      "budget": 119495.64060188868,
-                      "real": 188527.75
+                      "real": 188527.75,
+                      "budget": 119495.64060188868
                     }
                   },
                   "pneus": {
@@ -875509,8 +875509,8 @@
                     "ventes": null,
                     "pb": {
                       "prior_year": 11210.0399999999,
-                      "budget": 9794.409731151345,
-                      "real": 92380.70999999999
+                      "real": 92380.70999999999,
+                      "budget": 9794.409731151345
                     }
                   },
                   "pneus": {
@@ -880935,8 +880935,8 @@
                     "ventes": null,
                     "pb": {
                       "prior_year": 128387.12999999989,
-                      "budget": 129290.05033304002,
-                      "real": 280908.45999999996
+                      "real": 280908.45999999996,
+                      "budget": 129290.05033304002
                     }
                   },
                   "pneus": {
@@ -886422,8 +886422,8 @@
                     "ventes": null,
                     "pb": {
                       "prior_year": 6625.76,
-                      "budget": 6109.879931814478,
-                      "real": 5740.08
+                      "real": 5740.08,
+                      "budget": 6109.879931814478
                     }
                   },
                   "pneus": {
@@ -891848,8 +891848,8 @@
                     "ventes": null,
                     "pb": {
                       "prior_year": 6625.76,
-                      "budget": 6109.879931814478,
-                      "real": 5740.08
+                      "real": 5740.08,
+                      "budget": 6109.879931814478
                     }
                   },
                   "pneus": {
@@ -897335,8 +897335,8 @@
                     "ventes": null,
                     "pb": {
                       "prior_year": 5644.30999999999,
-                      "budget": 6000.212153339625,
-                      "real": 6351.880000000001
+                      "real": 6351.880000000001,
+                      "budget": 6000.212153339625
                     }
                   },
                   "pneus": {
@@ -902761,8 +902761,8 @@
                     "ventes": null,
                     "pb": {
                       "prior_year": 12270.06999999999,
-                      "budget": 12110.092085154103,
-                      "real": 12091.96
+                      "real": 12091.96,
+                      "budget": 12110.092085154103
                     }
                   },
                   "pneus": {
@@ -908248,8 +908248,8 @@
                     "ventes": null,
                     "pb": {
                       "prior_year": 4948.08,
-                      "budget": 31971.095766823528,
-                      "real": 30491.63
+                      "real": 30491.63,
+                      "budget": 31971.095766823528
                     }
                   },
                   "pneus": {
@@ -913674,8 +913674,8 @@
                     "ventes": null,
                     "pb": {
                       "prior_year": 17218.14999999999,
-                      "budget": 44081.18785197763,
-                      "real": 42583.59
+                      "real": 42583.59,
+                      "budget": 44081.18785197763
                     }
                   },
                   "pneus": {
@@ -919161,8 +919161,8 @@
                     "ventes": null,
                     "pb": {
                       "prior_year": 8155.12999999999,
-                      "budget": 5876.873852930483,
-                      "real": 8803.779999999999
+                      "real": 8803.779999999999,
+                      "budget": 5876.873852930483
                     }
                   },
                   "pneus": {
@@ -924587,8 +924587,8 @@
                     "ventes": null,
                     "pb": {
                       "prior_year": 25373.27999999998,
-                      "budget": 49958.06170490811,
-                      "real": 51387.369999999995
+                      "real": 51387.369999999995,
+                      "budget": 49958.06170490811
                     }
                   },
                   "pneus": {
@@ -930074,8 +930074,8 @@
                     "ventes": null,
                     "pb": {
                       "prior_year": 22987.82,
-                      "budget": 7103.806984239933,
-                      "real": 5408.780000000001
+                      "real": 5408.780000000001,
+                      "budget": 7103.806984239933
                     }
                   },
                   "pneus": {
@@ -935500,8 +935500,8 @@
                     "ventes": null,
                     "pb": {
                       "prior_year": 48361.09999999998,
-                      "budget": 57061.86868914805,
-                      "real": 56796.15
+                      "real": 56796.15,
+                      "budget": 57061.86868914805
                     }
                   },
                   "pneus": {
@@ -940987,8 +940987,8 @@
                     "ventes": null,
                     "pb": {
                       "prior_year": 75917.24,
-                      "budget": 6835.2363512296415,
-                      "real": 28617.67
+                      "real": 28617.67,
+                      "budget": 6835.2363512296415
                     }
                   },
                   "pneus": {
@@ -946387,8 +946387,8 @@
                     "ventes": null,
                     "pb": {
                       "prior_year": 134401.71999999997,
-                      "budget": 101768.69616662805,
-                      "real": 104509.58000000002
+                      "real": 104509.58000000002,
+                      "budget": 101768.69616662805
                     }
                   },
                   "pneus": {
@@ -951763,8 +951763,8 @@
                     "ventes": null,
                     "pb": {
                       "prior_year": 5765.22,
-                      "budget": 9399.894510089061,
-                      "real": 3100.73
+                      "real": 3100.73,
+                      "budget": 9399.894510089061
                     }
                   },
                   "pneus": {
@@ -957132,8 +957132,8 @@
                     "ventes": null,
                     "pb": {
                       "prior_year": 5765.22,
-                      "budget": 9399.894510089061,
-                      "real": 3100.73
+                      "real": 3100.73,
+                      "budget": 9399.894510089061
                     }
                   },
                   "pneus": {
@@ -962502,8 +962502,8 @@
                     "ventes": null,
                     "pb": {
                       "prior_year": 11694.3,
-                      "budget": 9590.381399843978,
-                      "real": 2525.45
+                      "real": 2525.45,
+                      "budget": 9590.381399843978
                     }
                   },
                   "pneus": {
@@ -967865,8 +967865,8 @@
                     "ventes": null,
                     "pb": {
                       "prior_year": 17459.52,
-                      "budget": 18990.27590993304,
-                      "real": 5626.18
+                      "real": 5626.18,
+                      "budget": 18990.27590993304
                     }
                   },
                   "pneus": {
@@ -973235,8 +973235,8 @@
                     "ventes": null,
                     "pb": {
                       "prior_year": 36752.42,
-                      "budget": 9069.459446760708,
-                      "real": 6759.89
+                      "real": 6759.89,
+                      "budget": 9069.459446760708
                     }
                   },
                   "pneus": {
@@ -978610,8 +978610,8 @@
                     "ventes": null,
                     "pb": {
                       "prior_year": 54211.939999999995,
-                      "budget": 28059.735356693745,
-                      "real": 12386.07
+                      "real": 12386.07,
+                      "budget": 28059.735356693745
                     }
                   },
                   "pneus": {
@@ -983980,8 +983980,8 @@
                     "ventes": null,
                     "pb": {
                       "prior_year": 4148.5,
-                      "budget": 9227.96454272772,
-                      "real": 10048.380000000001
+                      "real": 10048.380000000001,
+                      "budget": 9227.96454272772
                     }
                   },
                   "pneus": {
@@ -989355,8 +989355,8 @@
                     "ventes": null,
                     "pb": {
                       "prior_year": 58360.439999999995,
-                      "budget": 37287.69989942147,
-                      "real": 22434.45
+                      "real": 22434.45,
+                      "budget": 37287.69989942147
                     }
                   },
                   "pneus": {
@@ -994725,8 +994725,8 @@
                     "ventes": null,
                     "pb": {
                       "prior_year": 16821.09,
-                      "budget": 11217.747793097567,
-                      "real": 10251.25
+                      "real": 10251.25,
+                      "budget": 11217.747793097567
                     }
                   },
                   "pneus": {
@@ -1000100,8 +1000100,8 @@
                     "ventes": null,
                     "pb": {
                       "prior_year": 75181.53,
-                      "budget": 48505.44769251903,
-                      "real": 32685.7
+                      "real": 32685.7,
+                      "budget": 48505.44769251903
                     }
                   },
                   "pneus": {
@@ -1005470,8 +1005470,8 @@
                     "ventes": null,
                     "pb": {
                       "prior_year": 16821.09,
-                      "budget": 9811.650585318619,
-                      "real": 6027.79
+                      "real": 6027.79,
+                      "budget": 9811.650585318619
                     }
                   },
                   "pneus": {
@@ -1010845,8 +1010845,8 @@
                     "ventes": null,
                     "pb": {
                       "prior_year": 75181.53,
-                      "budget": 58317.09827783765,
-                      "real": 38713.490000000005
+                      "real": 38713.490000000005,
+                      "budget": 58317.09827783765
                     }
                   },
                   "pneus": {
@@ -1016215,8 +1016215,8 @@
                     "ventes": null,
                     "pb": {
                       "prior_year": 7361.08,
-                      "budget": 10662.177689201206,
-                      "real": 7736.16
+                      "real": 7736.16,
+                      "budget": 10662.177689201206
                     }
                   },
                   "pneus": {
@@ -1021590,8 +1021590,8 @@
                     "ventes": null,
                     "pb": {
                       "prior_year": 90647.99,
-                      "budget": 68979.27596703885,
-                      "real": 46449.65
+                      "real": 46449.65,
+                      "budget": 68979.27596703885
                     }
                   },
                   "pneus": {
@@ -1026960,8 +1026960,8 @@
                     "ventes": null,
                     "pb": {
                       "prior_year": 8767.1,
-                      "budget": 11556.971757632731,
-                      "real": 5731.89
+                      "real": 5731.89,
+                      "budget": 11556.971757632731
                     }
                   },
                   "pneus": {
@@ -1032347,8 +1032347,8 @@
                     "ventes": null,
                     "pb": {
                       "prior_year": 99415.09,
-                      "budget": 80536.24772467159,
-                      "real": 52181.54
+                      "real": 52181.54,
+                      "budget": 80536.24772467159
                     }
                   },
                   "pneus": {
@@ -1037717,8 +1037717,8 @@
                     "ventes": null,
                     "pb": {
                       "prior_year": 8616.21,
-                      "budget": 9911.457178838973,
-                      "real": 8047.139999999999
+                      "real": 8047.139999999999,
+                      "budget": 9911.457178838973
                     }
                   },
                   "pneus": {
@@ -1043092,8 +1043092,8 @@
                     "ventes": null,
                     "pb": {
                       "prior_year": 108031.29999999999,
-                      "budget": 90447.70490351056,
-                      "real": 60228.68
+                      "real": 60228.68,
+                      "budget": 90447.70490351056
                     }
                   },
                   "pneus": {
@@ -1048462,8 +1048462,8 @@
                     "ventes": null,
                     "pb": {
                       "prior_year": 16460.97,
-                      "budget": 10925.96821907405,
-                      "real": 11874.67
+                      "real": 11874.67,
+                      "budget": 10925.96821907405
                     }
                   },
                   "pneus": {
@@ -1053837,8 +1053837,8 @@
                     "ventes": null,
                     "pb": {
                       "prior_year": 124492.27,
-                      "budget": 101373.67312258462,
-                      "real": 72103.35
+                      "real": 72103.35,
+                      "budget": 101373.67312258462
                     }
                   },
                   "pneus": {
@@ -1059207,8 +1059207,8 @@
                     "ventes": null,
                     "pb": {
                       "prior_year": 33888.28999999999,
-                      "budget": 11467.587361020038,
-                      "real": 13647.72
+                      "real": 13647.72,
+                      "budget": 11467.587361020038
                     }
                   },
                   "pneus": {
@@ -1064588,8 +1064588,8 @@
                     "ventes": null,
                     "pb": {
                       "prior_year": 158380.56,
-                      "budget": 112841.26048360465,
-                      "real": 85751.06999999999
+                      "real": 85751.06999999999,
+                      "budget": 112841.26048360465
                     }
                   },
                   "pneus": {
@@ -1071825,8 +1071825,8 @@
                     "ventes": null,
                     "pb": {
                       "prior_year": 3100.73,
-                      "budget": 5090.053132694143,
-                      "real": 4475.320000000001
+                      "real": 4475.320000000001,
+                      "budget": 5090.053132694143
                     }
                   },
                   "pneus": {
@@ -1077212,8 +1077212,8 @@
                     "ventes": null,
                     "pb": {
                       "prior_year": 3100.73,
-                      "budget": 5090.053132694143,
-                      "real": 4475.320000000001
+                      "real": 4475.320000000001,
+                      "budget": 5090.053132694143
                     }
                   },
                   "pneus": {
@@ -1082606,8 +1082606,8 @@
                     "ventes": null,
                     "pb": {
                       "prior_year": 2525.45,
-                      "budget": 4475.924979626648,
-                      "real": 5514.78
+                      "real": 5514.78,
+                      "budget": 4475.924979626648
                     }
                   },
                   "pneus": {
@@ -1087987,8 +1087987,8 @@
                     "ventes": null,
                     "pb": {
                       "prior_year": 5626.18,
-                      "budget": 9565.97811232079,
-                      "real": 9990.099999999999
+                      "real": 9990.099999999999,
+                      "budget": 9565.97811232079
                     }
                   },
                   "pneus": {
@@ -1093382,8 +1093382,8 @@
                     "ventes": null,
                     "pb": {
                       "prior_year": 6759.89,
-                      "budget": 4767.238833526685,
-                      "real": 5634.599999999999
+                      "real": 5634.599999999999,
+                      "budget": 4767.238833526685
                     }
                   },
                   "pneus": {
@@ -1098763,8 +1098763,8 @@
                     "ventes": null,
                     "pb": {
                       "prior_year": 12386.07,
-                      "budget": 14333.216945847475,
-                      "real": 15624.7
+                      "real": 15624.7,
+                      "budget": 14333.216945847475
                     }
                   },
                   "pneus": {
@@ -1104158,8 +1104158,8 @@
                     "ventes": null,
                     "pb": {
                       "prior_year": 10048.380000000001,
-                      "budget": 5417.2411098479715,
-                      "real": 5275.83
+                      "real": 5275.83,
+                      "budget": 5417.2411098479715
                     }
                   },
                   "pneus": {
@@ -1109539,8 +1109539,8 @@
                     "ventes": null,
                     "pb": {
                       "prior_year": 22434.45,
-                      "budget": 19750.458055695446,
-                      "real": 20900.53
+                      "real": 20900.53,
+                      "budget": 19750.458055695446
                     }
                   },
                   "pneus": {
@@ -1114925,8 +1114925,8 @@
                     "ventes": null,
                     "pb": {
                       "prior_year": 10251.25,
-                      "budget": 5552.770070043105,
-                      "real": 8774.88
+                      "real": 8774.88,
+                      "budget": 5552.770070043105
                     }
                   },
                   "pneus": {
@@ -1120311,8 +1120311,8 @@
                     "ventes": null,
                     "pb": {
                       "prior_year": 32685.7,
-                      "budget": 25303.22812573855,
-                      "real": 29675.409999999996
+                      "real": 29675.409999999996,
+                      "budget": 25303.22812573855
                     }
                   },
                   "pneus": {
@@ -1125697,8 +1125697,8 @@
                     "ventes": null,
                     "pb": {
                       "prior_year": 10251.25,
-                      "budget": 6208.164410116402,
-                      "real": 14248.96
+                      "real": 14248.96,
+                      "budget": 6208.164410116402
                     }
                   },
                   "pneus": {
@@ -1131083,8 +1131083,8 @@
                     "ventes": null,
                     "pb": {
                       "prior_year": 32685.7,
-                      "budget": 31511.392535854953,
-                      "real": 43924.369999999995
+                      "real": 43924.369999999995,
+                      "budget": 31511.392535854953
                     }
                   },
                   "pneus": {
@@ -1136478,8 +1136478,8 @@
                     "ventes": null,
                     "pb": {
                       "prior_year": 7736.16,
-                      "budget": 5524.728814897495,
-                      "real": 7855.65
+                      "real": 7855.65,
+                      "budget": 5524.728814897495
                     }
                   },
                   "pneus": {
@@ -1141865,8 +1141865,8 @@
                     "ventes": null,
                     "pb": {
                       "prior_year": 46449.65,
-                      "budget": 37036.12135075245,
-                      "real": 51780.02
+                      "real": 51780.02,
+                      "budget": 37036.12135075245
                     }
                   },
                   "pneus": {
@@ -1147266,8 +1147266,8 @@
                     "ventes": null,
                     "pb": {
                       "prior_year": 5731.89,
-                      "budget": 5864.138673764024,
-                      "real": 7116.42
+                      "real": 7116.42,
+                      "budget": 5864.138673764024
                     }
                   },
                   "pneus": {
@@ -1152653,8 +1152653,8 @@
                     "ventes": null,
                     "pb": {
                       "prior_year": 52181.54,
-                      "budget": 42900.26002451648,
-                      "real": 58896.44
+                      "real": 58896.44,
+                      "budget": 42900.26002451648
                     }
                   },
                   "pneus": {
@@ -1158054,8 +1158054,8 @@
                     "ventes": null,
                     "pb": {
                       "prior_year": 8047.139999999999,
-                      "budget": 5361.234566786353,
-                      "real": 8911.33
+                      "real": 8911.33,
+                      "budget": 5361.234566786353
                     }
                   },
                   "pneus": {
@@ -1163441,8 +1163441,8 @@
                     "ventes": null,
                     "pb": {
                       "prior_year": 60228.68,
-                      "budget": 48261.494591302835,
-                      "real": 67807.77
+                      "real": 67807.77,
+                      "budget": 48261.494591302835
                     }
                   },
                   "pneus": {
@@ -1168848,8 +1168848,8 @@
                     "ventes": null,
                     "pb": {
                       "prior_year": 11874.67,
-                      "budget": 6304.657699491182,
-                      "real": 9461.630000000001
+                      "real": 9461.630000000001,
+                      "budget": 6304.657699491182
                     }
                   },
                   "pneus": {
@@ -1174235,8 +1174235,8 @@
                     "ventes": null,
                     "pb": {
                       "prior_year": 72103.35,
-                      "budget": 54566.152290794016,
-                      "real": 77269.4
+                      "real": 77269.4,
+                      "budget": 54566.152290794016
                     }
                   },
                   "pneus": {
@@ -1179633,8 +1179633,8 @@
                     "ventes": null,
                     "pb": {
                       "prior_year": 13647.72,
-                      "budget": 6717.858973397697,
-                      "real": 8364.220000000001
+                      "real": 8364.220000000001,
+                      "budget": 6717.858973397697
                     }
                   },
                   "pneus": {
@@ -1185003,8 +1185003,8 @@
                     "ventes": null,
                     "pb": {
                       "prior_year": 85751.06999999999,
-                      "budget": 61284.011264191715,
-                      "real": 85633.62
+                      "real": 85633.62,
+                      "budget": 61284.011264191715
                     }
                   },
                   "pneus": {
@@ -1190393,8 +1190393,8 @@
                     "ventes": null,
                     "pb": {
                       "prior_year": 9032.83,
-                      "budget": 4814.358102794888,
-                      "real": 15497.17
+                      "real": 15497.17,
+                      "budget": 4814.358102794888
                     }
                   },
                   "pneus": {
@@ -1195779,8 +1195779,8 @@
                     "ventes": null,
                     "pb": {
                       "prior_year": 94783.90000000001,
-                      "budget": 66098.3693669866,
-                      "real": 101130.79000000001
+                      "real": 101130.79000000001,
+                      "budget": 66098.3693669866
                     }
                   },
                   "pneus": {
@@ -1201183,8 +1201183,8 @@
                     "ventes": null,
                     "pb": {
                       "prior_year": 4475.320000000001,
-                      "budget": 5542.202943016208,
-                      "real": 5742.52
+                      "real": 5742.52,
+                      "budget": 5542.202943016208
                     }
                   },
                   "pneus": {
@@ -1206560,8 +1206560,8 @@
                     "ventes": null,
                     "pb": {
                       "prior_year": 4475.320000000001,
-                      "budget": 5542.202943016208,
-                      "real": 5742.52
+                      "real": 5742.52,
+                      "budget": 5542.202943016208
                     }
                   },
                   "pneus": {
@@ -1211963,8 +1211963,8 @@
                     "ventes": null,
                     "pb": {
                       "prior_year": 5514.78,
-                      "budget": 4870.884053580062,
-                      "real": 7516.799999999999
+                      "real": 7516.799999999999,
+                      "budget": 4870.884053580062
                     }
                   },
                   "pneus": {
@@ -1217355,8 +1217355,8 @@
                     "ventes": null,
                     "pb": {
                       "prior_year": 9990.099999999999,
-                      "budget": 10413.08699659627,
-                      "real": 13259.320000000002
+                      "real": 13259.320000000002,
+                      "budget": 10413.08699659627
                     }
                   },
                   "pneus": {
@@ -1222768,8 +1222768,8 @@
                     "ventes": null,
                     "pb": {
                       "prior_year": 5634.599999999999,
-                      "budget": 5326.767490459094,
-                      "real": 9182.9
+                      "real": 9182.9,
+                      "budget": 5326.767490459094
                     }
                   },
                   "pneus": {
@@ -1228161,8 +1228161,8 @@
                     "ventes": null,
                     "pb": {
                       "prior_year": 15624.7,
-                      "budget": 15739.854487055363,
-                      "real": 22442.219999999998
+                      "real": 22442.219999999998,
+                      "budget": 15739.854487055363
                     }
                   },
                   "pneus": {
@@ -1233574,8 +1233574,8 @@
                     "ventes": null,
                     "pb": {
                       "prior_year": 5275.83,
-                      "budget": 6091.332035999629,
-                      "real": 13912.76
+                      "real": 13912.76,
+                      "budget": 6091.332035999629
                     }
                   },
                   "pneus": {
@@ -1238967,8 +1238967,8 @@
                     "ventes": null,
                     "pb": {
                       "prior_year": 20900.53,
-                      "budget": 21831.186523054992,
-                      "real": 36354.98
+                      "real": 36354.98,
+                      "budget": 21831.186523054992
                     }
                   },
                   "pneus": {
@@ -1244380,8 +1244380,8 @@
                     "ventes": null,
                     "pb": {
                       "prior_year": 8774.88,
-                      "budget": 5908.910292056039,
-                      "real": 8490.46
+                      "real": 8490.46,
+                      "budget": 5908.910292056039
                     }
                   },
                   "pneus": {
@@ -1249773,8 +1249773,8 @@
                     "ventes": null,
                     "pb": {
                       "prior_year": 29675.409999999996,
-                      "budget": 27740.096815111032,
-                      "real": 44845.44
+                      "real": 44845.44,
+                      "budget": 27740.096815111032
                     }
                   },
                   "pneus": {
@@ -1255186,8 +1255186,8 @@
                     "ventes": null,
                     "pb": {
                       "prior_year": 14248.96,
-                      "budget": 6585.978698967875,
-                      "real": 7973.1900000000005
+                      "real": 7973.1900000000005,
+                      "budget": 6585.978698967875
                     }
                   },
                   "pneus": {
@@ -1260579,8 +1260579,8 @@
                     "ventes": null,
                     "pb": {
                       "prior_year": 43924.369999999995,
-                      "budget": 34326.075514078904,
-                      "real": 52818.630000000005
+                      "real": 52818.630000000005,
+                      "budget": 34326.075514078904
                     }
                   },
                   "pneus": {
@@ -1265998,8 +1265998,8 @@
                     "ventes": null,
                     "pb": {
                       "prior_year": 7855.65,
-                      "budget": 6081.236454856905,
-                      "real": 7131.57
+                      "real": 7131.57,
+                      "budget": 6081.236454856905
                     }
                   },
                   "pneus": {
@@ -1271391,8 +1271391,8 @@
                     "ventes": null,
                     "pb": {
                       "prior_year": 51780.02,
-                      "budget": 40407.31196893581,
-                      "real": 59950.2
+                      "real": 59950.2,
+                      "budget": 40407.31196893581
                     }
                   },
                   "pneus": {
@@ -1276810,8 +1276810,8 @@
                     "ventes": null,
                     "pb": {
                       "prior_year": 7116.42,
-                      "budget": 6192.4350303911315,
-                      "real": 4366.23
+                      "real": 4366.23,
+                      "budget": 6192.4350303911315
                     }
                   },
                   "pneus": {
@@ -1282203,8 +1282203,8 @@
                     "ventes": null,
                     "pb": {
                       "prior_year": 58896.44,
-                      "budget": 46599.74699932694,
-                      "real": 64316.43
+                      "real": 64316.43,
+                      "budget": 46599.74699932694
                     }
                   },
                   "pneus": {
@@ -1287622,8 +1287622,8 @@
                     "ventes": null,
                     "pb": {
                       "prior_year": 8911.33,
-                      "budget": 5734.369035142476,
-                      "real": 8499.460000000001
+                      "real": 8499.460000000001,
+                      "budget": 5734.369035142476
                     }
                   },
                   "pneus": {
@@ -1293015,8 +1293015,8 @@
                     "ventes": null,
                     "pb": {
                       "prior_year": 67807.77,
-                      "budget": 52334.116034469414,
-                      "real": 72815.89
+                      "real": 72815.89,
+                      "budget": 52334.116034469414
                     }
                   },
                   "pneus": {
@@ -1298434,8 +1298434,8 @@
                     "ventes": null,
                     "pb": {
                       "prior_year": 9461.630000000001,
-                      "budget": 6859.832059492634,
-                      "real": 5777.25
+                      "real": 5777.25,
+                      "budget": 6859.832059492634
                     }
                   },
                   "pneus": {
@@ -1303827,8 +1303827,8 @@
                     "ventes": null,
                     "pb": {
                       "prior_year": 77269.4,
-                      "budget": 76910.6310946351,
-                      "real": 78593.14
+                      "real": 78593.14,
+                      "budget": 76910.6310946351
                     }
                   },
                   "pneus": {
@@ -1309246,8 +1309246,8 @@
                     "ventes": null,
                     "pb": {
                       "prior_year": 8364.220000000001,
-                      "budget": 7588.029921281486,
-                      "real": 18021.03
+                      "real": 18021.03,
+                      "budget": 7588.029921281486
                     }
                   },
                   "pneus": {
@@ -1314639,8 +1314639,8 @@
                     "ventes": null,
                     "pb": {
                       "prior_year": 85633.62,
-                      "budget": 66781.97801524354,
-                      "real": 96614.17000000001
+                      "real": 96614.17000000001,
+                      "budget": 66781.97801524354
                     }
                   },
                   "pneus": {
@@ -1320058,8 +1320058,8 @@
                     "ventes": null,
                     "pb": {
                       "prior_year": 15497.17,
-                      "budget": 5316.021984756461,
-                      "real": 10502.949999999999
+                      "real": 10502.949999999999,
+                      "budget": 5316.021984756461
                     }
                   },
                   "pneus": {
@@ -1325451,8 +1325451,8 @@
                     "ventes": null,
                     "pb": {
                       "prior_year": 101130.79000000001,
-                      "budget": 72098.0,
-                      "real": 107117.12000000001
+                      "real": 107117.12000000001,
+                      "budget": 72098.0
                     }
                   },
                   "pneus": {
@@ -1330938,8 +1330938,8 @@
                     "ventes": null,
                     "pb": {
                       "prior_year": 5742.52,
-                      "budget": 6230.1419357614495,
-                      "real": 4347.889999999999
+                      "real": 4347.889999999999,
+                      "budget": 6230.1419357614495
                     }
                   },
                   "pneus": {
@@ -1336364,8 +1336364,8 @@
                     "ventes": null,
                     "pb": {
                       "prior_year": 5742.52,
-                      "budget": 6230.1419357614495,
-                      "real": 4347.889999999999
+                      "real": 4347.889999999999,
+                      "budget": 6230.1419357614495
                     }
                   },
                   "pneus": {
@@ -1341851,8 +1341851,8 @@
                     "ventes": null,
                     "pb": {
                       "prior_year": 7516.79999999999,
-                      "budget": 5481.777874103031,
-                      "real": 4787.86
+                      "real": 4787.86,
+                      "budget": 5481.777874103031
                     }
                   },
                   "pneus": {
@@ -1347277,8 +1347277,8 @@
                     "ventes": null,
                     "pb": {
                       "prior_year": 13259.31999999999,
-                      "budget": 11711.919809864481,
-                      "real": 9135.75
+                      "real": 9135.75,
+                      "budget": 11711.919809864481
                     }
                   },
                   "pneus": {
@@ -1352764,8 +1352764,8 @@
                     "ventes": null,
                     "pb": {
                       "prior_year": 9182.9,
-                      "budget": 7094.905940221313,
-                      "real": 31809.05
+                      "real": 31809.05,
+                      "budget": 7094.905940221313
                     }
                   },
                   "pneus": {
@@ -1358190,8 +1358190,8 @@
                     "ventes": null,
                     "pb": {
                       "prior_year": 22442.21999999999,
-                      "budget": 18806.825750085794,
-                      "real": 40944.8
+                      "real": 40944.8,
+                      "budget": 18806.825750085794
                     }
                   },
                   "pneus": {
@@ -1363677,8 +1363677,8 @@
                     "ventes": null,
                     "pb": {
                       "prior_year": 13912.76,
-                      "budget": 9161.655498393406,
-                      "real": 17862.83
+                      "real": 17862.83,
+                      "budget": 9161.655498393406
                     }
                   },
                   "pneus": {
@@ -1369103,8 +1369103,8 @@
                     "ventes": null,
                     "pb": {
                       "prior_year": 36354.97999999999,
-                      "budget": 27968.4812484792,
-                      "real": 58807.630000000005
+                      "real": 58807.630000000005,
+                      "budget": 27968.4812484792
                     }
                   },
                   "pneus": {
@@ -1374590,8 +1374590,8 @@
                     "ventes": null,
                     "pb": {
                       "prior_year": 8490.46,
-                      "budget": 9447.043146442393,
-                      "real": 12321.78
+                      "real": 12321.78,
+                      "budget": 9447.043146442393
                     }
                   },
                   "pneus": {
@@ -1380016,8 +1380016,8 @@
                     "ventes": null,
                     "pb": {
                       "prior_year": 44845.43999999999,
-                      "budget": 37415.524394921595,
-                      "real": 71129.41
+                      "real": 71129.41,
+                      "budget": 37415.524394921595
                     }
                   },
                   "pneus": {
@@ -1385503,8 +1385503,8 @@
                     "ventes": null,
                     "pb": {
                       "prior_year": 7973.19,
-                      "budget": 7739.0478702586215,
-                      "real": 5300.27
+                      "real": 5300.27,
+                      "budget": 7739.0478702586215
                     }
                   },
                   "pneus": {
@@ -1390929,8 +1390929,8 @@
                     "ventes": null,
                     "pb": {
                       "prior_year": 52818.62999999999,
-                      "budget": 45154.57226518021,
-                      "real": 76429.68
+                      "real": 76429.68,
+                      "budget": 45154.57226518021
                     }
                   },
                   "pneus": {
@@ -1396416,8 +1396416,8 @@
                     "ventes": null,
                     "pb": {
                       "prior_year": 7131.57,
-                      "budget": 7680.073300072235,
-                      "real": 3691.2800000000007
+                      "real": 3691.2800000000007,
+                      "budget": 7680.073300072235
                     }
                   },
                   "pneus": {
@@ -1401842,8 +1401842,8 @@
                     "ventes": null,
                     "pb": {
                       "prior_year": 59950.19999999999,
-                      "budget": 52834.645565252446,
-                      "real": 80120.96
+                      "real": 80120.96,
+                      "budget": 52834.645565252446
                     }
                   },
                   "pneus": {
@@ -1407329,8 +1407329,8 @@
                     "ventes": null,
                     "pb": {
                       "prior_year": 4366.23,
-                      "budget": 7003.819233570446,
-                      "real": 3470.01
+                      "real": 3470.01,
+                      "budget": 7003.819233570446
                     }
                   },
                   "pneus": {
@@ -1412755,8 +1412755,8 @@
                     "ventes": null,
                     "pb": {
                       "prior_year": 64316.42999999999,
-                      "budget": 59838.46479882289,
-                      "real": 83590.97
+                      "real": 83590.97,
+                      "budget": 59838.46479882289
                     }
                   },
                   "pneus": {
@@ -1418242,8 +1418242,8 @@
                     "ventes": null,
                     "pb": {
                       "prior_year": 8499.46,
-                      "budget": 6640.140925370007,
-                      "real": 9003.5
+                      "real": 9003.5,
+                      "budget": 6640.140925370007
                     }
                   },
                   "pneus": {
@@ -1423668,8 +1423668,8 @@
                     "ventes": null,
                     "pb": {
                       "prior_year": 72815.88999999998,
-                      "budget": 66478.6057241929,
-                      "real": 92594.47
+                      "real": 92594.47,
+                      "budget": 66478.6057241929
                     }
                   },
                   "pneus": {
@@ -1429155,8 +1429155,8 @@
                     "ventes": null,
                     "pb": {
                       "prior_year": 5777.25,
-                      "budget": 9779.446912593714,
-                      "real": 9631.32
+                      "real": 9631.32,
+                      "budget": 9779.446912593714
                     }
                   },
                   "pneus": {
@@ -1434581,8 +1434581,8 @@
                     "ventes": null,
                     "pb": {
                       "prior_year": 78593.13999999998,
-                      "budget": 76258.05263678661,
-                      "real": 102225.79000000001
+                      "real": 102225.79000000001,
+                      "budget": 76258.05263678661
                     }
                   },
                   "pneus": {
@@ -1440068,8 +1440068,8 @@
                     "ventes": null,
                     "pb": {
                       "prior_year": 18021.03,
-                      "budget": 10680.709323510635,
-                      "real": 14951.3
+                      "real": 14951.3,
+                      "budget": 10680.709323510635
                     }
                   },
                   "pneus": {
@@ -1445494,8 +1445494,8 @@
                     "ventes": null,
                     "pb": {
                       "prior_year": 96614.16999999998,
-                      "budget": 86938.76196029724,
-                      "real": 117177.09
+                      "real": 117177.09,
+                      "budget": 86938.76196029724
                     }
                   },
                   "pneus": {
@@ -1450981,8 +1450981,8 @@
                     "ventes": null,
                     "pb": {
                       "prior_year": 10502.9499999999,
-                      "budget": 6788.238039702763,
-                      "real": 11210.039999999999
+                      "real": 11210.039999999999,
+                      "budget": 6788.238039702763
                     }
                   },
                   "pneus": {
@@ -1456407,8 +1456407,8 @@
                     "ventes": null,
                     "pb": {
                       "prior_year": 107117.11999999988,
-                      "budget": 93727.0,
-                      "real": 128387.13
+                      "real": 128387.13,
+                      "budget": 93727.0
                     }
                   },
                   "pneus": {
@@ -1461894,8 +1461894,8 @@
                     "ventes": null,
                     "pb": {
                       "prior_year": 6967.79,
-                      "budget": 32051.62337730767,
-                      "real": 34739.36
+                      "real": 34739.36,
+                      "budget": 32051.62337730767
                     }
                   },
                   "pneus": {
@@ -1467294,8 +1467294,8 @@
                     "ventes": null,
                     "pb": {
                       "prior_year": 141369.50999999998,
-                      "budget": 133820.31954393574,
-                      "real": 139248.94
+                      "real": 139248.94,
+                      "budget": 133820.31954393574
                     }
                   },
                   "pneus": {
